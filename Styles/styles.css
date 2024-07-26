@@ -1,0 +1,107 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #222; /* Color de fondo para el cuerpo */
+    color: white; /* Color de texto blanco para todo el cuerpo */
+}
+
+/* Estilos para el encabezado */
+header {
+    background-color: #333;
+    color: white;
+    padding: 10px; /* Ajusta el padding para cambiar la altura */
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 30px; /* Ajusta el tamaño de la fuente */
+    font-weight: bold; /* Fuente en negrita */
+}
+
+/* Estilos para la barra de navegación */
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 5px; /* Ajusta el espacio entre los elementos de la lista */
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 10px 15px;
+    font-weight: bold; /* Fuente en negrita */
+}
+
+/* Estilos para el contenido principal */
+main {
+    padding: 5px;
+    text-align: center;
+}
+
+.list ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around; /* Distribución equitativa de los elementos */
+}
+
+.list .list {
+    width: calc(19% - 14px); /* Calcula el ancho de cada elemento para cuatro columnas con espacio entre ellos */
+    margin: 14px 0; /* Espacio entre las filas */
+    background-color: #444; /* Opcional: color de fondo para los elementos para mejor visualización */
+    padding: 10px; /* Espacio interno dentro de cada elemento */
+    box-sizing: border-box; /* Asegura que el padding no incremente el ancho total */
+    text-align: center; /* Centra el contenido */
+}
+
+.list .list img {
+    max-width: 100%;
+    height: auto;
+    display: block; /* Asegura que la imagen no sobrepase su contenedor */
+    margin: 0 auto; /* Centra la imagen horizontalmente */
+    transition: transform 0.3s ease; /* Animación al hacer hover */
+}
+
+.list .list img:hover {
+    transform: scale(0.9); /* Reducir tamaño al hacer hover */
+}
+
+/* Estilos para los textos dentro de .list */
+.list .list h3,
+.list .list p {
+    color: white; /* Color de texto blanco */
+    font-weight: bold; /* Fuente en negrita */
+    font-size: 16px; /* Tamaño de la fuente */
+}
+
+/* Estilos para el pie de página */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    margin-top: 5px; /* Espacio entre el contenido y el pie de página */
+    display: flex; /* Añadido para usar flexbox */
+    justify-content: center; /* Centra los elementos horizontalmente */
+    align-items: center; /* Centra los elementos verticalmente */
+}
+
+footer p {
+    margin: 0; /* Quita el margen por defecto del párrafo */
+}
+
+footer img {
+    max-width: 70px; /* Define el ancho máximo de la imagen */
+    height: auto; /* Hace que la altura se ajuste automáticamente al ancho */
+    margin-left: 1px; /* Espacio a la izquierda de la imagen */
+}
