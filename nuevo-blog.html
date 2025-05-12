@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Blog - Jesus Reyes Blog</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <header class="BarraNavegacionSuperior">
+        <div class="ContenedorBarraNavegacion">
+            <div class="TituloPrincipalBlog">
+                <h1>Blog de Noticias Jesus Manuel Reyes Reyes</h1>
+            </div>
+            
+            <nav class="MenuNavegacionPrincipal">
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="articulos.html">Artículos</a></li>
+                    <li><a href="nuevo-blog.html" class="active">Nuevo Blog</a></li>
+                    <li><a href="nuevo-video.html">Nuevo Video</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!--Contenedor para el formulario-->
+    <main class="ContenedorNuevoBlog">
+        <h2 class="TituloSeccion">Crear Nuevo Blog</h2>
+        
+        <!--Formulario del blog-->
+        <div class="ContenedorFormularioBlog">
+            <form class="FormularioBlog">
+                <!--Campo del título del blog-->
+                <div class="GrupoElementosFormulario">
+                    <label for="blog-title">Título del Blog:</label>
+                    <input type="text" id="blog-title" name="blog-title" placeholder="Ingresa un título atractivo" required>
+                </div>
+                
+                <!--Campo para subir la imagen-->
+                <div class="GrupoElementosFormulario">
+                    <label for="blog-image">Imagen del Blog:</label>
+                    <div class="ContenedorCargaImagen">
+                        <input type="file" id="blog-image" name="blog-image" accept="image/*" required>
+                        <!--Botón para seleciconar la imagen-->
+                        <label for="blog-image" class="BotonSeleccionArchivo">Seleccionar Imagen</label>
+                    </div>
+                    
+                    <!--Vista previa imagen-->
+                    <div class="VistaPreviewImagen">
+                        <p id="preview-text">Vista previa de la imagen</p>
+                        <img src="" alt="Vista previa" id="preview-image">
+                    </div>
+                </div>
+                
+                <!--Descripción del blog-->
+                <div class="GrupoElementosFormulario">
+                    <label for="blog-description">Descripción del Blog:</label>
+                    <textarea id="blog-description" name="blog-description" rows="5" placeholder="Escribe una breve descripción de tu blog" required></textarea>
+                </div>
+                
+                <!--Botón para la vista previa-->
+                <div class="GrupoElementosFormulario">
+                    <button type="button" id="preview-button" class="BotonVistaPrevia">Ver Vista Previa</button>
+                </div>
+            </form>
+            
+            <!--Vista previa del blog-->
+            <div class="VistaPreviewPublicacionBlog">
+                <h3>Vista previa del blog</h3>
+                
+                <div class="ArticuloVistaPrevia">
+                    <div class="ContenidoVistaPrevia">
+                        <h4 class="TituloVistaPrevia" id="preview-title-display">Título de ejemplo</h4>
+                        <p class="DescripcionVistaPrevia" id="preview-description-display">
+                            Descripción de ejemplo para mostrar cómo se vería tu blog una vez publicado.
+                        </p>
+                    </div>
+                    <div class="ContenedorImagenVistaPrevia">
+                        <img src="" alt="Imagen de ejemplo" id="preview-article-image">
+                    </div>
+                </div>
+                
+                <div class="GrupoElementosFormulario">
+                    <button type="submit" class="BotonPublicar">Publicar Blog</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('blog-image').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const previewImage = document.getElementById('preview-image');
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    
+                    //Actualizar la imagen en la vista previa
+                    document.getElementById('preview-article-image').src = e.target.result;
+                    
+                    //Cambiar el texto de la vista previa
+                    document.getElementById('preview-text').textContent = 'Imagen seleccionada:';
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Función para actualizar la vista previa del blog con el título y descripción
+        document.getElementById('preview-button').addEventListener('click', function() {
+            const title = document.getElementById('blog-title').value || 'Título de ejemplo';
+            const description = document.getElementById('blog-description').value || 'Asi es cómo se vería tu blog una vez publicado.';
+            
+            document.getElementById('preview-title-display').textContent = title;
+            document.getElementById('preview-description-display').textContent = description;
+        });
+    </script>
+</body>
+</html>

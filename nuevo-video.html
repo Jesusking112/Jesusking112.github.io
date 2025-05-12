@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Video - Jesus Reyes Blog</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <header class="BarraNavegacionSuperior">
+        <div class="ContenedorBarraNavegacion">
+            <div class="TituloPrincipalBlog">
+                <h1>Blog de Noticias Jesus Manuel Reyes Reyes</h1>
+            </div>
+            
+            <nav class="MenuNavegacionPrincipal">
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="articulos.html">Artículos</a></li>
+                    <li><a href="nuevo-blog.html">Nuevo Blog</a></li>
+                    <li><a href="nuevo-video.html" class="active">Nuevo Video</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="ContenedorNuevoVideo">
+        <h2 class="TituloSeccion">Compartir Nuevo Video</h2>
+        
+        <div class="ContenedorFormularioVideo">
+            <form class="FormularioVideo">
+                <div class="GrupoElementosFormulario">
+                    <label for="video-title">Título del Video:</label>
+                    <input type="text" id="video-title" name="video-title" placeholder="Ingresa un título descriptivo" required>
+                </div>
+                
+                <!--Campo para subir el video-->
+                <div class="GrupoElementosFormulario">
+                    <label for="video-file">Seleccionar Video:</label>
+                    <div class="ContenedorCargaVideo">
+                        <input type="file" id="video-file" name="video-file" accept="video/*" required>
+                        <!--Botón para seleciconar el video-->
+                        <label for="video-file" class="BotonSeleccionArchivo">Seleccionar Video</label>
+                    </div>
+                    
+                    <!--Información del video-->
+                    <div class="InformacionArchivo" id="file-info">
+                        <p>Ningún archivo seleccionado</p>
+                    </div>
+                    
+                    <!--Vista previa video-->
+                    <div class="VistaPreviewVideo">
+                        <p id="preview-text">Vista previa del video</p>
+                        <video id="preview-video" controls style="display: none;">
+                            Tu navegador no soporta la reproducción de videos.
+                        </video>
+                    </div>
+                </div>
+                
+                <!--Botón para la vista previa-->
+                <div class="GrupoElementosFormulario">
+                    <button type="button" id="preview-button" class="BotonVistaPrevia">Ver Vista Previa</button>
+                </div>
+            </form>
+            
+            <div class="VistaPreviewPublicacionVideo">
+                <h3>Vista previa de la publicación</h3>
+                
+                <div class="ArticuloVideoVistaPrevia">
+                    <h4 class="TituloVistaPrevia" id="preview-title-display">Título de ejemplo</h4>
+                    
+                    <div class="ContenedorVideoVistaPrevia">
+                        <video id="preview-publication-video" controls>
+                            Tu navegador no soporta la reproducción de videos.
+                        </video>
+                    </div>
+                </div>
+                
+                <div class="GrupoElementosFormulario">
+                    <button type="submit" class="BotonPublicar">Publicar Video</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Función para mostrar el video seleccionado en la vista previa
+        document.getElementById('video-file').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Mostrar información del archivo
+                const fileInfo = document.getElementById('file-info');
+                fileInfo.innerHTML = `
+                    <p><strong>Archivo:</strong> ${file.name}</p>
+                    <p><strong>Tamaño:</strong> ${Math.round(file.size / 1024)} KB</p>
+                    <p><strong>Tipo:</strong> ${file.type}</p>
+                `;
+                
+                // Crear URL para el video
+                const videoURL = URL.createObjectURL(file);
+                
+                // Actualizar la vista previa del video
+                const previewVideo = document.getElementById('preview-video');
+                previewVideo.src = videoURL;
+                previewVideo.style.display = 'block';
+                
+                // Cambiar el texto de la vista previa
+                document.getElementById('preview-text').textContent = 'Video seleccionado:';
+                
+                // También actualizar el video en la vista previa de publicación
+                document.getElementById('preview-publication-video').src = videoURL;
+            }
+        });
+        
+        // Función para actualizar la vista previa de la publicación con el título
+        document.getElementById('preview-button').addEventListener('click', function() {
+            const title = document.getElementById('video-title').value || 'Título de ejemplo';
+            document.getElementById('preview-title-display').textContent = title;
+        });
+    </script>
+</body>
+</html>
