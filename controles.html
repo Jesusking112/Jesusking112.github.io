@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Controls</title>
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .volver {
+      display: inline-block;
+      background-color: #2c2c2c;
+      color: #f0f0f0;
+      padding: 10px 15px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      box-shadow: 0 0 6px #000;
+      transition: background 0.3s;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+    .volver:hover {
+      background-color: #3a3a3a;
+    }
+    .idioma {
+      margin-top: 10px;
+    }
+    select {
+      background-color: #2c2c2c;
+      color: #f0f0f0;
+      border: none;
+      padding: 5px;
+      border-radius: 4px;
+    }
+    .control-item {
+      margin-top: 40px;
+    }
+    .control-item img {
+      max-width: 300px;
+      display: block;
+      margin: 0 auto;
+    }
+    .descripcion {
+      margin-top: 10px;
+      font-size: 18px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5em;
+    }
+  </style>
+  <script>
+    function cambiarIdioma() {
+      const idioma = document.getElementById("selectorIdioma").value;
+      const textos = {
+        es: [
+          "Usa las teclas W,A,S,D o flechas para moverte y la barra espaciadora para interactuar o las flechas de arriba,abajo,izquierda,derecha.",
+          "Presiona clic derecho para abrir el menu, regresar y la espada funciona como un raton normal con clic izquierdo.",
+          "la barra espaciadora sirve tambien para seleccionar en caso que el raton no sirva y precionar Esc para retroceder."
+        ],
+        en: [
+          "Use the W,A,S,D keys or arrow keys to move and the space bar to interact, or the up,down,left,right arrow keys.",
+          "Right-click to open the menu, return, and the sword works like a normal mouse with a left click.",
+          "The space bar can also be used to select items if the mouse is not working and press Esc to go back."
+
+        ]
+      };
+      document.getElementById("desc1").innerText = textos[idioma][0];
+      document.getElementById("desc2").innerText = textos[idioma][1];
+      document.getElementById("desc3").innerText = textos[idioma][2];
+    }
+  </script>
+</head>
+<body>
+
+  <a href="oficial.html" class="volver">← Regresar</a>
+
+  <h1>Controls</h1>
+
+  <div class="idioma">
+    <label for="selectorIdioma">Lenguage:</label>
+    <select id="selectorIdioma" onchange="cambiarIdioma()">
+      <option value="es">Español</option>
+      <option value="en">English</option>
+    </select>
+  </div>
+
+  <div class="control-item">
+    <img src="imgs/img1.png" alt="Movimiento">
+    <div class="descripcion" id="desc1">
+      Usa las teclas W,A,S,D o flechas para moverte y la barra espaciadora para interactuar o las flechas de arriba,abajo,izquierda,derecha.
+    </div>
+  </div>
+
+  <div class="control-item">
+    <div class="descripcion" id="desc2">
+      Presiona clic derecho para abrir el menu, regresar y la espada funciona como un raton normal con clic izquierdo.
+    </div>
+
+  </div>
+    <div class="control-item">
+    <div class="descripcion" id="desc3">
+      la barra espaciadora sirve tambien para seleccionar en caso que el raton no sirva y precionar Esc para retroceder.
+    </div>
+  </div>
+
+</body>
+</html>
