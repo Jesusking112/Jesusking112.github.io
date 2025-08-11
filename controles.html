@@ -63,18 +63,21 @@
         es: [
           "Usa las teclas W,A,S,D o flechas para moverte y la barra espaciadora para interactuar o las flechas de arriba,abajo,izquierda,derecha.",
           "Presiona clic derecho para abrir el menu, regresar y la espada funciona como un raton normal con clic izquierdo.",
-          "la barra espaciadora sirve tambien para seleccionar en caso que el raton no sirva y precionar Esc para retroceder."
+          "la barra espaciadora sirve tambien para seleccionar en caso que el raton no sirva y precionar Esc para retroceder.",
+          "(1) El JOYSTICK tiene arriba,abajo,izquierda,derecha y la mezcla entre los 4. (2) X funciona como clic derecho o selección. (3) A al mantenerlo presionado podras correr. (4) B Sirve para abrir el menu,cancelar,regresar."
         ],
         en: [
           "Use the W,A,S,D keys or arrow keys to move and the space bar to interact, or the up,down,left,right arrow keys.",
           "Right-click to open the menu, return, and the sword works like a normal mouse with a left click.",
-          "The space bar can also be used to select items if the mouse is not working and press Esc to go back."
+          "The space bar can also be used to select items if the mouse is not working and press Esc to go back.",
+          "(1) The JOYSTICK has up, down, left, right, and a combination of the four. (2) X functions as a right click or selection. (3) Hold down A to run. (4) B is used to open the menu, cancel, or return."
 
         ]
       };
       document.getElementById("desc1").innerText = textos[idioma][0];
       document.getElementById("desc2").innerText = textos[idioma][1];
       document.getElementById("desc3").innerText = textos[idioma][2];
+      document.getElementById("desc4").innerText = textos[idioma][3];
     }
   </script>
 </head>
@@ -111,5 +114,15 @@
     </div>
   </div>
 
+  </div>
+    <div class="control-item">
+    <img src="imgs/img2.png" alt="Movimiento">
+    <div class="descripcion" id="desc4">
+      (1) El JOYSTICK tiene arriba,abajo,izquierda,derecha y la mezcla entre los 4.
+      (2) X funciona como clic derecho o selección.
+      (3) A al mantenerlo presionado podras correr.
+      (4) B Sirve para abrir el menu,cancelar,regresar.
+    </div>
+  </div>
 </body>
 </html>
