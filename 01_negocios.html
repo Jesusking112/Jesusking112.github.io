@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Barberías (Administrador)</title>
+
+<script src="modulo_conexion.js"></script>
+<script src="01_agenda.js"></script>
+<link rel="stylesheet" href="01_agenda.css" />
+
+<style>
+  .grid-negocios {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .card-negocio {
+    border: 1px solid var(--borde);
+    background: var(--tarjeta-2);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card-negocio .nombre { font-size: 16px; font-weight: 700; color: var(--texto); }
+  .card-negocio .datos-neg { font-size: 12px; color: var(--tenue); line-height: 1.6; }
+  .card-negocio .datos-neg b { color: var(--texto); font-weight: 600; }
+  .pill {
+    display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 8px;
+    border-radius: 999px; border: 1px solid var(--borde);
+  }
+  .pill.ok { color: var(--ok); background: var(--ok-suave); border-color: rgba(16,185,129,0.5); }
+  .pill.aviso { color: var(--aviso); background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.5); }
+  .pill.expira { color: #fca5a5; background: var(--peligro-suave); border-color: rgba(239,68,68,0.4); }
+  .card-negocio .acciones a {
+    display: block; text-align: center; text-decoration: none;
+    padding: 9px 10px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    border: 1px solid var(--primario); color: #fff; background: var(--primario);
+  }
+  .card-negocio .acciones a:hover { background: var(--primario-hover); }
+  .card-nuevo {
+    border: 1px dashed var(--borde); background: transparent;
+    align-items: center; justify-content: center; cursor: pointer;
+    min-height: 130px; color: var(--tenue); font-weight: 600; text-align: center;
+  }
+  .card-nuevo:hover { border-color: var(--primario); color: var(--texto); }
+  .card-nuevo .mas { font-size: 26px; line-height: 1; }
+    .dos-col { display: flex; gap: 10px; }
+    .btn-sec {
+      border: 1px solid var(--borde, #374151);
+      background: var(--tarjeta-2, #0f172a);
+      color: var(--texto, #f3f4f6);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-sec:hover { border-color: var(--primario, #3b82f6); }
+  .dos-col .campo { flex: 1; }
+</style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-4"></path>
+        </svg>
+      </div>
+      <div>
+        <h1>Personal</h1>
+        <p>Panel del administrador. Crea personal y vincula sus roles y personal.</p>
+      </div>
+    </header>
+
+    <div class="seccion">
+      <h3>Tus barberías</h3>
+      <p class="sub">Cada barbería usa su propio par de roles y su propio calendario aislado.</p>
+      <div id="gridNegocios" class="grid-negocios">
+        <p class="vacio">Cargando barberías...</p>
+      </div>
+      <p class="mensaje" id="msg"></p>
+    </div>
+  </div>
+
+  <div class="modal-fondo" id="modalFondo">
+    <div class="modal">
+      <h3>Nueva barbería</h3>
+      <p class="sub">Define sus roles, horario y vigencia. Los roles debes haberlos creado antes en tu tabla de modos.</p>
+
+      <div class="campo">
+        <label for="nNombre">Nombre de la personal</label>
+        <input type="text" id="nNombre" placeholder="Ej. Barbería Norte" autocomplete="off" maxlength="80" />
+      </div>
+
+      <div class="dos-col">
+        <div class="campo">
+          <label for="nRolRes">Rol para RESERVAR</label>
+          <input type="number" id="nRolRes" placeholder="Ej. 5" min="2" />
+        </div>
+        <div class="campo">
+          <label for="nRolGes">Rol para GESTIONAR</label>
+          <input type="number" id="nRolGes" placeholder="Ej. 6" min="2" />
+        </div>
+      </div>
+
+      <div class="dos-col">
+        <div class="campo">
+          <label for="nIntervalo">Intervalo de citas</label>
+          <select id="nIntervalo">
+            <option value="15">Cada 15 min</option>
+            <option value="30" selected>Cada 30 min</option>
+            <option value="45">Cada 45 min</option>
+            <option value="60">Cada 60 min</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="nMeses">Vigencia</label>
+          <select id="nMeses">
+            <option value="d15">Prueba: 15 días</option>
+            <option value="0">Sin límite</option>
+            <option value="1">1 mes</option>
+            <option value="3">3 meses</option>
+            <option value="6">6 meses</option>
+            <option value="12">12 meses</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="nCampoExtra">Dato adicional a pedir al reservar (opcional)</label>
+        <input type="text" id="nCampoExtra" placeholder="Ej. Teléfono, Matrícula, Nº de mesa…" autocomplete="off" maxlength="40" />
+        <p class="ayuda" style="margin:6px 0 0;">Déjalo vacío si solo hace falta el nombre. Sirve para adaptar
+          el módulo a otros rubros (no solo negocios).</p>
+      </div>
+
+      <div class="dos-col">
+        <div class="campo">
+          <label for="nHoraIni">Hora de apertura</label>
+          <input type="time" id="nHoraIni" value="09:00" />
+        </div>
+        <div class="campo">
+          <label for="nHoraFin">Hora de cierre</label>
+          <input type="time" id="nHoraFin" value="20:00" />
+        </div>
+      </div>
+
+      <div class="dos-col">
+        <div class="campo">
+          <label for="nClaveAdmin">Clave del administrador del local</label>
+          <input type="text" id="nClaveAdmin" placeholder="Para crear barberos" autocomplete="off" maxlength="60" />
+        </div>
+        <div class="campo">
+          <label for="nClaveTrab">Clave para los que trabajan</label>
+          <input type="text" id="nClaveTrab" placeholder="Clave del personal" autocomplete="off" maxlength="60" />
+        </div>
+      </div>
+
+      <div class="acciones">
+        <button class="btn-linea" id="nCerrar">Cerrar</button>
+        <button class="btn-primario" id="nConfirmar">Crear negocio</button>
+      </div>
+      <p class="mensaje" id="modalMensaje"></p>
+    </div>
+  </div>
+
+  <div class="modal-fondo" id="edFondo">
+    <div class="modal">
+      <h3>Editar barbería</h3>
+      <p class="sub" id="edSub"></p>
+
+      <div class="campo">
+        <label for="edNombre">Nombre</label>
+        <input type="text" id="edNombre" autocomplete="off" maxlength="80" />
+      </div>
+
+      <div class="dos-col">
+        <div class="campo">
+          <label for="edIntervalo">Intervalo entre citas</label>
+          <select id="edIntervalo">
+            <option value="15">15 minutos</option>
+            <option value="20">20 minutos</option>
+            <option value="30">30 minutos</option>
+            <option value="45">45 minutos</option>
+            <option value="60">1 hora</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="edCampoExtra">Dato adicional (opcional)</label>
+          <input type="text" id="edCampoExtra" placeholder="Ej. Teléfono" autocomplete="off" maxlength="40" />
+        </div>
+      </div>
+
+      <div class="dos-col">
+        <div class="campo">
+          <label for="edHoraIni">Hora de apertura</label>
+          <input type="time" id="edHoraIni" />
+        </div>
+        <div class="campo">
+          <label for="edHoraFin">Hora de cierre</label>
+          <input type="time" id="edHoraFin" />
+        </div>
+      </div>
+
+      <div class="dos-col">
+        <div class="campo">
+          <label for="edClaveAdmin">Clave del administrador</label>
+          <input type="text" id="edClaveAdmin" autocomplete="off" maxlength="60" />
+        </div>
+        <div class="campo">
+          <label for="edClaveTrab">Clave del personal</label>
+          <input type="text" id="edClaveTrab" autocomplete="off" maxlength="60" />
+        </div>
+      </div>
+
+      <p class="ayuda" style="margin:0 0 12px;">Cambiar el intervalo u horario no borra los horarios ya
+        marcados, pero la grilla se recalcula: revisa la plantilla después.</p>
+
+      <div class="acciones">
+        <button class="btn-linea" id="edCerrar">Cerrar</button>
+        <button class="btn-primario" id="edGuardar">Guardar cambios</button>
+      </div>
+      <p class="mensaje" id="edMsg"></p>
+    </div>
+  </div>
+
+  <!-- MODAL: renovar / extender vigencia -->
+  <div class="modal-fondo" id="rnFondo">
+    <div class="modal" style="max-width: 440px;">
+      <h3>Renovar vigencia</h3>
+      <p class="sub" id="rnSub"></p>
+
+      <div class="campo">
+        <label for="rnTiempo">Tiempo a añadir</label>
+        <select id="rnTiempo">
+          <option value="d15">15 días (prueba)</option>
+          <option value="1">1 mes</option>
+          <option value="3">3 meses</option>
+          <option value="6">6 meses</option>
+          <option value="12">12 meses</option>
+          <option value="sin">Sin límite</option>
+        </select>
+        <p class="ayuda" style="margin:6px 0 0;">Si la barbería sigue vigente, el tiempo se suma a su fecha
+          actual. Si ya expiró, se cuenta desde hoy.</p>
+      </div>
+
+      <div class="acciones">
+        <button class="btn-linea" id="rnCerrar">Cerrar</button>
+        <button class="btn-primario" id="rnGuardar">Renovar</button>
+      </div>
+      <p class="mensaje" id="rnMsg"></p>
+    </div>
+  </div>
+
+<script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+    const A = window.Agenda;
+
+    let negociosCache = [];
+    let edId = null;
+    let rnId = null;
+
+    function setMsg(txt, tipo) {
+      const m = $("msg");
+      if (!m) return;
+      m.textContent = txt || "";
+      m.className = "mensaje" + (tipo ? " " + tipo : "");
+    }
+
+    function badgeVigencia(n) {
+      if (!n.fecha_expira) return '<span class="pill ok">Sin límite</span>';
+      if (n.expirado) return '<span class="pill expira">Expirada</span>';
+      const d = n.dias_restantes;
+      const clase = (d != null && d <= 7) ? "aviso" : "ok";
+      return '<span class="pill ' + clase + '">' + (d != null ? d + ' días' : 'Vigente') + '</span>';
+    }
+
+    function render(negocios) {
+      const cont = $("gridNegocios");
+      if (!cont) return;
+      let html = "";
+      (negocios || []).forEach((n) => {
+        const q = "?negocio=" + encodeURIComponent(n.id);
+        html += '<div class="card-negocio">' +
+          '<div class="nombre">' + A.esc(n.nombre) + '</div>' +
+          '<div class="datos-neg">' +
+            'Roles: <b>' + A.esc(n.rol_reservar) + '</b> reservar / <b>' + A.esc(n.rol_gestionar) + '</b> gestionar<br>' +
+            'Intervalo: <b>' + A.esc(n.intervalo_min) + ' min</b> · ' + A.esc(n.hora_inicio) + '–' + A.esc(n.hora_fin) + '<br>' +
+            'Vigencia: ' + badgeVigencia(n) +
+          '</div>' +
+          '<div class="acciones" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">' +
+            '<a href="01_barberos.html' + q + '">Entrar a barberos</a>' +
+            '<button type="button" class="btn-sec btn-editar" data-id="' + n.id + '">Editar</button>' +
+            '<button type="button" class="btn-sec btn-renovar" data-id="' + n.id + '">Renovar</button>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '<div class="card-negocio card-nuevo" id="cardNuevo">' +
+        '<div class="mas">+</div><div>Crear nueva barbería</div></div>';
+      cont.innerHTML = html;
+      const cn = $("cardNuevo");
+      if (cn) cn.addEventListener("click", abrirModal);
+
+      cont.querySelectorAll(".btn-editar").forEach((b) =>
+        b.addEventListener("click", () => abrirEditar(b.dataset.id)));
+      cont.querySelectorAll(".btn-renovar").forEach((b) =>
+        b.addEventListener("click", () => abrirRenovar(b.dataset.id)));
+    }
+
+    async function cargar() {
+      const res = await A.api.listarNegocios();
+      if (res && res.error) { setMsg(res.error, "error"); $("gridNegocios").innerHTML = ""; negociosCache = []; render([]); return; }
+      const negocios = (res && res.negocios) ? res.negocios : [];
+      negociosCache = negocios;
+      setMsg(negocios.length ? "" : "Aún no hay barberías. Crea la primera.");
+      render(negocios);
+    }
+
+    function abrirModal() {
+      ["nNombre","nRolRes","nRolGes","nClaveAdmin","nClaveTrab","nCampoExtra"].forEach((id) => { $(id).value = ""; });
+      $("nIntervalo").value = "30";
+      $("nMeses").value = "d15";
+      $("nHoraIni").value = "09:00";
+      $("nHoraFin").value = "20:00";
+      $("modalMensaje").textContent = "";
+      $("modalMensaje").className = "mensaje";
+      $("modalFondo").classList.add("abierto");
+      $("nNombre").focus();
+    }
+    function cerrarModal() { $("modalFondo").classList.remove("abierto"); }
+
+    async function confirmar() {
+      const vig = String($("nMeses").value || "0");
+      const esPrueba = vig.charAt(0) === "d";
+
+      const datos = {
+        nombre: $("nNombre").value.trim(),
+        rol_reservar: Number($("nRolRes").value),
+        rol_gestionar: Number($("nRolGes").value),
+        intervalo_min: Number($("nIntervalo").value),
+        hora_inicio: $("nHoraIni").value || "09:00",
+        hora_fin: $("nHoraFin").value || "20:00",
+        clave_admin: $("nClaveAdmin").value.trim(),
+        clave_trabajador: $("nClaveTrab").value.trim(),
+        campo_extra: $("nCampoExtra").value.trim(),
+        meses: esPrueba ? 0 : Number(vig),
+        dias: esPrueba ? Number(vig.slice(1)) : 0
+      };
+      if (!datos.nombre) { return errModal("Escribe el nombre de la barbería."); }
+      if (!datos.rol_reservar || !datos.rol_gestionar) { return errModal("Indica los dos roles."); }
+      if (datos.rol_reservar === datos.rol_gestionar) { return errModal("Los roles deben ser distintos."); }
+
+      $("nConfirmar").disabled = true;
+      $("modalMensaje").textContent = "Creando...";
+      $("modalMensaje").className = "mensaje";
+
+      const res = await A.api.crearNegocio(datos);
+      $("nConfirmar").disabled = false;
+      if (res && res.error) { return errModal(res.error); }
+
+      cerrarModal();
+      setMsg("Barbería creada.", "ok");
+      await cargar();
+    }
+    function errModal(txt) { $("modalMensaje").textContent = txt; $("modalMensaje").className = "mensaje error"; }
+
+    function abrirEditar(id) {
+      const n = negociosCache.find((x) => String(x.id) === String(id));
+      if (!n) { setMsg("No se encontró la barbería.", "error"); return; }
+      edId = n.id;
+
+      $("edSub").textContent = n.nombre;
+      $("edNombre").value = n.nombre || "";
+      $("edIntervalo").value = String(n.intervalo_min || 30);
+      $("edHoraIni").value = n.hora_inicio || "09:00";
+      $("edHoraFin").value = n.hora_fin || "20:00";
+      $("edClaveAdmin").value = n.clave_admin || "";
+      $("edClaveTrab").value = n.clave_trabajador || "";
+      $("edCampoExtra").value = n.campo_extra || "";
+      $("edMsg").textContent = ""; $("edMsg").className = "mensaje";
+      $("edFondo").classList.add("abierto");
+    }
+
+    async function guardarEditar() {
+      if (!edId) return;
+      const datos = {
+        id: edId,
+        nombre: $("edNombre").value.trim(),
+        intervalo_min: Number($("edIntervalo").value),
+        hora_inicio: $("edHoraIni").value || "09:00",
+        hora_fin: $("edHoraFin").value || "20:00",
+        clave_admin: $("edClaveAdmin").value.trim(),
+        clave_trabajador: $("edClaveTrab").value.trim(),
+        campo_extra: $("edCampoExtra").value.trim()
+      };
+      if (!datos.nombre) { $("edMsg").textContent = "El nombre no puede quedar vacío."; $("edMsg").className = "mensaje error"; return; }
+
+      $("edGuardar").disabled = true;
+      $("edMsg").textContent = "Guardando..."; $("edMsg").className = "mensaje";
+      const res = await A.api.editarNegocio(datos);
+      $("edGuardar").disabled = false;
+      if (res && res.error) { $("edMsg").textContent = res.error; $("edMsg").className = "mensaje error"; return; }
+
+      $("edFondo").classList.remove("abierto");
+      setMsg("Barbería actualizada.", "ok");
+      await cargar();
+    }
+
+    function abrirRenovar(id) {
+      const n = negociosCache.find((x) => String(x.id) === String(id));
+      if (!n) { setMsg("No se encontró la barbería.", "error"); return; }
+      rnId = n.id;
+
+      $("rnSub").textContent = n.nombre + " — " +
+        (n.fecha_expira ? ("expira el " + n.fecha_expira) : "sin límite actualmente");
+      $("rnTiempo").value = "1";
+      $("rnMsg").textContent = ""; $("rnMsg").className = "mensaje";
+      $("rnFondo").classList.add("abierto");
+    }
+
+    async function guardarRenovar() {
+      if (!rnId) return;
+      const v = String($("rnTiempo").value);
+      const datos = { id: rnId };
+      if (v === "sin") datos.sin_limite = true;
+      else if (v.charAt(0) === "d") datos.dias = Number(v.slice(1));
+      else datos.meses = Number(v);
+
+      $("rnGuardar").disabled = true;
+      $("rnMsg").textContent = "Renovando..."; $("rnMsg").className = "mensaje";
+      const res = await A.api.renovarNegocio(datos);
+      $("rnGuardar").disabled = false;
+      if (res && res.error) { $("rnMsg").textContent = res.error; $("rnMsg").className = "mensaje error"; return; }
+
+      $("rnFondo").classList.remove("abierto");
+      setMsg((res && res.mensaje) ? res.mensaje : "Vigencia actualizada.", "ok");
+      await cargar();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const ok = await window.Plataforma.protegerPagina([1]);
+      if (!ok) return;
+
+      $("nConfirmar").addEventListener("click", confirmar);
+      $("nCerrar").addEventListener("click", cerrarModal);
+      $("modalFondo").addEventListener("click", (e) => { if (e.target === $("modalFondo")) cerrarModal(); });
+      $("nNombre").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.nativeEvent?.isComposing && e.keyCode !== 229) confirmar();
+      });
+
+      $("edGuardar").addEventListener("click", guardarEditar);
+      $("edCerrar").addEventListener("click", () => $("edFondo").classList.remove("abierto"));
+      $("edFondo").addEventListener("click", (e) => {
+        if (e.target === $("edFondo")) $("edFondo").classList.remove("abierto");
+      });
+
+      $("rnGuardar").addEventListener("click", guardarRenovar);
+      $("rnCerrar").addEventListener("click", () => $("rnFondo").classList.remove("abierto"));
+      $("rnFondo").addEventListener("click", (e) => {
+        if (e.target === $("rnFondo")) $("rnFondo").classList.remove("abierto");
+      });
+
+      await cargar();
+    });
+  })();
+</script>
+</body>
+</html>

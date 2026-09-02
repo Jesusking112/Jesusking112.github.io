@@ -1,0 +1,379 @@
+:root {
+  --fondo: #020303;
+  --fondo-2: #d2d4c9;
+  --tarjeta: #9e918f;
+  --borde: #1e2b45;
+  --texto: #e6edf7;
+  --texto-suave: #020202;
+  --primario: #2563eb;
+  --primario-hover: #1d4ed8;
+  --exito: #ffffff;
+  --error: #ffffff;
+  --radio: 18px;
+}
+
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body { 
+  background: var(--fondo); 
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  color: var(--texto);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background:
+    radial-gradient(1000px 600px at 50% -10%, rgba(37, 99, 235, 0.25) 0%, transparent 70%),
+    radial-gradient(800px 500px at 100% 100%, rgba(30, 43, 69, 0.4) 0%, transparent 60%),
+    var(--fondo);
+  background-attachment: fixed;
+}
+
+.contenedor {
+  width: 100%;
+  max-width: 410px;
+  margin: auto;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.marca .logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primario) 0%, #1d4ed8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5);
+}
+
+.marca .logo svg { 
+  width: 24px; 
+  height: 24px; 
+  color: #ffffff; 
+}
+
+.marca .nombre { 
+  font-size: 21px; 
+  font-weight: 800; 
+  letter-spacing: -0.4px; 
+}
+
+.tarjeta {
+  background: var(--tarjeta);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radio);
+  padding: 36px 30px;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.6),
+    0 0 0 1px var(--borde);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.tarjeta h1 { 
+  font-size: 24px; 
+  font-weight: 800; 
+  margin-bottom: 6px; 
+  letter-spacing: -0.5px;
+}
+
+.tarjeta .subtitulo { 
+  color: var(--texto-suave); 
+  font-size: 14px; 
+  margin-bottom: 26px; 
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
+.campo { 
+  margin-bottom: 20px; 
+}
+
+.campo label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--texto-suave);
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.input-wrap { 
+  position: relative; 
+  display: flex;
+  align-items: center;
+}
+
+.input-wrap svg {
+  position: absolute; 
+  left: 16px; 
+  top: 50%; 
+  transform: translateY(-50%);
+  width: 18px; 
+  height: 18px; 
+  color: var(--texto-suave);
+  opacity: 0.6;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+input[type="text"], 
+input[type="password"] {
+  width: 100%;
+  padding: 14px 16px 14px 46px;
+  background: var(--fondo-2);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  color: #000000;
+  font-size: 15px;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+input[type="text"]::placeholder, 
+input[type="password"]::placeholder {
+  color: #666;
+  font-weight: 400;
+}
+
+input:hover {
+  background: #e2e4d9;
+}
+
+input:focus {
+  background: #ffffff;
+  border-color: var(--primario);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25), 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+.input-wrap:focus-within svg {
+  color: var(--primario);
+  opacity: 1;
+}
+
+#txtCaptcha {
+  padding-left: 16px !important;
+}
+
+#canvasCaptcha {
+  border-radius: 10px !important;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.btn-ojo {
+  position: absolute; 
+  right: 10px; 
+  top: 50%; 
+  transform: translateY(-50%);
+  background: transparent; 
+  border: none; 
+  cursor: pointer; 
+  color: var(--texto-suave);
+  padding: 6px 8px; 
+  border-radius: 8px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.btn-ojo:hover { 
+  opacity: 1; 
+  background: rgba(0,0,0,0.05);
+}
+
+.btn-ojo svg { 
+  width: 18px; 
+  height: 18px; 
+  position: static; 
+  transform: none; 
+}
+
+button.principal {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, var(--primario) 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+  box-shadow: 0 6px 20px -4px rgba(37, 99, 235, 0.5);
+}
+
+button.principal:hover { 
+  box-shadow: 0 8px 25px -4px rgba(37, 99, 235, 0.6);
+  transform: translateY(-2px);
+}
+
+button.principal:active { 
+  transform: translateY(0); 
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.4);
+}
+
+button.principal:disabled { 
+  opacity: 0.5; 
+  cursor: not-allowed; 
+  transform: none;
+  box-shadow: none;
+}
+
+.mensaje {
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  min-height: 20px;
+}
+
+.mensaje.error { color: #b91c1c; }
+.mensaje.exito { color: #15803d; }
+
+.nota-seguridad {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  font-size: 12px;
+  color: var(--texto-suave);
+  opacity: 0.8;
+  text-align: center;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.nota-seguridad svg { 
+  width: 16px; 
+  height: 16px; 
+  flex-shrink: 0; 
+  color: var(--primario);
+}
+
+.panel { display: none; }
+.panel.activo { display: block; }
+
+.bienvenida { 
+  text-align: center; 
+  margin-bottom: 24px; 
+}
+
+.bienvenida .check {
+  width: 60px; 
+  height: 60px; 
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.15); 
+  color: var(--primario);
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  margin: 0 auto 16px;
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+}
+
+.bienvenida .check svg { width: 30px; height: 30px; }
+.bienvenida h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.bienvenida p { color: var(--texto-suave); font-size: 14px; }
+
+.detalle {
+  background: var(--fondo-2);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 6px 18px;
+  margin-bottom: 22px;
+}
+
+.detalle .fila {
+  display: flex; 
+  justify-content: space-between; 
+  gap: 12px;
+  padding: 12px 0; 
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08); 
+  font-size: 13px;
+}
+
+.detalle .fila:last-child { border-bottom: none; }
+.detalle .fila .k { color: var(--texto-suave); opacity: 0.8; }
+.detalle .fila .v { font-weight: 700; text-align: right; word-break: break-all; color: #000; }
+
+button.secundario {
+  width: 100%; 
+  padding: 13px; 
+  background: transparent;
+  border: 2px solid var(--borde); 
+  color: var(--texto-suave);
+  border-radius: 12px; 
+  font-size: 14px; 
+  font-weight: 700; 
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button.secundario:hover { 
+  border-color: var(--primario); 
+  color: var(--primario);
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.pie { 
+  text-align: center; 
+  margin-top: 26px; 
+  font-size: 12px; 
+  color: var(--texto-suave); 
+  opacity: 0.6;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 14px;
+  }
+  
+  .tarjeta {
+    padding: 26px 20px;
+  }
+
+  .campo {
+    margin-bottom: 18px;
+  }
+  
+  input[type="text"], 
+  input[type="password"] {
+    font-size: 16px;
+  }
+}

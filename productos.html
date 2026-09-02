@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tienda de Productos & Software | Sistemas & Contabilidad</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg-main: #ffffff;
+    --bg-soft: #f8fafc;
+    --bg-card: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --primary: #0284c7;
+    --primary-hover: #0369a1;
+    --secondary: #0d9488;
+    --border: #e2e8f0;
+    --accent-gradient: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 10px 25px -5px rgba(2, 132, 199, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+    --shadow-lg: 0 20px 40px -15px rgba(0,0,0,0.06);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+}
+
+.contenedor {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    z-index: 1000;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 85px;
+}
+
+.logo {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+    text-decoration: none;
+}
+
+.logo span {
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2.5rem;
+}
+
+.nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color .2s;
+}
+
+.nav-links a:hover, .nav-links a.activo {
+    color: var(--primary);
+}
+
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.menu-toggle span {
+    width: 24px;
+    height: 2px;
+    background: var(--text-main);
+    transition: 0.3s;
+}
+
+.hero-productos {
+    padding: 4rem 0 3rem 0;
+    text-align: center;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+}
+
+.hero-productos h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 1rem;
+}
+
+.hero-productos h1 span {
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-productos p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.tienda-seccion {
+    padding: 5rem 0;
+}
+
+.grid-productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+}
+
+.producto-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.producto-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: #bae6fd;
+}
+
+.producto-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #e0f2fe;
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    align-self: flex-start;
+    text-transform: uppercase;
+}
+
+.producto-card h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.2rem;
+}
+
+.precio-tag {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--secondary);
+    margin-bottom: 0.5rem;
+}
+
+.compatibilidad {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.producto-card p {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.producto-caracteristicas {
+    list-style: none;
+    margin-bottom: 1.5rem;
+    border-top: 1px dashed var(--border);
+    padding-top: 1rem;
+}
+
+.producto-caracteristicas li {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.producto-caracteristicas li::before {
+    content: "✓";
+    color: var(--secondary);
+    font-weight: bold;
+}
+
+.producto-acciones {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-descargar, .btn-comprar {
+    display: block;
+    width: 100%;
+    padding: 0.85rem;
+    border-radius: 6px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-descargar {
+    background: var(--bg-soft);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+}
+
+.btn-descargar:hover {
+    background: #e2e8f0;
+}
+
+.btn-comprar {
+    background: var(--primary);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+}
+
+.btn-comprar:hover {
+    background: var(--primary-hover);
+}
+
+/* Modal de Pago Directo Nequi */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.nequi-box {
+    background: #f1f5f9;
+    border: 2px dashed #0284c7;
+    padding: 1.25rem;
+    border-radius: 8px;
+    text-align: center;
+    margin: 1.25rem 0;
+}
+
+.nequi-num {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: 1px;
+}
+
+footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 0;
+    background: var(--bg-soft);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle { display: flex; }
+    .nav-links {
+        position: fixed;
+        top: 85px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 85px);
+        background: var(--bg-main);
+        flex-direction: column;
+        align-items: center;
+        padding-top: 3rem;
+        gap: 2rem;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        border-top: 1px solid var(--border);
+    }
+    .nav-links.active { transform: translateX(0); }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <nav class="contenedor">
+        <a href="index.html" class="logo">Sistemas & <span>Contabilidad</span></a>
+        <button class="menu-toggle" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="index.html#inicio">Inicio</a></li>
+            <li><a href="index.html#servicios">Servicios</a></li>
+            <li><a href="index.html#contacto">Contacto</a></li>
+        </ul>
+    </nav>
+</header>
+
+<section class="hero-productos">
+    <div class="contenedor">
+        <h1>Herramientas de Software <span>Locales y Portables</span></h1>
+        <p>Descarga versiones de prueba o adquiere tu licencia mediante pago directo rápido y sin complicaciones.</p>
+    </div>
+</section>
+
+<section class="tienda-seccion contenedor">
+    <div class="grid-productos">
+
+        <div class="producto-card">
+            <div>
+                <span class="producto-badge">Generador de QR</span>
+                <h3>QR Video Studio</h3>
+                <div class="precio-tag"></div>
+                <div class="compatibilidad">💻 Windows 10 / 11 (.exe local)</div>
+                <p>Genera códigos QR dinámicos y animados integrando videos o imágenes en movimiento de forma local.</p>
+                
+                <ul class="producto-caracteristicas">
+                    <li>Prueba gratuita de 3 días completa</li>
+                    <li>Procesamiento visual con OpenCV / FFmpeg</li>
+                    <li>Uso vitalicio sin suscripción</li>
+                </ul>
+            </div>
+
+            <div class="producto-acciones">
+                <a href="descargas/QRVideoStudio_Trial.exe" class="btn-descargar" download>
+                    ⬇️ Descargar Prueba Gratis
+                </a>
+                <button class="btn-comprar" onclick="abrirPago('QR Video Studio', '$29.000 COP')">
+                    💳 Comprar Licencia
+                </button>
+            </div>
+        </div>
+
+        <div class="producto-card">
+            <div>
+                <span class="producto-badge">Seguridad</span>
+                <h3>Encriptador Visual de Datos</h3>
+                <div class="precio-tag"></div>
+                <div class="compatibilidad">💻 Windows 10 / 11 (.exe local)</div>
+                <p>Oculta documentos, videos o archivos confidenciales cifrados (AES-256) dentro de imágenes PNG de forma 100% segura.</p>
+                
+                <ul class="producto-caracteristicas">
+                    <li>Prueba gratuita de 5 usos</li>
+                    <li>Soporta archivos de cualquier tamaño (cadena de volúmenes)</li>
+                    <li>Licencia vitalicia (pago único por Nequi, 100% offline)</li>
+                </ul>
+            </div>
+
+            <div class="producto-acciones">
+                <a href="descargas/Encriptador_Trial.exe" class="btn-descargar" download>
+                    ⬇️ Descargar Prueba Gratis
+                </a>
+                <button class="btn-comprar" onclick="abrirPago('Encriptador Visual de Datos', '$35.000 COP')">
+                    💳 Comprar Licencia
+                </button>
+            </div>
+        </div>
+
+        <div class="producto-card">
+            <div>
+                <span class="producto-badge">Macro Estudio</span>
+                <h3>Gestiona Macros de forma local</h3>
+                <div class="precio-tag"></div>
+                <div class="compatibilidad">💻 Windows 10 / 11 (.exe local)</div>
+                <p>Automatiza acciones con solo precionar un solo boton.</p>
+                
+                <ul class="producto-caracteristicas">
+                    <li>Funciona de forma local sin necesidad de internet</li>
+                    <li>Licencia vitalicia con soporte y actualizaciones</li>
+                </ul>
+            </div>
+
+            <div class="producto-acciones">
+                <a href="https://drive.google.com/uc?export=download&id=1lKGw3MsMJsKqkymVGEXKQjcnY5W_hR3L" class="btn-descargar" target="_blank">
+                    ⬇️ Descargar Prueba de 3 dias
+                </a>
+                <button class="btn-comprar" onclick="abrirPago('Organizador Masivo de Documentos', '$10.000 COP')">
+                    💳 Comprar Licencia
+                </button>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<div id="modalPago" class="modal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="cerrarPago()">×</button>
+        <h3 id="pagoTitulo" style="color: #0f172a; font-family:'Poppins', sans-serif;">Comprar Licencia</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Manejo directo para una entrega inmediata sin comisiones extra.</p>
+        
+        <div class="nequi-box">
+            <p style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">MÉTODOS DE PAGO DIRECTO (NEQUI)</p>
+            <div class="nequi-num">📱 318 628 1728</div>
+            <p style="font-size: 0.9rem; font-weight: 700; color: #0f172a; margin-top: 5px;" id="pagoMonto">Precio: -</p>
+        </div>
+
+        <div style="font-size: 0.88rem; color: var(--text-muted);">
+            <strong>Pasos para recibir tu archivo/licencia:</strong>
+            <ol style="padding-left: 1.2rem; margin-top: 0.5rem; line-height: 1.5;">
+                <li>Realiza la transferencia por el valor indicado a la cuenta Nequi.</li>
+                <li>Tómale captura de pantalla o descarga la factura/comprobante de pago.</li>
+                <li>Envíanos el comprobante vía WhatsApp para enviarte el instalador ejecutable sin restricciones e instrucciones.</li>
+            </ol>
+        </div>
+
+        <a id="btnEnviarComprobante" href="#" target="_blank" class="btn-comprar" style="margin-top: 1.2rem; background: #16a34a; text-decoration: none;">
+            📲 Enviar Comprobante por WhatsApp
+        </a>
+    </div>
+</div>
+
+<footer>
+</footer>
+
+<script>
+const mobileMenu = document.getElementById('mobile-menu');
+const navMenu = document.getElementById('nav-menu');
+
+mobileMenu.addEventListener('click', () => {
+    mobileMenu.classList.toggle('active');
+    navMenu.classList.toggle('active');
+});
+
+function abrirPago(producto, precio) {
+    document.getElementById('pagoTitulo').textContent = 'Comprar: ' + producto;
+    document.getElementById('pagoMonto').textContent = 'Precio a Transferir: ' + precio;
+    
+    const mensaje = encodeURIComponent(`Hola, acabo de realizar la transferencia Nequi para comprar la licencia de "${producto}" (${precio}). Adjunto mi comprobante para recibir los archivos.`);
+    document.getElementById('btnEnviarComprobante').href = `https://wa.me/3124895999?text=${mensaje}`;
+    
+    document.getElementById('modalPago').style.display = 'flex';
+}
+
+function cerrarPago() {
+    document.getElementById('modalPago').style.display = 'none';
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('modalPago');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+</body>
+</html>

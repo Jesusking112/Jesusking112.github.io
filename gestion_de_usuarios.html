@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Panel de Administracion</title>
+
+<!-- IMPORTANTE: modulo_conexion.js SIEMPRE antes que el guard acceso_1.js -->
+<script src="modulo_conexion.js"></script>
+<script src="acceso_1.js"></script>
+
+<link rel="stylesheet" href="gestion_de_usuarios.css">
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+        </svg>
+      </div>
+      <div>
+        <h1>Panel de Administracion / Gestor de usuarios</h1>
+        <p>Gestion de usuarios y auditoria</p>
+      </div>
+    </header>
+
+    <div class="estado-bar">
+      <span id="resultado">Cargando datos...</span>
+    </div>
+
+    <div class="seccion">
+      <h3>Anadir nuevo usuario</h3>
+      <div class="grid">
+        <div>
+          <label for="txtUser">Usuario</label>
+          <input type="text" id="txtUser" placeholder="Nombre de usuario (no se modificara)" autocomplete="off" />
+        </div>
+        <div>
+          <label for="txtPassword">Contrasena</label>
+          <input type="password" id="txtPassword" placeholder="Minimo 8 caracteres" autocomplete="off" />
+        </div>
+        <div>
+          <label for="selectModo">Modo / Rol</label>
+          <select id="selectModo"></select>
+        </div>
+      </div>
+      <div class="acciones-form">
+        <button class="btn-primario" id="btnGuardar">Guardar usuario</button>
+      </div>
+    </div>
+
+    <div class="seccion">
+      <h3>Usuarios registrados</h3>
+      <div class="barra-herramientas">
+        <input type="text" id="txtBuscar" class="input-buscar" placeholder="Buscar usuario por nombre..." autocomplete="off" />
+        <button class="btn-linea" id="btnUsuarios">Refrescar</button>
+      </div>
+      <div id="contenedorTabla"></div>
+    </div>
+  </div>
+</body>
+</html>

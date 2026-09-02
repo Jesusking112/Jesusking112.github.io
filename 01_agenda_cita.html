@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agendar cita</title>
+
+<script src="modulo_conexion.js"></script>
+<script src="acceso_3.js"></script>
+<script src="01_agenda.js"></script>
+
+<link rel="stylesheet" href="01_agenda.css" />
+<script>document.documentElement.style.visibility = "hidden";</script>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path>
+        </svg>
+      </div>
+      <div>
+        <h1>Agendar una cita</h1>
+        <p id="subEncabezado">Elige un día, toca un horario libre y reserva a nombre del cliente.</p>
+      </div>
+      <nav style="margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; align-self:flex-start;">
+        <a id="navGestionar" href="01_gestion_agenda.html" class="btn-sec" style="text-decoration:none;">Gestionar &rarr;</a>
+        <a href="02_soporte.html" class="btn-sec" style="text-decoration:none;">Soporte</a>
+        <a href="01_barberos.html" class="btn-linea" style="text-decoration:none; padding:8px 12px; border-radius:8px;">&larr; Reservaciones</a>
+      </nav>
+    </header>
+
+    <div class="seccion">
+      <div class="barra-controles">
+        <div class="campo">
+          <label for="fecha">Día de la cita</label>
+          <input type="date" id="fecha" />
+        </div>
+        <div>
+          <button class="btn-linea" id="btnRefrescar">Refrescar</button>
+        </div>
+      </div>
+      <p class="ayuda">Los horarios se actualizan solos cada pocos segundos. Un hueco en
+        <strong>rojo</strong> ya está reservado; toca su botón para cancelarlo con la clave.</p>
+      <div id="contenedorSlots"><p class="vacio">Cargando horarios...</p></div>
+      <p class="mensaje" id="mensaje"></p>
+      <div id="avisoClave"></div>
+    </div>
+
+    <div class="seccion">
+      <h3>Horarios cancelados</h3>
+      <p class="sub">Listado de horarios cancelados esta semana con sus motivos.</p>
+      <div id="contenedorCanceladasSemana">
+        <p class="vacio">Cargando citas canceladas...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-fondo" id="modalFondo">
+    <div class="modal">
+      <h3>Reservar horario</h3>
+      <p class="sub" id="modalSub">-</p>
+      <div class="campo">
+        <label for="mNombre">Nombre de quien viene</label>
+        <input type="text" id="mNombre" placeholder="Ej. María López" autocomplete="off" maxlength="80" />
+      </div>
+      <div class="campo" id="campoExtra" style="display:none;">
+        <label for="mExtra" id="labelExtra">Dato adicional</label>
+        <input type="text" id="mExtra" autocomplete="off" maxlength="120" />
+      </div>
+      <div class="campo">
+        <label for="mClave">Clave para poder cancelar (mín. 4)</label>
+        <input type="text" id="mClave" placeholder="Ej. 1234" autocomplete="off" inputmode="numeric" />
+        <p class="pista">Recomendado: 4 números. ¡Anótala! La necesitarás para cancelar.</p>
+      </div>
+      <div class="acciones">
+        <button class="btn-linea" id="mCancelar">Cerrar</button>
+        <button class="btn-primario" id="mConfirmar">Reservar</button>
+      </div>
+      <p class="mensaje" id="modalMensaje"></p>
+    </div>
+  </div>
+
+<script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+    let temporizador = null;
+    let horaSeleccionada = null;
+    let campoExtraNombre = "";
+
+    function obtenerRangoSemanaActual() {
+      const hoy = new Date();
+      const diaSemana = hoy.getDay();
+      const diffLunes = hoy.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1);
+
+      const lunes = new Date(hoy);
+      lunes.setDate(diffLunes);
+      const domingo = new Date(lunes);
+      domingo.setDate(lunes.getDate() + 6);
+
+      const formatFecha = (d) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      return { inicio: formatFecha(lunes), fin: formatFecha(domingo) };
+    }
+
+    async function cargarCanceladasSemana() {
+      const contenedor = $("contenedorCanceladasSemana");
+      if (!contenedor) return;
+
+      const { inicio, fin } = obtenerRangoSemanaActual();
+
+      let res;
+      try {
+        res = await window.Agenda.api.buscarCitas({ estado: "cancelada" });
+      } catch (e) {
+        contenedor.innerHTML = '<p class="vacio">No se pudieron cargar las canceladas.</p>';
+        return;
+      }
+
+      if (res && res.error) {
+        contenedor.innerHTML = '<p class="vacio">' + window.Agenda.esc(res.error) + '</p>';
+        return;
+      }
+
+      if (!Array.isArray(res)) {
+        contenedor.innerHTML = '<p class="vacio">No hay citas canceladas esta semana.</p>';
+        return;
+      }
+
+      let canceladasSemana = res.filter((c) =>
+        c.fecha >= inicio && c.fecha <= fin && c.motivo_cancelacion != null
+      );
+
+      if (!canceladasSemana.length) {
+        contenedor.innerHTML = '<p class="vacio">No hay citas canceladas esta semana.</p>';
+        return;
+      }
+
+      canceladasSemana.sort((a, b) =>
+        `${b.fecha}T${b.hora}`.localeCompare(`${a.fecha}T${a.hora}`));
+
+      let html = '<div class="tabla-scroll"><table class="datos"><thead><tr>' +
+        '<th>Fecha</th><th>Hora</th><th>Cliente</th><th>Motivo de cancelación</th>' +
+        '</tr></thead><tbody>';
+      canceladasSemana.forEach((c) => {
+        html += "<tr><td>" + window.Agenda.esc(c.fecha) + "</td><td><strong>" +
+          window.Agenda.esc(c.hora) + "</strong></td><td>" +
+          window.Agenda.esc(c.nombre_cliente || "N/A") + "</td>" +
+          '<td><span style="color: var(--peligro, #ef4444);">' +
+          window.Agenda.esc(c.motivo_cancelacion) + "</span></td></tr>";
+      });
+      html += "</tbody></table></div>";
+      contenedor.innerHTML = html;
+    }
+
+    async function cancelarCita(id, hora) {
+      const clave = prompt("Clave de cancelación para la cita de las " + hora + ":");
+      if (clave == null) return;
+
+      const motivo = prompt("Motivo de la cancelación (opcional):", "Cancelado por cliente/administrador");
+      if (motivo == null) return;
+
+      setMensaje("Cancelando...");
+      const res = await window.Agenda.api.cancelarCita({
+        id: id,
+        cancelPassword: clave,
+        motivo: motivo || "Cancelado por cliente/administrador"
+      });
+
+      if (res && res.error) {
+        setMensaje(res.error, "error");
+        return;
+      }
+
+      setMensaje(res.mensaje || "Cita cancelada.", "ok");
+      await cargarSlots();
+      await cargarCanceladasSemana();
+    }
+
+    function setMensaje(txt, tipo) {
+      const m = $("mensaje");
+      if (!m) return;
+      m.textContent = txt;
+      m.className = "mensaje" + (tipo ? " " + tipo : "");
+    }
+
+    function mostrarAvisoClave(nombre, hora, clave) {
+      const c = $("avisoClave");
+      if (!c) return;
+      c.innerHTML = '<div class="aviso-clave">Cita reservada para ' +
+        window.Agenda.esc(nombre) + ' a las ' + window.Agenda.esc(hora) + '.<br>' +
+        'Tu clave para cancelar es: <strong>' + window.Agenda.esc(clave) + '</strong><br>' +
+        'Anótala en un lugar seguro; la necesitarás si quieres cancelar la cita.</div>';
+    }
+
+    function abrirModal(hora) {
+      horaSeleccionada = hora;
+      $("modalSub").textContent = "Día " + $("fecha").value + " a las " + hora;
+      $("mNombre").value = "";
+      $("mClave").value = "";
+      $("mExtra").value = "";
+      $("modalMensaje").textContent = "";
+      $("modalMensaje").className = "mensaje";
+      $("modalFondo").classList.add("abierto");
+      $("mNombre").focus();
+    }
+
+    function cerrarModal() {
+      $("modalFondo").classList.remove("abierto");
+      horaSeleccionada = null;
+    }
+
+    async function confirmarReserva() {
+      const nombre = $("mNombre").value.trim();
+      const clave = $("mClave").value;
+      const extra = $("mExtra").value.trim();
+      if (!nombre) { $("modalMensaje").textContent = "Escribe un nombre."; $("modalMensaje").className = "mensaje error"; return; }
+
+      if (campoExtraNombre && !extra) {
+        $("modalMensaje").textContent = "Escribe " + campoExtraNombre + ".";
+        $("modalMensaje").className = "mensaje error";
+        return;
+      }
+      if (clave.length < 4) { $("modalMensaje").textContent = "La clave debe tener al menos 4 caracteres."; $("modalMensaje").className = "mensaje error"; return; }
+
+      $("mConfirmar").disabled = true;
+      $("modalMensaje").textContent = "Reservando...";
+      $("modalMensaje").className = "mensaje";
+
+      const res = await window.Agenda.api.crearCita({
+        fecha: $("fecha").value, hora: horaSeleccionada, nombre,
+        cancelPassword: clave, dato_extra: extra
+      });
+      $("mConfirmar").disabled = false;
+
+      if (res.error) { $("modalMensaje").textContent = res.error; $("modalMensaje").className = "mensaje error"; return; }
+
+      const horaOk = horaSeleccionada;
+      cerrarModal();
+      mostrarAvisoClave(nombre, horaOk, clave);
+      setMensaje("Cita reservada correctamente.", "ok");
+      await cargarSlots();
+      await cargarCanceladasSemana();
+    }
+
+    function renderSlots(slots, info) {
+      const c = $("contenedorSlots");
+      info = info || {};
+
+      if (info.barbero && $("subEncabezado")) {
+        $("subEncabezado").textContent = "Personal: " + info.barbero +
+          " — elige un día y reserva a nombre del cliente.";
+      }
+      if (!slots.length) {
+        var dia = info.diaNombre ? (" (" + info.diaNombre + ")") : "";
+        c.innerHTML = '<p class="vacio">Este personal no atiende este día' + window.Agenda.esc(dia) +
+          '. Configura sus horarios en "Gestionar".</p>';
+        return;
+      }
+
+      c.innerHTML = '<div class="slots">' + slots.map((s) => {
+        if (s.ocupado) {
+          return '<div class="slot ocupado"><div class="hora">' + window.Agenda.esc(s.hora) + '</div>' +
+            '<div class="estado">Ocupado: ' + window.Agenda.esc(s.nombre || "-") + '</div>' +
+            '<button class="btn-cancelar" data-id="' + window.Agenda.esc(s.id) + '" data-hora="' + window.Agenda.esc(s.hora) + '">Cancelar</button></div>';
+        }
+        return '<div class="slot libre" data-hora="' + window.Agenda.esc(s.hora) + '"><div class="hora">' +
+          window.Agenda.esc(s.hora) + '</div><div class="estado">Libre</div></div>';
+      }).join("") + '</div>';
+
+      c.querySelectorAll(".slot.libre").forEach((el) =>
+        el.addEventListener("click", () => abrirModal(el.getAttribute("data-hora"))));
+      c.querySelectorAll(".btn-cancelar").forEach((b) =>
+        b.addEventListener("click", () => cancelarCita(Number(b.getAttribute("data-id")), b.getAttribute("data-hora"))));
+    }
+
+    async function cargarSlots() {
+      const fecha = $("fecha").value;
+      if (!fecha) return;
+      const res = await window.Agenda.api.obtenerSlotsDia(fecha);
+      if (res.error) { setMensaje(res.error, "error"); return; }
+      renderSlots(res.slots || [], res);
+    }
+
+    function programarAuto() {
+      if (temporizador) clearInterval(temporizador);
+      temporizador = setInterval(cargarSlots, 12000);
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const ok = await window.Plataforma.protegerPagina();
+      if (!ok) return;
+
+      const barberoId = window.Agenda.exigirBarberoEnURL();
+      if (!barberoId) return;
+
+      const navG = $("navGestionar");
+      const est = await window.Agenda.api.estadoNegocio();
+      if (navG) {
+        if (est && !est.error && est.puede_gestionar) {
+          const neg = window.Agenda.negocioActual();
+          navG.href = "01_gestion_agenda.html?barbero=" + barberoId +
+            (neg ? "&negocio=" + neg : "");
+        } else {
+          navG.style.display = "none";
+        }
+      }
+
+      if (est && !est.error && est.campo_extra) {
+        campoExtraNombre = String(est.campo_extra);
+        $("labelExtra").textContent = campoExtraNombre;
+        $("campoExtra").style.display = "";
+      }
+
+      $("fecha").value = window.Agenda.hoyISO();
+      $("fecha").min = window.Agenda.hoyISO();
+      $("fecha").addEventListener("change", () => {
+        $("avisoClave").innerHTML = "";
+        cargarSlots();
+      });
+      $("btnRefrescar").addEventListener("click", cargarSlots);
+      $("mConfirmar").addEventListener("click", confirmarReserva);
+      $("mCancelar").addEventListener("click", cerrarModal);
+      $("modalFondo").addEventListener("click", (e) => { if (e.target === $("modalFondo")) cerrarModal(); });
+
+      await cargarSlots();
+      await cargarCanceladasSemana();
+      programarAuto();
+    });
+  })();
+</script>
+
+</body>
+</html>

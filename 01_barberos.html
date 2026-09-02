@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Barberos</title>
+
+<script src="modulo_conexion.js"></script>
+<script src="01_agenda.js"></script>
+<link rel="stylesheet" href="01_agenda.css" />
+
+<style>
+  .grid-barberos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .card-barbero {
+    border: 1px solid var(--borde);
+    background: var(--tarjeta-2);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card-barbero .nombre {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 16px; font-weight: 700; color: var(--texto);
+  }
+  .card-barbero .avatar {
+    width: 38px; height: 38px; border-radius: 50%; flex: 0 0 auto;
+    background: var(--primario); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; text-transform: uppercase;
+  }
+  .card-barbero .acciones { display: flex; gap: 8px; }
+  .card-barbero .acciones a {
+    flex: 1; text-align: center; text-decoration: none;
+    padding: 9px 10px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    border: 1px solid var(--borde); color: var(--texto); background: transparent;
+  }
+  .card-barbero .acciones a.principal { background: var(--primario); color: #fff; border-color: var(--primario); }
+  .card-barbero .acciones a:hover { border-color: var(--primario); }
+  .card-nuevo {
+    border: 1px dashed var(--borde);
+    background: transparent;
+    align-items: center; justify-content: center;
+    cursor: pointer; min-height: 120px; color: var(--tenue);
+    font-weight: 600;
+  }
+  .card-nuevo:hover { border-color: var(--primario); color: var(--texto); }
+  .card-nuevo .mas { font-size: 26px; line-height: 1; }
+</style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a6 6 0 0 1 12 0v1"></path><path d="M18 8h4M20 6v4"></path>
+        </svg>
+      </div>
+      <div>
+        <h1>Rerservaciones</h1>
+        <p id="subTitulo">Elige un Usuario para ver su agenda, o crea uno nuevo.</p>
+      </div>
+      <nav style="margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; align-self:flex-start;">
+        <a href="02_soporte.html" class="btn-sec" style="text-decoration:none;">Soporte</a>
+        <a id="navNegocios" href="01_negocios.html" class="btn-linea"
+           style="text-decoration:none; padding:8px 12px; border-radius:8px; display:none;">&larr; Reservaciones</a>
+      </nav>
+    </header>
+
+    <div class="seccion">
+      <h3>Selecciona un usuario asignado</h3>
+      <p class="sub">Cada reservacion tiene su propio calendario y sus propias citas.</p>
+      <div id="gridBarberos" class="grid-barberos">
+        <p class="vacio">Cargando reservaciones...</p>
+      </div>
+      <p class="mensaje" id="msg"></p>
+    </div>
+  </div>
+
+  <div class="modal-fondo" id="modalFondo">
+    <div class="modal">
+      <h3>Nuevo barbero</h3>
+      <p class="sub" id="modalSub">Escribe el nombre del usuario.</p>
+      <div class="campo">
+        <label for="nNombre">Nombre del barbero</label>
+        <input type="text" id="nNombre" placeholder="Ej. Carlos" autocomplete="off" maxlength="60" />
+      </div>
+      <div class="campo" id="campoClave" style="display:none;">
+        <label for="nClave">Clave del director</label>
+        <input type="password" id="nClave" placeholder="Clave para autorizar" autocomplete="off" />
+        <p class="pista">Solo el director/administrador puede crear usuario.</p>
+      </div>
+      <div class="acciones">
+        <button class="btn-linea" id="nCerrar">Cerrar</button>
+        <button class="btn-primario" id="nConfirmar">Crear</button>
+      </div>
+      <p class="mensaje" id="modalMensaje"></p>
+    </div>
+  </div>
+
+<script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+    const A = window.Agenda;
+    let esAdmin = false;
+    let negocioSel = null;      //barbería activa (solo la usa el admin desde la URL)
+    let puedeGestionar = false; //si el usuario puede crear barberos sin clave
+
+    function setMsg(txt, tipo) {
+      const m = $("msg");
+      if (!m) return;
+      m.textContent = txt || "";
+      m.className = "mensaje" + (tipo ? " " + tipo : "");
+    }
+
+    function iniciales(nombre) {
+      const p = String(nombre || "").trim().split(/\s+/);
+      return ((p[0] || "")[0] || "") + ((p[1] || "")[0] || "");
+    }
+
+    function render(barberos) {
+      const cont = $("gridBarberos");
+      if (!cont) return;
+
+      let html = "";
+      const negParam = negocioSel ? ("&negocio=" + encodeURIComponent(negocioSel)) : "";
+      (barberos || []).forEach((b) => {
+        const q = "?barbero=" + encodeURIComponent(b.id) + negParam;
+        const linkGestionar = puedeGestionar
+          ? '<a href="01_gestion_agenda.html' + q + '">Gestionar</a>'
+          : '';
+        html += '<div class="card-barbero">' +
+          '<div class="nombre"><span class="avatar">' + A.esc(iniciales(b.nombre)) + '</span>' +
+          A.esc(b.nombre) + '</div>' +
+          '<div class="acciones">' +
+            '<a class="principal" href="01_agenda_cita.html' + q + '">Agendar</a>' +
+            linkGestionar +
+          '</div></div>';
+      });
+
+      if (puedeGestionar) {
+        html += '<div class="card-barbero card-nuevo" id="cardNuevo">' +
+          '<div class="mas">+</div><div>Crear nuevo barbero</div></div>';
+      }
+
+      cont.innerHTML = html;
+      const cn = $("cardNuevo");
+      if (cn) cn.addEventListener("click", abrirModal);
+    }
+
+    async function cargar() {
+      const res = await A.api.listarBarberos();
+      if (res && res.error) { setMsg(res.error, "error"); $("gridBarberos").innerHTML = ''; return; }
+      const barberos = (res && res.barberos) ? res.barberos : [];
+      if (!barberos.length) {
+        $("gridBarberos").innerHTML = '';
+        render([]);
+        setMsg("No hay usuarios todavía. Crea el primero.");
+        return;
+      }
+      setMsg("");
+      render(barberos);
+    }
+
+    function abrirModal() {
+      $("nNombre").value = "";
+      $("nClave").value = "";
+      $("modalMensaje").textContent = "";
+      $("modalMensaje").className = "mensaje";
+      const sinClave = esAdmin;
+      $("campoClave").style.display = sinClave ? "none" : "block";
+      $("modalSub").textContent = sinClave
+        ? "Escribe el nombre del usuario."
+        : "Escribe el nombre y la clave del administrador del local.";
+      $("modalFondo").classList.add("abierto");
+      $("nNombre").focus();
+    }
+
+    function cerrarModal() {
+      $("modalFondo").classList.remove("abierto");
+    }
+
+    async function confirmar() {
+      const nombre = $("nNombre").value.trim();
+      const clave = $("nClave").value;
+      if (!nombre) { $("modalMensaje").textContent = "Escribe un nombre."; $("modalMensaje").className = "mensaje error"; return; }
+      const sinClave = esAdmin;
+      if (!sinClave && !clave) { $("modalMensaje").textContent = "Escribe la clave del administrador del local."; $("modalMensaje").className = "mensaje error"; return; }
+
+      $("nConfirmar").disabled = true;
+      $("modalMensaje").textContent = "Creando...";
+      $("modalMensaje").className = "mensaje";
+
+      const res = await A.api.crearBarbero(nombre, clave);
+      $("nConfirmar").disabled = false;
+
+      if (res && res.error) { $("modalMensaje").textContent = res.error; $("modalMensaje").className = "mensaje error"; return; }
+
+      cerrarModal();
+      setMsg("Barbero creado.", "ok");
+      await cargar();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const ok = await window.Plataforma.protegerPagina();
+      if (!ok) return;
+
+      esAdmin = A.esAdmin();
+      negocioSel = A.negocioActual();
+
+      if (esAdmin && $("navNegocios")) $("navNegocios").style.display = "";
+
+      const est = await A.api.estadoNegocio();
+      if (est && !est.error) {
+        puedeGestionar = !!est.puede_gestionar || esAdmin;
+        if (est.negocio && $("subTitulo")) {
+          $("subTitulo").textContent = est.negocio + " — elige un usuario o crea uno nuevo.";
+        }
+      }
+
+      $("nConfirmar").addEventListener("click", confirmar);
+      $("nCerrar").addEventListener("click", cerrarModal);
+      $("modalFondo").addEventListener("click", (e) => { if (e.target === $("modalFondo")) cerrarModal(); });
+      $("nNombre").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.nativeEvent?.isComposing && e.keyCode !== 229) confirmar();
+      });
+
+      await cargar();
+    });
+  })();
+</script>
+</body>
+</html>

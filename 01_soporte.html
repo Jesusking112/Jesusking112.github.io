@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Soporte y ayuda</title>
+<link rel="stylesheet" href="01_agenda.css" />
+<style>
+  .centro { max-width: 560px; margin: 8vh auto 0; }
+  .aviso-expira {
+    background: var(--peligro-suave); border: 1px solid rgba(239,68,68,0.4);
+    color: var(--texto); border-radius: var(--radio); padding: 18px 20px;
+    font-size: 14px; line-height: 1.6; margin-bottom: 20px; display: none;
+  }
+  .aviso-expira b { color: #fca5a5; }
+  .placeholder {
+    border: 1px dashed var(--borde); border-radius: var(--radio);
+    padding: 40px 24px; text-align: center; color: var(--tenue);
+  }
+  .placeholder h2 { color: var(--texto); font-size: 18px; margin-bottom: 8px; }
+  .placeholder p { font-size: 14px; line-height: 1.6; }
+  .acciones-sop { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; justify-content: center; }
+  .acciones-sop a {
+    text-decoration: none; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600;
+    border: 1px solid var(--borde); color: var(--texto);
+  }
+  .acciones-sop a.principal { background: var(--primario); border-color: var(--primario); color: #fff; }
+</style>
+</head>
+<body>
+  <div class="wrap centro">
+    <header class="top">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path>
+        </svg>
+      </div>
+      <div>
+        <h1>Soporte y ayuda</h1>
+        <p>Consultas, peticiones y estado de tu negocio.</p>
+      </div>
+    </header>
+
+    <div class="aviso-expira" id="avisoExpira">
+      <b>Acceso vencido.</b> <span id="motivoExpira"></span>
+      Comunícate con el administrador para renovar el acceso de tu negocio.
+    </div>
+
+    <div class="placeholder">
+      <h2>Centro de ayuda (próximamente)</h2>
+      <p>Este espacio está reservado para el módulo de soporte: encuestas,<br>
+         peticiones y consultas. Por ahora es un punto de contacto.</p>
+    </div>
+
+    <div class="acciones-sop">
+      <a class="principal" href="login.html">Ir al inicio de sesión</a>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var motivo = "";
+      try { motivo = sessionStorage.getItem("motivo_expiro") || ""; } catch (e) {}
+      if (motivo) {
+        document.getElementById("avisoExpira").style.display = "block";
+        document.getElementById("motivoExpira").textContent = motivo + " ";
+        try { sessionStorage.removeItem("motivo_expiro"); } catch (e) {}
+      }
+    })();
+  </script>
+</body>
+</html>

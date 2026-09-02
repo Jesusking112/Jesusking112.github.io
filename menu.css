@@ -1,0 +1,220 @@
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+}
+  
+:root {
+  --fondo: #040507;
+  --panel: #000000;
+  --panel2: #030405;
+  --borde: #000000;
+  --texto: #fdfdfd;
+  --tenue: #9ca3af;
+  --acento: #3b82f6;
+  --acento-hover: #2563eb;
+  --peligro: #ef4444;
+  --ok: #67c9a8;
+  --radio: 12px;
+  --sidebar-width: 290px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+.barra {
+  width: var(--sidebar-width);
+  background: var(--panel);
+  border-right: 1px solid var(--borde);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  z-index: 20;
+  gap: 8px;
+}
+
+.marca { 
+  font-weight: 700; 
+  font-size: 20px;
+  letter-spacing: -.5px; 
+  padding: 0 12px;
+  margin-bottom: 28px;
+}
+.marca span { color: var(--acento); }
+
+.menu-navegacion {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+}
+
+  .btn-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--tenue);
+  padding: 12px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+  
+.btn-nav:hover {
+  color: var(--texto);
+  background: rgba(255, 0, 0, 0.514);
+}
+
+.btn-nav.activo {
+  color: var(--texto);
+  background: rgba(223, 13, 13, 0.808);
+  border-color: rgb(250, 250, 250);
+}
+
+.btn-nav .icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  flex-shrink: 0;
+}
+  
+.btn-nav.activo .icono {
+  color: var(--acento);
+}
+
+.usuario-caja { 
+  position: relative; 
+  width: 100%;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--borde);
+}
+  
+.usuario-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--panel2);
+  border: 1px solid var(--borde);
+  color: var(--texto);
+  padding: 10px 12px;
+  border-radius: var(--radio);
+  cursor: pointer;
+  font-size: 13px;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+.usuario-btn:hover { border-color: var(--acento); }
+  
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  background: var(--acento);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px;
+  flex-shrink: 0;
+}
+  
+.rol-chip {
+  font-size: 11px;
+  color: #fff;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid var(--acento);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: auto;
+}
+  
+.flecha { font-size: 9px; color: var(--tenue); }
+
+.menu-usuario {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0; right: 0;
+  background: var(--panel2);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: 0 -10px 25px rgba(0,0,0,.5);
+  overflow: hidden;
+  display: none;
+}
+.menu-usuario.abierto { display: block; }
+.menu-usuario .cabecera {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--borde);
+  font-size: 13px;
+  color: var(--tenue);
+}
+.menu-usuario .cabecera b { color: var(--texto); }
+.menu-usuario button {
+  width: 100%; text-align: left; background: transparent; border: none;
+  color: var(--texto); padding: 12px 14px; cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.menu-usuario button:hover { background: rgba(239,68,68,.15); color: var(--peligro); }
+
+.contenido { 
+  margin-left: var(--sidebar-width);
+  flex-grow: 1;
+  height: 100vh;
+  padding: 24px; 
+  display: flex;
+  flex-direction: column;
+}
+
+.vista-contenido {
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+  .visor-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+}
+
+  .vista-estandar {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+}
+.vista-estandar h2 { font-size: 22px; margin-bottom: 10px; color: var(--texto); }
+.vista-estandar p { color: var(--tenue); font-size: 15px; max-width: 500px; line-height: 1.6; }
+  
+.icono-grande {
+  color: var(--acento);
+  background: rgba(244, 244, 245, 0.1);
+  padding: 20px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  display: inline-flex;
+}

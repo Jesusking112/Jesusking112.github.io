@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soporte — Administración</title>
+  <link rel="stylesheet" href="02_soporte.css" />
+  <style> html { visibility: hidden; } </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="cab" style="display:flex; align-items:flex-start; gap:12px;">
+      <div style="flex:1;">
+        <h1>Soporte — Administración</h1>
+        <p>Revisa las peticiones de los locales, responde y organiza por estado.</p>
+      </div>
+      <button type="button" id="btnRegresar" class="btn-sec" style="display:none; white-space:nowrap;">&larr; Regresar</button>
+    </header>
+
+    <!-- Buscador tipo tokens -->
+    <div class="buscador">
+      <input type="text" id="q" placeholder="Buscar por token, asunto o tipo..." autocomplete="off" />
+      <button class="btn-sec" id="btnBuscar">Buscar</button>
+    </div>
+
+    <!-- Bandejas -->
+    <div class="bandeja-tabs">
+      <button class="tab activa" id="tabPend" data-estado="sin_revisar">Sin revisar</button>
+      <button class="tab" id="tabRev" data-estado="revisado">Revisados</button>
+      <button class="tab" id="tabTodos" data-estado="todos">Todos</button>
+    </div>
+
+    <!-- LISTA -->
+    <section id="vistaLista">
+      <div class="lista-tickets" id="lista">
+        <p class="vacio">Cargando...</p>
+      </div>
+      <p class="mensaje" id="msgLista"></p>
+    </section>
+
+    <!-- DETALLE (chat) -->
+    <section class="seccion oculto" id="vistaDetalle">
+      <div class="acciones" style="margin-bottom:12px;">
+        <button class="btn-linea" id="btnVolver">&larr; Volver a la lista</button>
+      </div>
+
+      <div style="margin-bottom:10px;">
+        <h2 style="margin:0 0 4px;" id="dAsunto"></h2>
+        <span class="pill tipo" id="dTipo"></span>
+        <span class="pill" id="dEstado"></span>
+        <span class="ticket-item meta" style="border:none;padding:0;display:inline;margin-left:6px;">
+          Token: <strong id="dToken"></strong>
+        </span>
+        <p class="ayuda" id="dContacto"></p>
+      </div>
+
+      <div class="chat" id="chat"></div>
+
+      <div class="campo">
+        <label for="dRespuesta">Tu respuesta</label>
+        <textarea id="dRespuesta" maxlength="2000" placeholder="Escribe la respuesta..."></textarea>
+      </div>
+
+      <div class="acciones">
+        <button class="btn-sec" id="btnRapidas">Respuestas rápidas</button>
+        <button class="btn-primario" id="btnResponder">Enviar</button>
+        <button class="btn-primario" id="btnResponderRev">Enviar y marcar revisado</button>
+        <button class="btn-sec" id="btnToggleEstado">Marcar revisado</button>
+      </div>
+      <p class="mensaje" id="msgDetalle"></p>
+    </section>
+  </div>
+
+  <!-- Barra deslizante de respuestas rápidas -->
+  <div class="fondo-barra" id="fondoBarra">
+    <aside class="barra-rapidas" role="dialog" aria-label="Respuestas rápidas">
+      <header>
+        <h3>Respuestas rápidas</h3>
+        <button class="cerrar" id="cerrarBarra" aria-label="Cerrar">&times;</button>
+      </header>
+      <div class="lista" id="listaRapidas">
+        <p class="vacio">Cargando...</p>
+      </div>
+      <footer>
+        <div class="campo" style="margin:0 0 10px;">
+          <textarea id="nuevaRapida" maxlength="500" placeholder="Escribe una respuesta reutilizable..." style="min-height:70px;"></textarea>
+        </div>
+        <button class="btn-primario" id="btnGuardarRapida" style="width:100%;">Guardar respuesta rápida</button>
+        <p class="mensaje" id="msgRapida"></p>
+      </footer>
+    </aside>
+  </div>
+
+  <script src="modulo_conexion.js"></script>
+  <script src="01_agenda.js"></script>
+  <script src="02_soporte.js"></script>
+  <script src="02_soporte_admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gestión de agenda</title>
+
+<script src="01_agenda.js"></script>
+<link rel="stylesheet" href="01_agenda.css" />
+
+<style>
+  .barra-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 12px 0;
+  }
+  .btn-sec {
+    border: 1px solid var(--borde, #d1d5db);
+    background: var(--tarjeta-2, #0f172a);
+    color: var(--texto, #f3f4f6);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .btn-sec:hover { border-color: var(--primario, #3b82f6); }
+  .btn-peligro {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: transparent;
+  }
+  .btn-peligro:hover { background: rgba(239, 68, 68, 0.08); }
+  .contador-pill {
+    margin-left: auto;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+  }
+  table.semana thead th.dia-head { cursor: pointer; user-select: none; }
+  table.semana thead th.dia-head:hover { text-decoration: underline; }
+  table.semana td.hora-col {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+  table.semana td.hora-col .borra-fila {
+    display: inline-block;
+    margin-left: 6px;
+    color: #ef4444;
+    font-weight: 700;
+  }
+  table.semana td.hora-col:hover { background: rgba(239, 68, 68, 0.06); }
+  .leyenda {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--tenue, #9ca3af);
+    margin-top: 6px;
+  }
+  .leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+  .punto { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .punto.verde { background: #10b981; }
+  .punto.gris { background: #898f97; }
+
+  table.semana thead th.dia-head { padding-bottom: 4px; }
+  .set-dia {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    margin-top: 4px;
+  }
+  .set-dia button {
+    border: 1px solid var(--borde, #374151);
+    background: var(--tarjeta-2, #0f172a);
+    color: var(--texto, #f3f4f6);
+    border-radius: 6px;
+    padding: 2px 7px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    line-height: 1.4;
+  }
+  .set-dia button.si:hover { background: rgba(16, 185, 129, 0.12); border-color: #10b981; color: #10b981; }
+  .set-dia button.no:hover { background: rgba(239, 68, 68, 0.10); border-color: #ef4444; color: #ef4444; }
+
+  .lista-motivos {
+    max-height: 180px; overflow-y: auto; border: 1px solid var(--borde, #374151);
+    padding: 8px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .btn-motivo-item {
+    text-align: left; padding: 8px; border: 1px solid var(--borde, #374151);
+    background: var(--tarjeta-2, #0f172a); color: var(--texto, #f3f4f6);
+    border-radius: 6px; cursor: pointer; width: 100%; font-weight: 500;
+  }
+  .btn-motivo-item:hover { border-color: var(--primario, #3b82f6); }
+</style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+        </svg>
+      </div>
+      <div>
+        <h1>Gestión de agenda</h1>
+        <p id="subEncabezado">Primero revisa las citas ya reservadas; abajo ajusta tus horarios de la semana.</p>
+      </div>
+      <nav style="margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; align-self:flex-start;">
+        <a id="navAgendar" href="01_agenda_cita.html" class="btn-sec" style="text-decoration:none;">Agendar &rarr;</a>
+        <a href="02_soporte.html" class="btn-sec" style="text-decoration:none;">Soporte</a>
+        <a href="01_barberos.html" class="btn-linea" style="text-decoration:none; padding:8px 12px; border-radius:8px;">&larr; Reservaciones</a>
+      </nav>
+    </header>
+
+    <div class="seccion">
+      <h3>Citas agendadas</h3>
+      <div class="tabs">
+        <button class="tab activa" id="tabDia">Del día</button>
+        <button class="tab" id="tabMes">Todo el mes / Todos</button>
+      </div>
+
+      <div class="panel-tab activo" id="panelDia">
+        <div class="barra-controles">
+          <div class="campo">
+            <label for="fechaDia">Día</label>
+            <input type="date" id="fechaDia" />
+          </div>
+          <div class="campo">
+            <label for="buscarDia">Buscar por hora o nombre</label>
+            <input type="text" id="buscarDia" placeholder="Ej. 10:30 o María" autocomplete="off" />
+          </div>
+          <div><button class="btn-primario" id="btnBuscarDia">Buscar</button></div>
+        </div>
+        <div id="tablaDia"></div>
+      </div>
+
+      <div class="panel-tab" id="panelMes">
+        <div class="barra-controles">
+          <div class="campo">
+            <label for="mes">Mes</label>
+            <input type="month" id="mes" />
+          </div>
+          <div class="campo" style="flex:0 0 auto; min-width:auto;">
+            <label for="chkTodos">&nbsp;</label>
+            <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:var(--texto); cursor:pointer;">
+              <input type="checkbox" id="chkTodos" style="width:auto;" /> Ver TODAS (ignora el mes)
+            </label>
+          </div>
+          <div class="campo">
+            <label for="buscarMes">Buscar por hora o nombre</label>
+            <input type="text" id="buscarMes" placeholder="Ej. 12:00 o Juan" autocomplete="off" />
+          </div>
+          <div><button class="btn-primario" id="btnBuscarMes">Buscar</button></div>
+        </div>
+        <div id="tablaMes"></div>
+      </div>
+
+      <p class="mensaje" id="msgBuscar"></p>
+    </div>
+
+    <div class="seccion">
+      <h3>Mis horarios (plantilla de la semana)</h3>
+      <p class="ayuda">Esta plantilla es fija: <strong>se repite igual cada semana</strong> hasta que la cambies
+        (no se borra ni se reinicia). Toca una casilla para activar/desactivar una hora suelta.</p>
+
+      <div class="barra-acciones">
+        <button class="btn-sec" id="btnTodo">Marcar toda la semana</button>
+        <button class="btn-sec btn-peligro" id="btnVaciar">Vaciar toda la semana</button>
+        <button class="btn-sec" id="btnAvanzado">Marcar todo menos…</button>
+        <span class="contador-pill" id="contadorDisp">0 horas activas</span>
+      </div>
+
+      <div id="panelAvanzado" style="display:none; border:1px solid var(--borde,#374151); border-radius:10px; padding:12px; margin-bottom:12px;">
+        <p class="ayuda" style="margin:0 0 10px;">Marca el día completo <strong>excepto</strong> las horas del rango
+          (útil si tienes muchos itinerarios y solo quieres excluir un tramo).</p>
+
+        <div class="barra-controles">
+          <div class="campo">
+            <label for="avDesde">Excluir desde</label>
+            <select id="avDesde"></select>
+          </div>
+          <div class="campo">
+            <label for="avHasta">Excluir hasta (incluida)</label>
+            <select id="avHasta"></select>
+          </div>
+        </div>
+
+        <label style="display:block; font-weight:600; margin-bottom:6px;">Días</label>
+        <div id="avDias" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:12px;"></div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button class="btn-sec" id="avTodosDias">Todos los días</button>
+          <button class="btn-sec" id="avNingunDia">Ningún día</button>
+          <button class="btn-primario" id="avAplicar">Aplicar</button>
+        </div>
+      </div>
+
+      <p class="ayuda" style="margin-top:0;">
+        Debajo del nombre de cada día usa <strong>✓ Todo</strong> (poner ese día entero disponible) o
+        <strong>✗ Nada</strong> (poner ese día entero no disponible). También puedes tocar una
+        <strong>hora</strong> (columna izquierda) para activar/borrar esa hora en <strong>toda la semana</strong>,
+        o tocar una casilla suelta para cambiar solo esa hora.
+      </p>
+
+      <div class="tabla-scroll">
+        <table class="semana" id="tablaSemana"></table>
+      </div>
+
+      <div class="leyenda">
+        <span><i class="punto verde"></i> Atiendes (disponible)</span>
+        <span><i class="punto gris"></i> No atiendes</span>
+      </div>
+      <p class="mensaje" id="msgDisp"></p>
+    </div>
+  </div>
+
+  <div class="modal-fondo" id="modalConfirmFondo">
+    <div class="modal" style="max-width: 460px;">
+      <h3 id="confirmTitulo">¿Seguro?</h3>
+      <p class="sub" id="confirmDetalle"></p>
+
+      <div class="campo" id="confirmCampoMotivo" style="display:none;">
+        <label for="confirmMotivo">Motivo de la cancelación</label>
+        <input type="text" id="confirmMotivo" placeholder="Buscar o escribir motivo..." autocomplete="off" />
+        <div id="confirmListaMotivos" class="lista-motivos" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="acciones" style="margin-top: 15px;">
+        <button class="btn-linea" id="confirmNo">No, volver</button>
+        <button class="btn-primario btn-peligro" id="confirmSi">Sí, continuar</button>
+      </div>
+      <p class="mensaje" id="confirmMsg"></p>
+    </div>
+  </div>
+
+  <div class="modal-fondo" id="modalMotivoFondo">
+    <div class="modal" style="max-width: 460px;">
+      <h3>Cancelar cita</h3>
+      <p class="sub" id="modalCancelSub">Indica la clave del cliente y el motivo de la cancelación.</p>
+
+      <div class="campo">
+        <label for="inputClaveCancel">Clave de cancelación del cliente</label>
+        <input type="text" id="inputClaveCancel" placeholder="La clave que el cliente dio al reservar" autocomplete="off" inputmode="numeric" />
+      </div>
+
+      <label for="inputBuscarMotivo">Motivo</label>
+      <div class="campo" style="margin-bottom: 10px;">
+        <input type="text" id="inputBuscarMotivo" placeholder="Buscar o escribir motivo..." autocomplete="off" />
+      </div>
+
+      <div id="listaMotivosScroll" class="lista-motivos"></div>
+
+      <div class="acciones" style="margin-top: 15px;">
+        <button class="btn-linea" id="btnCerrarMotivo">Cerrar</button>
+        <button class="btn-primario" id="btnConfirmarMotivoText">Confirmar cancelación</button>
+      </div>
+      <p class="mensaje" id="msgCancel"></p>
+    </div>
+  </div>
+
+<script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+    const A = window.Agenda;
+
+    let dispMapa = {};
+    let ocupado = false;
+    let cancelIdActual = null;
+    let HORAS = A.HORAS;
+    let campoExtraNombre = "";
+
+    const MOTIVOS_PREELEGIDOS = [
+      "Tendremos que salir temprano",
+      "Cierre por mantenimiento de local",
+      "Enfermedad o imprevisto personal",
+      "Día festivo / No laborable",
+      "Solicitud directa del cliente",
+      "Error al asignar el horario",
+      "Fuerza mayor / Clima"
+    ];
+
+    function claveDH(dia, hora) { return dia + "-" + hora; }
+    function estaOn(dia, hora) { return dispMapa[claveDH(dia, hora)] === true; }
+
+    function msg(txt, tipo) {
+      const el = $("msgDisp");
+      if (!el) return;
+      el.textContent = txt || "";
+      el.className = "mensaje" + (tipo ? " " + tipo : "");
+    }
+
+    function renderMotivosEn(contId, inputId, lista) {
+      const cont = $(contId);
+      if (!cont) return;
+      cont.innerHTML = (lista || []).map((m) =>
+        '<button type="button" class="btn-motivo-item">' + A.esc(m) + "</button>"
+      ).join("");
+      cont.querySelectorAll(".btn-motivo-item").forEach((btn) =>
+        btn.addEventListener("click", () => {
+          if ($(inputId)) $(inputId).value = btn.innerText.trim();
+        }));
+    }
+
+    function pedirConfirmacion(opts) {
+      const o = opts || {};
+      return new Promise((resolve) => {
+        if ($("confirmTitulo")) $("confirmTitulo").textContent = o.titulo || "¿Estás seguro?";
+        if ($("confirmDetalle")) $("confirmDetalle").textContent = o.detalle || "";
+        if ($("confirmMsg")) { $("confirmMsg").textContent = ""; $("confirmMsg").className = "mensaje"; }
+
+        const pedir = !!o.pedirMotivo;
+        if ($("confirmCampoMotivo")) $("confirmCampoMotivo").style.display = pedir ? "" : "none";
+        if ($("confirmMotivo")) $("confirmMotivo").value = "";
+        if (pedir) renderMotivosEn("confirmListaMotivos", "confirmMotivo", MOTIVOS_PREELEGIDOS);
+
+        if ($("modalConfirmFondo")) $("modalConfirmFondo").classList.add("abierto");
+
+        function cerrar() {
+          if ($("modalConfirmFondo")) $("modalConfirmFondo").classList.remove("abierto");
+          $("confirmSi").removeEventListener("click", si);
+          $("confirmNo").removeEventListener("click", no);
+        }
+        function si() {
+          const motivo = $("confirmMotivo") ? $("confirmMotivo").value.trim() : "";
+          if (pedir && !motivo) {
+            if ($("confirmMsg")) { $("confirmMsg").textContent = "Escribe o elige un motivo."; $("confirmMsg").className = "mensaje error"; }
+            return;
+          }
+          cerrar(); resolve({ ok: true, motivo: motivo });
+        }
+        function no() { cerrar(); resolve({ ok: false, motivo: "" }); }
+
+        $("confirmSi").addEventListener("click", si);
+        $("confirmNo").addEventListener("click", no);
+      });
+    }
+
+    async function citasAfectadas(slots) {
+      const res = await A.api.buscarCitas({});
+      if (!res || res.error) return [];
+      const hoy = A.hoyISO();
+      const set = {};
+      slots.forEach((s) => { set[s.dia + "-" + s.hora] = true; });
+      return (res || []).filter((c) => {
+        if (c.estado && c.estado !== "reservada") return false;
+        if (String(c.fecha) < hoy) return false;
+        const d = new Date(String(c.fecha) + "T00:00:00").getDay();
+        return set[d + "-" + String(c.hora)] === true;
+      });
+    }
+
+    async function cancelarCitas(citas, motivo) {
+      let err = 0;
+      for (const c of citas) {
+        const r = await A.api.cancelarCita({ id: c.id, motivo: motivo });
+        if (r && r.error) err++;
+      }
+      return err;
+    }
+
+    let apagando = false;
+    async function apagarSlots(slots, queTexto) {
+      if (ocupado || apagando || !slots.length) return;
+      const pendientes = slots.filter((s) => estaOn(s.dia, s.hora));
+      if (!pendientes.length) { msg("No había nada que quitar."); return; }
+      apagando = true;
+      try {
+        await apagarSlotsInterno(pendientes, queTexto);
+      } finally {
+        apagando = false;
+      }
+    }
+
+    async function apagarSlotsInterno(pendientes, queTexto) {
+
+      msg("Revisando citas…");
+      const afectadas = await citasAfectadas(pendientes);
+      msg("");
+
+      const detalle = "Vas a quitar " + pendientes.length + " hora(s): " + queTexto + ". " +
+        (afectadas.length
+          ? "Hay " + afectadas.length + " cita(s) agendada(s) que se CANCELARÁN."
+          : "No hay citas agendadas afectadas.");
+
+      const conf = await pedirConfirmacion({
+        titulo: "Confirmar: quitar horarios",
+        detalle: detalle,
+        pedirMotivo: afectadas.length > 0
+      });
+      if (!conf.ok) { msg("Cancelado. No se cambió nada."); return; }
+
+      if (afectadas.length) {
+        msg("Cancelando " + afectadas.length + " cita(s)…");
+        const errC = await cancelarCitas(afectadas, conf.motivo);
+        if (errC) msg(errC + " cita(s) no se pudieron cancelar.", "error");
+      }
+
+      await aplicarBulk(pendientes.map((s) => ({ dia: s.dia, hora: s.hora, activo: false })));
+      if (afectadas.length) { await buscarDia(); await buscarMes(); }
+    }
+
+    function contarActivas() {
+      let n = 0;
+      HORAS.forEach((h) => A.DIAS_ORDEN.forEach((d) => { if (estaOn(d, h)) n++; }));
+      const el = $("contadorDisp");
+      if (el) el.textContent = n + (n === 1 ? " hora activa" : " horas activas");
+    }
+
+    function construirTabla() {
+      const tabla = $("tablaSemana");
+      if (!tabla) return;
+
+      let html = "<thead><tr><th>Hora</th>";
+      A.DIAS_ORDEN.forEach((d) => {
+        html += '<th class="dia-head" data-dia="' + d + '">' + A.DIAS[d] +
+          '<span class="set-dia">' +
+            '<button type="button" class="si" data-set-dia="' + d + '" data-activar="1" title="Poner todo el ' + A.DIAS[d] + ' como disponible">✓ Todo</button>' +
+            '<button type="button" class="no" data-set-dia="' + d + '" data-activar="0" title="Poner todo el ' + A.DIAS[d] + ' como no disponible">✗ Nada</button>' +
+          "</span></th>";
+      });
+      html += "</tr></thead><tbody>";
+
+      HORAS.forEach((hora) => {
+        html += '<tr><td class="hora-col" data-hora="' + hora + '" title="Activar/borrar esta hora en toda la semana">' +
+          hora + '<span class="borra-fila">⇄</span></td>';
+        A.DIAS_ORDEN.forEach((d) => {
+          const on = estaOn(d, hora);
+          html += '<td><button class="celda-toggle' + (on ? " on" : "") +
+            '" data-dia="' + d + '" data-hora="' + hora + '">' + (on ? "Sí" : "—") + "</button></td>";
+        });
+        html += "</tr>";
+      });
+      html += "</tbody>";
+      tabla.innerHTML = html;
+
+      tabla.querySelectorAll(".celda-toggle").forEach((b) =>
+        b.addEventListener("click", () => togglear(Number(b.getAttribute("data-dia")), b.getAttribute("data-hora"))));
+
+      tabla.querySelectorAll(".set-dia button").forEach((b) =>
+        b.addEventListener("click", (e) => {
+          e.stopPropagation();
+          setColumna(Number(b.getAttribute("data-set-dia")), b.getAttribute("data-activar") === "1");
+        }));
+
+      tabla.querySelectorAll(".dia-head").forEach((th) =>
+        th.addEventListener("click", () => toggleColumna(Number(th.getAttribute("data-dia")))));
+
+      tabla.querySelectorAll(".hora-col").forEach((td) =>
+        td.addEventListener("click", () => toggleFila(td.getAttribute("data-hora"))));
+
+      contarActivas();
+    }
+
+    function refrescarVisual() { construirTabla(); }
+
+    async function togglear(dia, hora) {
+      if (ocupado) return;
+      const nuevo = !estaOn(dia, hora);
+
+      if (!nuevo) {
+        await apagarSlots([{ dia, hora }], A.DIAS[dia] + " a las " + hora);
+        return;
+      }
+
+      ocupado = true;
+      msg("Guardando…");
+
+      const res = await A.api.guardarDisponibilidad(dia, hora, nuevo);
+      ocupado = false;
+
+      if (res && res.error) { msg(res.error, "error"); return; }
+
+      dispMapa[claveDH(dia, hora)] = nuevo;
+      refrescarVisual();
+      msg("Guardado.", "ok");
+    }
+
+    async function correrEnLotes(tareas, tam = 6) {
+      let err = 0;
+      for (let i = 0; i < tareas.length; i += tam) {
+        const lote = tareas.slice(i, i + tam).map((f) => f());
+        const res = await Promise.all(lote);
+        res.forEach((r) => { if (r && r.error) err++; });
+        msg("Guardando… " + Math.min(i + tam, tareas.length) + "/" + tareas.length);
+      }
+      return err;
+    }
+
+    async function aplicarBulk(cambios) {
+      if (ocupado) return;
+      const reales = cambios.filter((c) => estaOn(c.dia, c.hora) !== c.activo);
+      if (!reales.length) { msg("No había nada que cambiar."); return; }
+
+      ocupado = true;
+      const tareas = reales.map((c) => () =>
+        A.api.guardarDisponibilidad(c.dia, c.hora, c.activo).then((r) => {
+          if (!(r && r.error)) dispMapa[claveDH(c.dia, c.hora)] = c.activo;
+          return r;
+        }));
+
+      const err = await correrEnLotes(tareas);
+      ocupado = false;
+      refrescarVisual();
+
+      if (err) msg(err + " no se pudieron guardar. Vuelve a intentarlo.", "error");
+      else msg("Listo. " + reales.length + " hora(s) actualizada(s).", "ok");
+    }
+
+    function toggleFila(hora) {
+      const activar = !A.DIAS_ORDEN.some((d) => estaOn(d, hora));
+      const slots = A.DIAS_ORDEN.map((d) => ({ dia: d, hora }));
+      if (activar) aplicarBulk(slots.map((s) => ({ dia: s.dia, hora: s.hora, activo: true })));
+      else apagarSlots(slots, "las " + hora + " de toda la semana");
+    }
+
+    function toggleColumna(dia) {
+      const activar = !HORAS.some((h) => estaOn(dia, h));
+      const slots = HORAS.map((h) => ({ dia, hora: h }));
+      if (activar) aplicarBulk(slots.map((s) => ({ dia: s.dia, hora: s.hora, activo: true })));
+      else apagarSlots(slots, "todo el " + A.DIAS[dia]);
+    }
+
+    function setColumna(dia, activar) {
+      const slots = HORAS.map((h) => ({ dia, hora: h }));
+      if (activar) aplicarBulk(slots.map((s) => ({ dia: s.dia, hora: s.hora, activo: true })));
+      else apagarSlots(slots, "todo el " + A.DIAS[dia]);
+    }
+
+    function marcarTodo(activar) {
+      const slots = [];
+      HORAS.forEach((h) => A.DIAS_ORDEN.forEach((d) => slots.push({ dia: d, hora: h })));
+      if (activar) aplicarBulk(slots.map((s) => ({ dia: s.dia, hora: s.hora, activo: true })));
+      else apagarSlots(slots, "TODA la semana");
+    }
+
+    function llenarPanelAvanzado() {
+      const ops = HORAS.map((h) => '<option value="' + h + '">' + h + "</option>").join("");
+      if ($("avDesde")) $("avDesde").innerHTML = ops;
+      if ($("avHasta")) $("avHasta").innerHTML = ops;
+      if (HORAS.length && $("avHasta")) $("avHasta").value = HORAS[HORAS.length - 1];
+
+      if ($("avDias")) {
+        $("avDias").innerHTML = A.DIAS_ORDEN.map((d) =>
+          '<label style="display:flex; align-items:center; gap:6px;">' +
+          '<input type="checkbox" class="av-dia" value="' + d + '" checked /> ' + A.esc(A.DIAS[d]) +
+          "</label>").join("");
+      }
+    }
+
+    function diasAvanzadoElegidos() {
+      return Array.from(document.querySelectorAll(".av-dia"))
+        .filter((c) => c.checked).map((c) => Number(c.value));
+    }
+
+    async function aplicarAvanzado() {
+      const dias = diasAvanzadoElegidos();
+      if (!dias.length) { msg("Elige al menos un día.", "error"); return; }
+
+      const desde = $("avDesde").value;
+      const hasta = $("avHasta").value;
+      if (desde > hasta) { msg("El rango de exclusión está invertido.", "error"); return; }
+
+      const enRango = (h) => h >= desde && h <= hasta;
+      const encender = [];
+      const apagar = [];
+      dias.forEach((d) => HORAS.forEach((h) => {
+        if (enRango(h)) apagar.push({ dia: d, hora: h });
+        else encender.push({ dia: d, hora: h, activo: true });
+      }));
+
+      await apagarSlots(apagar, "el rango " + desde + "–" + hasta + " en " + dias.length + " día(s)");
+      await aplicarBulk(encender);
+    }
+
+    async function cargarDisponibilidad() {
+      const res = await A.api.obtenerDisponibilidad();
+      if (res && res.error) { msg(res.error, "error"); return; }
+
+      dispMapa = {};
+      (res || []).forEach((r) => {
+        dispMapa[claveDH(Number(r.dia_semana), r.hora)] = r.activo === true;
+      });
+      construirTabla();
+    }
+
+    function renderResultados(contenedor, lista) {
+      if (!contenedor) return;
+      if (!lista || !lista.length) {
+        contenedor.innerHTML = '<p class="vacio">No se encontraron citas.</p>';
+        return;
+      }
+
+      let html = '<div class="tabla-scroll"><table class="datos"><thead><tr>' +
+        '<th>Fecha</th><th>Hora</th><th>Cliente</th>' +
+        (campoExtraNombre ? "<th>" + A.esc(campoExtraNombre) + "</th>" : "") +
+        '<th>Clave</th><th>Agendó</th><th>Acción</th>' +
+        '</tr></thead><tbody>';
+      lista.forEach((c) => {
+        const clave = (c.cancel_clave != null && c.cancel_clave !== "") ? c.cancel_clave : "-";
+        html += "<tr><td>" + A.esc(c.fecha) + "</td><td>" + A.esc(c.hora) + "</td><td><strong>" +
+          A.esc(c.nombre_cliente) + "</strong></td>" +
+          (campoExtraNombre ? "<td>" + A.esc(c.dato_extra || "-") + "</td>" : "") +
+          '<td><code style="font-weight:700;color:var(--primario,#3b82f6);">' + A.esc(clave) + "</code></td>" +
+          "<td>" + A.esc(c.agendado_por || "-") + "</td>" +
+          '<td><button class="btn-cancelar-cita" data-id="' + A.esc(c.id) +
+            '" data-hora="' + A.esc(c.hora) + '" data-nombre="' + A.esc(c.nombre_cliente) +
+            '" data-clave="' + A.esc(clave === "-" ? "" : clave) +
+            '">Cancelar</button></td></tr>';
+      });
+      html += "</tbody></table></div>";
+      contenedor.innerHTML = html;
+
+      contenedor.querySelectorAll(".btn-cancelar-cita").forEach((b) =>
+        b.addEventListener("click", () =>
+          abrirCancelacion(
+            Number(b.getAttribute("data-id")),
+            b.getAttribute("data-hora"),
+            b.getAttribute("data-nombre"),
+            b.getAttribute("data-clave")
+          )));
+    }
+
+    async function buscarDia() {
+      const elMsg = $("msgBuscar");
+      if (elMsg) { elMsg.textContent = "Buscando..."; elMsg.className = "mensaje"; }
+
+      const res = await A.api.buscarCitas({
+        fecha: $("fechaDia") ? $("fechaDia").value : "",
+        texto: $("buscarDia") ? $("buscarDia").value.trim() : ""
+      });
+
+      if (res && res.error) {
+        if (elMsg) { elMsg.textContent = res.error; elMsg.className = "mensaje error"; }
+        return;
+      }
+
+      renderResultados($("tablaDia"), res);
+      if (elMsg) elMsg.textContent = (res || []).length + " cita(s).";
+    }
+
+    async function buscarMes() {
+      const elMsg = $("msgBuscar");
+      if (elMsg) { elMsg.textContent = "Buscando..."; elMsg.className = "mensaje"; }
+
+      const datos = { texto: $("buscarMes") ? $("buscarMes").value.trim() : "" };
+      const chkTodos = $("chkTodos");
+      const mes = $("mes");
+
+      if ((!chkTodos || !chkTodos.checked) && mes && mes.value) {
+        datos.mes = mes.value;
+      }
+
+      const res = await A.api.buscarCitas(datos);
+      if (res && res.error) {
+        if (elMsg) { elMsg.textContent = res.error; elMsg.className = "mensaje error"; }
+        return;
+      }
+
+      renderResultados($("tablaMes"), res);
+      if (elMsg) elMsg.textContent = (res || []).length + " cita(s).";
+    }
+
+    function activarTab(cual) {
+      if ($("tabDia")) $("tabDia").classList.toggle("activa", cual === "dia");
+      if ($("tabMes")) $("tabMes").classList.toggle("activa", cual === "mes");
+      if ($("panelDia")) $("panelDia").classList.toggle("activo", cual === "dia");
+      if ($("panelMes")) $("panelMes").classList.toggle("activo", cual === "mes");
+    }
+
+    function msgCancel(txt, tipo) {
+      const e = $("msgCancel");
+      if (!e) return;
+      e.textContent = txt || "";
+      e.className = "mensaje" + (tipo ? " " + tipo : "");
+    }
+
+    function renderizarOpcionesMotivo(lista) {
+      const cont = $("listaMotivosScroll");
+      if (!cont) return;
+      if (!lista || !lista.length) {
+        cont.innerHTML = '<p style="font-size:12px;color:var(--tenue,#9ca3af);">Sin coincidencias. Puedes usar el texto que escribiste arriba.</p>';
+        return;
+      }
+      cont.innerHTML = lista.map((m) =>
+        `<button type="button" class="btn-motivo-item">${A.esc(m)}</button>`
+      ).join("");
+      cont.querySelectorAll(".btn-motivo-item").forEach((btn) =>
+        btn.addEventListener("click", () => {
+          if ($("inputBuscarMotivo")) $("inputBuscarMotivo").value = btn.innerText.trim();
+        }));
+    }
+
+    function abrirCancelacion(id, hora, nombre, clave) {
+      cancelIdActual = id;
+      if ($("modalCancelSub")) $("modalCancelSub").textContent =
+        "Cita de " + (nombre || "cliente") + " a las " + (hora || "") +
+        (clave ? '. Clave del cliente: ' + clave : ". Indica la clave y el motivo.");
+
+      if ($("inputClaveCancel")) $("inputClaveCancel").value = clave || "";
+      if ($("inputBuscarMotivo")) $("inputBuscarMotivo").value = "";
+      msgCancel("");
+      renderizarOpcionesMotivo(MOTIVOS_PREELEGIDOS);
+      if ($("modalMotivoFondo")) $("modalMotivoFondo").classList.add("abierto");
+      if ($("inputClaveCancel")) $("inputClaveCancel").focus();
+    }
+
+    function cerrarModalMotivo() {
+      if ($("modalMotivoFondo")) $("modalMotivoFondo").classList.remove("abierto");
+      cancelIdActual = null;
+    }
+
+    async function confirmarCancelacion() {
+      if (cancelIdActual == null) return;
+      const clave = $("inputClaveCancel") ? $("inputClaveCancel").value.trim() : "";
+      const motivo = $("inputBuscarMotivo") ? $("inputBuscarMotivo").value.trim() : "";
+      if (!clave) { msgCancel("Escribe la clave de cancelación del cliente.", "error"); return; }
+      if (!motivo) { msgCancel("Escribe o selecciona un motivo.", "error"); return; }
+
+      msgCancel("Cancelando…");
+      const res = await A.api.cancelarCita({ id: cancelIdActual, cancelPassword: clave, motivo: motivo });
+      if (res && res.error) { msgCancel(res.error, "error"); return; }
+
+      cerrarModalMotivo();
+      await buscarDia();
+      await buscarMes();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const ok = await window.Agenda.protegerPagina();
+      if (!ok) return;
+
+      const barberoId = window.Agenda.exigirBarberoEnURL();
+      if (!barberoId) return;
+
+      const est = await A.api.estadoNegocio();
+      if (!est || est.error || !est.puede_gestionar) {
+        document.body.innerHTML =
+          '<div class="wrap"><section class="seccion" style="text-align:center;">' +
+          '<h1>Acceso restringido</h1>' +
+          '<p class="ayuda">Tu rol solo permite reservar citas, no gestionar horarios.</p>' +
+          '<a class="btn-primario" style="text-decoration:none;display:inline-block;margin-top:12px;" ' +
+          'href="01_agenda_cita.html?barbero=' + encodeURIComponent(barberoId) +
+          (A.negocioActual() ? "&negocio=" + encodeURIComponent(A.negocioActual()) : "") +
+          '">Ir a agendar</a></section></div>';
+        return;
+      }
+
+      HORAS = A.generarHoras(est.hora_inicio, est.hora_fin, est.intervalo_min);
+      campoExtraNombre = est.campo_extra ? String(est.campo_extra) : "";
+      llenarPanelAvanzado();
+
+      if ($("btnAvanzado")) $("btnAvanzado").addEventListener("click", () => {
+        const p = $("panelAvanzado");
+        if (p) p.style.display = (p.style.display === "none") ? "" : "none";
+      });
+      if ($("avAplicar")) $("avAplicar").addEventListener("click", aplicarAvanzado);
+      if ($("avTodosDias")) $("avTodosDias").addEventListener("click", () => {
+        document.querySelectorAll(".av-dia").forEach((c) => { c.checked = true; });
+      });
+      if ($("avNingunDia")) $("avNingunDia").addEventListener("click", () => {
+        document.querySelectorAll(".av-dia").forEach((c) => { c.checked = false; });
+      });
+
+      if ($("modalConfirmFondo")) $("modalConfirmFondo").addEventListener("click", (e) => {
+        if (e.target === $("modalConfirmFondo") && $("confirmNo")) $("confirmNo").click();
+      });
+
+      if ($("confirmMotivo")) $("confirmMotivo").addEventListener("input", (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        renderMotivosEn("confirmListaMotivos", "confirmMotivo",
+          MOTIVOS_PREELEGIDOS.filter((m) => m.toLowerCase().includes(q)));
+      });
+
+      const navA = $("navAgendar");
+      if (navA) navA.href = "01_agenda_cita.html?barbero=" + barberoId;
+
+      const rb = await A.api.listarBarberos();
+      if (rb && rb.barberos) {
+        const b = rb.barberos.find((x) => Number(x.id) === Number(barberoId));
+        if (b && $("subEncabezado")) {
+          $("subEncabezado").textContent = "Usuario: " + b.nombre +
+            " — revisa sus citas y ajusta sus horarios.";
+        }
+      }
+
+      const hoy = A.hoyISO();
+      if ($("fechaDia")) $("fechaDia").value = hoy;
+      if ($("mes")) $("mes").value = hoy.slice(0, 7);
+
+      const inputMotivo = $("inputBuscarMotivo");
+      if (inputMotivo) {
+        inputMotivo.addEventListener("input", (e) => {
+          const q = e.target.value.toLowerCase().trim();
+          const filtrados = MOTIVOS_PREELEGIDOS.filter((m) => m.toLowerCase().includes(q));
+          renderizarOpcionesMotivo(filtrados);
+        });
+      }
+
+      if ($("btnConfirmarMotivoText")) $("btnConfirmarMotivoText").addEventListener("click", confirmarCancelacion);
+      if ($("btnCerrarMotivo")) $("btnCerrarMotivo").addEventListener("click", cerrarModalMotivo);
+      if ($("modalMotivoFondo")) $("modalMotivoFondo").addEventListener("click", (e) => {
+        if (e.target === $("modalMotivoFondo")) cerrarModalMotivo();
+      });
+
+      if ($("tabDia")) $("tabDia").addEventListener("click", () => activarTab("dia"));
+      if ($("tabMes")) $("tabMes").addEventListener("click", () => activarTab("mes"));
+      if ($("btnBuscarDia")) $("btnBuscarDia").addEventListener("click", buscarDia);
+      if ($("btnBuscarMes")) $("btnBuscarMes").addEventListener("click", buscarMes);
+      if ($("buscarDia")) $("buscarDia").addEventListener("input", buscarDia);
+      if ($("buscarMes")) $("buscarMes").addEventListener("input", buscarMes);
+      if ($("fechaDia")) $("fechaDia").addEventListener("change", buscarDia);
+      if ($("mes")) $("mes").addEventListener("change", buscarMes);
+      if ($("chkTodos")) $("chkTodos").addEventListener("change", buscarMes);
+
+      if ($("btnTodo")) $("btnTodo").addEventListener("click", () => marcarTodo(true));
+      if ($("btnVaciar")) $("btnVaciar").addEventListener("click", () => marcarTodo(false));
+
+      await buscarDia();
+      await cargarDisponibilidad();
+    });
+  })();
+</script>
+</body>
+</html>

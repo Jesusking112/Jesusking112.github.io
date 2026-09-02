@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soporte y peticiones</title>
+  <link rel="stylesheet" href="02_soporte.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="cab" style="display:flex; align-items:flex-start; gap:12px;">
+      <div style="flex:1;">
+        <h1>Soporte y peticiones</h1>
+        <p>Envía una queja, sugerencia o solicitud. Recibirás un <strong>token</strong> y una <strong>clave</strong>
+          para ver mis respuestas cuando quieras.</p>
+      </div>
+      <button type="button" id="btnRegresar" class="btn-sec" style="display:none; white-space:nowrap;">&larr; Regresar</button>
+    </header>
+
+    <div class="seccion oculto" id="avisoExpiro" style="border-color: rgba(245,158,11,.5);">
+      <h2 style="color:var(--alerta);">Tu acceso está en pausa</h2>
+      <p class="ayuda" id="avisoExpiroTxt" style="font-size:14px;"></p>
+      <p class="ayuda">Puedes usar este formulario para solicitar la renovación.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab activa" id="tabEnviar">Enviar algo nuevo</button>
+      <button class="tab" id="tabConsultar">Ya tengo un token</button>
+    </div>
+
+    <section class="seccion" id="panelEnviar">
+      <h2>Cuéntame qué necesitas</h2>
+
+      <div class="dos-col">
+        <div class="campo">
+          <label for="fTipo">Tipo</label>
+          <select id="fTipo">
+            <option value="queja">Queja</option>
+            <option value="solicitud">Solicitud / Petición</option>
+            <option value="sugerencia">Sugerencia</option>
+            <option value="renovacion">Renovar suscripción</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="fNombre">Tu usuario de acceso (obligatorio)</label>
+          <input type="text" id="fNombre" maxlength="60" placeholder="Cómo te llamo" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="fAsunto">Asunto</label>
+        <input type="text" id="fAsunto" maxlength="80" placeholder="Resume en pocas palabras" autocomplete="off" />
+      </div>
+
+      <div class="campo">
+        <label for="fMensaje">Mensaje</label>
+        <textarea id="fMensaje" maxlength="2000" placeholder="Explícame con detalle..."></textarea>
+      </div>
+
+      <div class="acciones">
+        <button class="btn-primario" id="btnEnviar">Enviar</button>
+      </div>
+      <p class="mensaje" id="msgEnviar"></p>
+
+      <!-- Resultado con token + clave -->
+      <div class="clave-caja oculto" id="cajaClave">
+        <small>Tu token de seguimiento</small>
+        <span class="token" id="outToken">--------</span>
+        <small>Tu clave para ver respuestas (guárdala)</small>
+        <span class="clave" id="outClave">--------</span>
+        <div class="acciones" style="justify-content:center; margin-top:12px;">
+          <button class="btn-sec" id="btnCopiar">Copiar ambas</button>
+          <button class="btn-sec" id="btnIrConsulta">Ver mi ticket</button>
+        </div>
+        <p class="ayuda">Sin la clave no podrás ver las respuestas. Anótala antes de cerrar.</p>
+      </div>
+    </section>
+
+    <!-- ====================== CONSULTAR ====================== -->
+    <section class="seccion oculto" id="panelConsultar">
+      <h2>Consulta tu ticket</h2>
+      <div class="dos-col">
+        <div class="campo">
+          <label for="cToken">Token</label>
+          <input type="text" id="cToken" maxlength="12" placeholder="8 dígitos" autocomplete="off" inputmode="numeric" />
+        </div>
+        <div class="campo">
+          <label for="cClave">Clave</label>
+          <input type="text" id="cClave" maxlength="12" placeholder="8 dígitos" autocomplete="off" />
+        </div>
+      </div>
+      <div class="acciones">
+        <button class="btn-primario" id="btnBuscar">Abrir</button>
+      </div>
+      <p class="mensaje" id="msgConsultar"></p>
+
+      <!-- Hilo del ticket -->
+      <div class="oculto" id="hilo" style="margin-top:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+          <div>
+            <h2 style="margin:0;" id="hiloAsunto"></h2>
+            <span class="pill tipo" id="hiloTipo"></span>
+            <span class="pill" id="hiloEstado"></span>
+          </div>
+        </div>
+
+        <div class="chat" id="chat"></div>
+
+        <div class="campo" id="cajaResponder">
+          <label for="cRespuesta">Añadir un mensaje</label>
+          <textarea id="cRespuesta" maxlength="2000" placeholder="Escribe aquí para ampliar tu petición..."></textarea>
+        </div>
+        <div class="acciones">
+          <button class="btn-primario" id="btnResponder">Enviar mensaje</button>
+          <button class="btn-sec" id="btnRefrescar">Actualizar</button>
+        </div>
+        <p class="mensaje" id="msgHilo"></p>
+      </div>
+    </section>
+  </div>
+
+  <script src="02_soporte.js"></script>
+  <script src="02_soporte_usuario.js"></script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Menu principal</title>
+
+<script>
+  (function () {
+    try {
+      const s = JSON.parse(sessionStorage.getItem("sesion") || "null");
+      if (s && s.token && s.Modo) {
+        const modo = Number(s.Modo);
+        if (modo === 3) {
+          window.location.replace("01_agenda_cita.html");
+        } else if (modo === 4) {
+          window.location.replace("01_gestion_agenda.html");
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+
+<link rel="stylesheet" href="menu.css">
+<link rel="stylesheet" href="pantalla_completa.css">
+
+<script src="modulo_conexion.js"></script>
+<script src="pantalla_completa.js" defer></script>
+<script>document.documentElement.style.visibility = "hidden";</script>
+
+</head>
+<body>
+  <button id="btnToggleFullscreen" class="btn-fullscreen">pantalla completa</button>
+
+  <header class="barra">
+    <div class="marca">Servicios<span> disponibles</span></div>
+    <nav class="menu-navegacion" id="menuNavegacion"></nav>
+    <div class="usuario-caja">
+      <button class="usuario-btn" id="btnUsuario">
+        <span class="avatar" id="avatar">?</span>
+        <span id="nombreUsuario">Usuario</span>
+        <span class="rol-chip" id="rolChip">-</span>
+        <span class="flecha">&#9660;</span>
+      </button>
+      <div class="menu-usuario" id="menuUsuario">
+        <div class="cabecera">Conectado como<br><b id="menuNombre">-</b></div>
+        <button id="btnCerrar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg> Cerrar sesion</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="contenido">
+    <div class="vista-contenido" id="vistaContenido"></div>
+  </main>
+
+<script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+
+    const SVG = {
+      inicio:    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>',
+      perfil:    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+      reportes:  '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4"/><path d="M4 20h16"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg>',
+      usuarios:  '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M17 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.5c2.5.6 4 2.6 4 5.5"/></svg>',
+      auditoria: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M14 3v4h4"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>',
+      config:    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+    };
+
+    const OPCIONES = [
+      { id: 'usuarios',  titulo: 'Gestion de usuarios', desc: 'Crear, resetear y eliminar usuarios.',     icono: SVG.usuarios,  roles: [1, 2],    destino: 'gestion_de_usuarios.html' },
+
+      { id: 'agendar',   titulo: 'Agendar cita',      desc: 'Reserva un horario en tiempo real.',         icono: SVG.perfil,    roles: [1, 3], destino: '01_agenda_cita.html' },
+      { id: 'agenda',    titulo: 'Gestión de agenda', desc: 'Define horarios y consulta las citas.',      icono: SVG.config,    roles: [1, 4],    destino: '01_gestion_agenda.html' },
+
+      { id: 'inicio',    titulo: 'Soporte',              desc: 'Soporte usuarios.',    icono: SVG.inicio,    roles: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], destino: '02_soporte.html' },
+      { id: 'inicio',    titulo: 'Soporte admin',              desc: 'Admin soporte.',    icono: SVG.inicio,    roles: [1], destino: '02_soporte_admin.html' },
+      //{ id: 'perfil',    titulo: 'Mi perfil',           desc: 'Consulta tus datos y tu ultimo acceso.',   icono: SVG.perfil,    roles: [1, 2], destino: '#' },
+      //{ id: 'reportes',  titulo: 'Reportes',            desc: 'Visualiza reportes de tu actividad.',      icono: SVG.reportes,  roles: [1, 2], destino: '#' },
+      //{ id: 'auditoria', titulo: 'Auditoria y logs',    desc: 'Registros de conexiones y descargas PDF.', icono: SVG.auditoria, roles: [1],    destino: '#' },
+      //{ id: 'config',    titulo: 'Configuracion',       desc: 'Ajustes del sistema (solo admin).',        icono: SVG.config,    roles: [1],    destino: '#' },
+
+    ];
+
+    function cargarContenidoVista(opcion) {
+      const contenedor = $('vistaContenido');
+      if (opcion.destino && opcion.destino !== '#') {
+        contenedor.innerHTML = '<iframe class="visor-iframe" src="' + opcion.destino + '"></iframe>';
+      } else {
+        contenedor.innerHTML =
+          '<div class="vista-estandar"><div class="icono-grande">' + opcion.icono + '</div>' +
+          '<h2>Ventana de contenido: ' + opcion.titulo + '</h2><p>' + opcion.desc + '</p></div>';
+      }
+    }
+
+    function construirMenu(sesion) {
+      const modo = Number(sesion.Modo);
+      const inicial = (sesion.User || '?').charAt(0).toUpperCase();
+      $('avatar').textContent = inicial;
+      $('nombreUsuario').textContent = sesion.User;
+      $('menuNombre').textContent = sesion.User;
+      $('rolChip').textContent = modo === 1 ? 'Admin' : 'Usuario';
+
+      const permitidas = OPCIONES.filter(o => o.roles.includes(modo));
+      const navContenedor = $('menuNavegacion');
+      navContenedor.innerHTML = '';
+      if (permitidas.length === 0) {
+        $('vistaContenido').innerHTML = '<div class="vista-estandar"><h2>No tienes opciones asignadas.</h2></div>';
+        return;
+      }
+      permitidas.forEach((op, index) => {
+        const boton = document.createElement('button');
+        boton.className = 'btn-nav';
+        boton.id = 'btn-' + op.id;
+        boton.innerHTML = '<span class="icono">' + op.icono + '</span><span>' + op.titulo + '</span>';
+        boton.addEventListener('click', () => {
+          document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('activo'));
+          boton.classList.add('activo');
+          cargarContenidoVista(op);
+        });
+        navContenedor.appendChild(boton);
+        if (index === 0) { boton.classList.add('activo'); cargarContenidoVista(op); }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const ok = await window.Plataforma.protegerPagina([1, 2, 3, 4]);
+      if (!ok) return;
+
+      const sesion = window.Plataforma.obtenerSesion();
+      construirMenu(sesion);
+
+      $('btnUsuario').addEventListener('click', (e) => {
+        e.stopPropagation();
+        $('menuUsuario').classList.toggle('abierto');
+      });
+      document.addEventListener('click', () => $('menuUsuario').classList.remove('abierto'));
+
+      $('btnCerrar').addEventListener('click', async () => {
+        try { await window.Plataforma.api.logout(); } catch (e) {}
+        window.Plataforma.borrarSesion();
+        window.location.replace('login.html');
+      });
+    });
+  })();
+</script>
+</body>
+</html>
