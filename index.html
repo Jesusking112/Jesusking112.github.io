@@ -1,8 +1,349 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Sistemas & Contabilidad: software a medida, servicios contables y mantenimiento tecnológico para empresas. Diagnóstico inicial gratuito.">
+<meta name="theme-color" content="#08111f">
+<title>Sistemas & Contabilidad | Tecnología, Software y Gestión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 
+<style>
+:root{
+ --bg:#07111f;--bg2:#0b1728;--surface:#0f1d30;--surface2:#12243a;
+ --text:#f7fbff;--muted:#a9b8c9;--line:rgba(255,255,255,.10);
+ --blue:#36a9ff;--cyan:#38e0c0;--green:#21d58b;
+ --grad:linear-gradient(135deg,#36a9ff 0%,#38e0c0 100%);
+ --shadow:0 24px 70px rgba(0,0,0,.28);--radius:22px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button,input,select,textarea{font:inherit}
+.container{width:min(1160px,calc(100% - 40px));margin:auto}
+header{position:sticky;top:0;z-index:1000;background:rgba(7,17,31,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.logo{font-family:Manrope,sans-serif;font-weight:800;font-size:1.15rem;letter-spacing:-.5px}
+.logo span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-links{display:flex;align-items:center;gap:26px;list-style:none}
+.nav-links a{color:#b9c6d6;font-weight:600;font-size:.92rem;transition:.2s}
+.nav-links a:hover{color:#fff}
+.nav-cta{background:var(--grad)!important;color:#06111e!important;padding:10px 17px;border-radius:12px;font-weight:800!important}
+.menu{display:none;background:none;border:0;color:#fff;font-size:1.6rem;cursor:pointer}
+
+.hero{position:relative;padding:92px 0 80px;overflow:hidden}
+.hero:before{content:"";position:absolute;width:650px;height:650px;right:-300px;top:-250px;background:radial-gradient(circle,rgba(54,169,255,.20),transparent 68%);pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:70px;align-items:center}
+.eyebrow{display:inline-flex;gap:9px;align-items:center;color:#9fead9;background:rgba(56,224,192,.08);border:1px solid rgba(56,224,192,.18);padding:8px 12px;border-radius:999px;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;margin-bottom:22px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 15px var(--green)}
+h1,h2,h3{font-family:Manrope,sans-serif;letter-spacing:-1px}
+h1{font-size:clamp(2.7rem,6vw,5rem);line-height:1.03;max-width:760px}
+.gradient{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-copy{font-size:1.12rem;color:var(--muted);max-width:650px;margin:24px 0 30px}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:0;border-radius:13px;padding:14px 20px;font-weight:800;cursor:pointer;transition:.2s}
+.btn-primary{background:var(--grad);color:#06111e;box-shadow:0 12px 35px rgba(54,169,255,.18)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 42px rgba(54,169,255,.28)}
+.btn-outline{border:1px solid var(--line);color:#e8f1fa;background:rgba(255,255,255,.035)}
+.btn-outline:hover{background:rgba(255,255,255,.07)}
+.trust{display:flex;gap:22px;flex-wrap:wrap;margin-top:28px;color:#91a3b7;font-size:.86rem}
+.trust strong{color:#fff}
+.hero-card{background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));border:1px solid var(--line);border-radius:28px;padding:25px;box-shadow:var(--shadow);position:relative}
+.window{border:1px solid rgba(255,255,255,.09);border-radius:19px;background:#091522;overflow:hidden}
+.window-top{height:43px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;padding:0 15px}
+.window-top i{width:8px;height:8px;border-radius:50%;background:#496177}
+.dashboard{padding:22px}
+.dash-title{font-weight:800;font-size:1.1rem;margin-bottom:5px}
+.dash-sub{color:#8193a8;font-size:.8rem}
+.metric{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}
+.metric div{background:#0e1f31;border:1px solid var(--line);padding:15px;border-radius:14px}
+.metric b{font-size:1.25rem}.metric span{display:block;color:#7f93a8;font-size:.72rem;margin-top:2px}
+.progress{height:8px;background:#172b41;border-radius:99px;overflow:hidden;margin-top:15px}
+.progress span{display:block;width:78%;height:100%;background:var(--grad);border-radius:99px}
+.card-note{margin-top:16px;color:#8da0b4;font-size:.78rem}
+
+.section{padding:90px 0}
+.section-alt{background:#091524;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.section-head{max-width:730px;margin-bottom:42px}
+.kicker{color:#5fe3c9;text-transform:uppercase;letter-spacing:1.5px;font-weight:800;font-size:.75rem;margin-bottom:10px}
+.section h2{font-size:clamp(2rem,4vw,3rem);line-height:1.1}
+.section-head p{color:var(--muted);margin-top:13px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:var(--radius);padding:28px;transition:.25s;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-6px);border-color:rgba(54,169,255,.35);box-shadow:0 18px 50px rgba(0,0,0,.2)}
+.icon{width:48px;height:48px;border-radius:14px;background:rgba(54,169,255,.10);display:grid;place-items:center;font-size:1.4rem;margin-bottom:20px}
+.card h3{font-size:1.25rem;margin-bottom:10px}
+.card p{color:var(--muted);font-size:.92rem;flex:1}
+.card ul{list-style:none;margin:18px 0 23px;color:#b7c5d4;font-size:.86rem}
+.card li{margin:8px 0}.card li:before{content:"✓";color:#54dfc5;font-weight:900;margin-right:8px}
+.text-link{color:#69dfff;font-weight:800;font-size:.88rem}
+
+.feature{display:grid;grid-template-columns:.9fr 1.1fr;gap:50px;align-items:center}
+.feature-box{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:30px}
+.checks{display:grid;gap:13px;margin-top:22px}
+.check{display:flex;gap:12px;align-items:flex-start;color:#b9c7d6;font-size:.92rem}
+.check b{color:#fff}
+.check-icon{width:25px;height:25px;border-radius:8px;background:rgba(56,224,192,.11);color:#62e2cc;display:grid;place-items:center;flex:0 0 auto}
+
+.products{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.product{position:relative;padding:28px;border-radius:22px;border:1px solid var(--line);background:linear-gradient(145deg,#0e1d30,#0a1625)}
+.badge{display:inline-block;background:rgba(54,169,255,.10);color:#70d5ff;border:1px solid rgba(54,169,255,.16);padding:6px 10px;border-radius:999px;font-size:.7rem;font-weight:800;text-transform:uppercase}
+.product h3{font-size:1.35rem;margin:17px 0 5px}.price{font-size:1.55rem;font-weight:900;color:#61e5c9}.compat{color:#7f92a7;font-size:.78rem;margin:4px 0 15px}.product p{color:var(--muted);font-size:.9rem;margin-bottom:18px}
+.product .btn{width:100%}
+
+.process{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:steps}
+.step{padding:28px;border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.025)}
+.step-num{width:34px;height:34px;border-radius:10px;background:var(--grad);color:#07111f;font-weight:900;display:grid;place-items:center;margin-bottom:18px}
+.step p{color:var(--muted);font-size:.9rem;margin-top:8px}
+
+.cta{padding:65px 0}
+.cta-box{background:linear-gradient(135deg,#10304a,#0b2930);border:1px solid rgba(56,224,192,.18);border-radius:28px;padding:45px;display:flex;justify-content:space-between;align-items:center;gap:30px;box-shadow:var(--shadow)}
+.cta h2{font-size:clamp(1.8rem,4vw,2.7rem)}.cta p{color:#afc0d0;margin-top:8px;max-width:650px}
+
+.contact-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:40px}
+.contact-info p{color:var(--muted);margin:12px 0 25px}.contact-list{display:grid;gap:14px}.contact-item{padding:16px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.025)}.contact-item small{display:block;color:#7e92a7}.contact-item b{display:block;margin-top:3px}
+.form{background:#0c192a;border:1px solid var(--line);border-radius:23px;padding:28px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{margin-bottom:14px}.field.full{grid-column:1/-1}
+label{display:block;font-size:.8rem;font-weight:800;color:#c3cfdb;margin-bottom:7px}
+input,select,textarea{width:100%;border:1px solid var(--line);background:#081522;color:#fff;border-radius:12px;padding:12px 13px;outline:0}
+input:focus,select:focus,textarea:focus{border-color:rgba(54,169,255,.65)}textarea{min-height:120px;resize:vertical}
+.form button{width:100%}.success{display:none;background:rgba(33,213,139,.10);border:1px solid rgba(33,213,139,.25);color:#7df1bb;padding:12px;border-radius:12px;margin-bottom:14px;text-align:center;font-size:.85rem}
+
+footer{border-top:1px solid var(--line);padding:28px 0;color:#71849a;font-size:.8rem}
+.footer-inner{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(1,7,14,.78);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px}
+.modal-card{width:min(620px,100%);background:#0d1a2b;border:1px solid var(--line);border-radius:24px;padding:30px;position:relative;box-shadow:var(--shadow)}
+.close{position:absolute;right:17px;top:12px;border:0;background:none;color:#9db0c2;font-size:1.8rem;cursor:pointer}.modal-card h3{font-size:1.5rem}.modal-card p{color:var(--muted);margin:10px 0 18px}.modal-card ul{list-style:none}.modal-card li{padding:8px 0;color:#b7c6d5}.modal-card li:before{content:"✓";color:#5de1c6;margin-right:8px}
+
+@media(max-width:900px){
+ .hero-grid,.feature,.contact-grid{grid-template-columns:1fr}.hero-grid{gap:45px}.cards{grid-template-columns:1fr 1fr}.hero-card{max-width:650px}
+}
+@media(max-width:680px){
+ .container{width:min(100% - 28px,1160px)}nav{height:68px}.menu{display:block}.nav-links{position:fixed;left:0;right:0;top:68px;background:#07111f;border-bottom:1px solid var(--line);display:none;flex-direction:column;padding:24px}.nav-links.open{display:flex}.nav-cta{width:100%;text-align:center}.hero{padding:65px 0}.section{padding:65px 0}.cards,.products,.process{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.cta-box{padding:30px;display:block}.cta-box .btn{margin-top:20px;width:100%}.hero-copy{font-size:1rem}.trust{gap:12px}
+}
+</style>
+</head>
+<body>
+
+<header>
+<nav class="container">
+<a class="logo" href="#inicio">Sistemas <span>& Contabilidad</span></a>
+<button class="menu" id="menuBtn" aria-label="Abrir menú">☰</button>
+<ul class="nav-links" id="navLinks">
+<li><a href="#inicio">Inicio</a></li>
+<li><a href="#servicios">Servicios</a></li>
+<li><a href="#productos">Software</a></li>
+<li><a href="login.html">Área de clientes</a></li>
+<li><a href="#contacto" class="nav-cta">Hablar con nosotros</a></li>
+</ul>
+</nav>
+</header>
+
+<main>
+<section class="hero" id="inicio">
+<div class="container hero-grid">
+<div>
+<div class="eyebrow"><span class="dot"></span> Tecnología + gestión para negocios</div>
+<h1>Convierte procesos complicados en <span class="gradient">sistemas que trabajan para ti.</span></h1>
+<p class="hero-copy">Desarrollamos software a medida, brindamos servicios contables y mantenemos tu infraestructura tecnológica funcionando. Soluciones prácticas para empresas que quieren ordenar, automatizar y crecer.</p>
+<div class="actions">
+<a class="btn btn-primary" href="#contacto">🚀 Solicitar diagnóstico gratuito</a>
+<a class="btn btn-outline" href="#servicios">Ver soluciones</a>
+</div>
+<div class="trust">
+<span>✓ <strong>Diagnóstico inicial</strong> gratuito</span>
+<span>✓ Soluciones a medida</span>
+<span>✓ Atención por WhatsApp</span>
+</div>
+</div>
+
+<div class="hero-card">
+<div class="window">
+<div class="window-top"><i></i><i></i><i></i></div>
+<div class="dashboard">
+<div class="dash-title">Panel de operación</div>
+<div class="dash-sub">Una sola visión para tomar mejores decisiones</div>
+<div class="metric">
+<div><b>Automatiza</b><span>Procesos repetitivos</span></div>
+<div><b>Controla</b><span>Información y operaciones</span></div>
+<div><b>Ordena</b><span>Datos y reportes</span></div>
+<div><b>Crece</b><span>Con decisiones informadas</span></div>
+</div>
+<div style="font-size:.76rem;color:#91a5b8">Nivel de optimización</div>
+<div class="progress"><span></span></div>
+<div class="card-note">Diseñamos la solución alrededor de tu negocio, no al revés.</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="section section-alt" id="servicios">
+<div class="container">
+<div class="section-head">
+<div class="kicker">Lo que resolvemos</div>
+<h2>Menos vueltas. Más control.</h2>
+<p>Elige el área que necesitas y cuéntanos qué problema quieres solucionar. Te orientamos antes de venderte una solución.</p>
+</div>
+<div class="cards">
+<article class="card">
+<div class="icon">💻</div><h3>Software a medida</h3>
+<p>Aplicaciones y sistemas para automatizar operaciones, controlar información y adaptarse a la forma real de trabajar de tu empresa.</p>
+<ul><li>Diagnóstico de requerimientos</li><li>Desarrollo personalizado</li><li>Paneles y control operativo</li><li>Soporte de despliegue</li></ul>
+<button class="btn btn-outline" onclick="irContacto('Área Tecnológica / Software')">Quiero una solución</button>
+</article>
+<article class="card">
+<div class="icon">📊</div><h3>Contabilidad & gestión</h3>
+<p>Servicios y asesoría para mantener organizada la información financiera y convertirla en una herramienta para decidir.</p>
+<ul><li>Declaraciones de renta</li><li>Facturación electrónica</li><li>Estados financieros</li><li>Reportes para gerencia</li></ul>
+<button class="btn btn-outline" onclick="irContacto('Área Contable')">Solicitar asesoría</button>
+</article>
+<article class="card">
+<div class="icon">⚙️</div><h3>Mantenimiento tecnológico</h3>
+<p>Prevención y corrección de problemas de hardware y software para reducir interrupciones y mantener tus equipos operativos.</p>
+<ul><li>Diagnóstico de equipos</li><li>Limpieza y optimización</li><li>Revisión de componentes</li><li>Mantenimiento programado</li></ul>
+<button class="btn btn-outline" onclick="irContacto('Mantenimiento de Hardware')">Revisar mis equipos</button>
+</article>
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="container feature">
+<div>
+<div class="kicker">Cómo trabajamos</div>
+<h2>No empezamos programando. Empezamos entendiendo.</h2>
+<p style="color:var(--muted);margin-top:15px">Una buena solución no es la que tiene más funciones: es la que elimina el problema correcto.</p>
+<div class="checks">
+<div class="check"><span class="check-icon">1</span><span><b>Entendemos tu operación.</b><br>Qué haces, dónde pierdes tiempo y qué información necesitas.</span></div>
+<div class="check"><span class="check-icon">2</span><span><b>Proponemos una solución.</b><br>Priorizamos lo que realmente aporta valor y evitamos complejidad innecesaria.</span></div>
+<div class="check"><span class="check-icon">3</span><span><b>Implementamos y acompañamos.</b><br>Te ayudamos a llevar la solución a tu operación.</span></div>
+</div>
+</div>
+<div class="feature-box">
+<div class="kicker">Para empresas</div>
+<h3 style="font-size:1.55rem">¿Tu negocio todavía depende de hojas de cálculo, procesos manuales o información dispersa?</h3>
+<p style="color:var(--muted);margin-top:12px">Podemos revisar tu caso y decirte qué conviene automatizar, qué conviene mantener simple y qué no vale la pena desarrollar.</p>
+<a href="#contacto" class="btn btn-primary" style="margin-top:22px">Cuéntanos tu caso →</a>
+</div>
+</div>
+</section>
+
+<section class="section section-alt" id="productos">
+<div class="container">
+<div class="section-head">
+<div class="kicker">Software disponible</div>
+<h2>Herramientas listas para usar</h2>
+<p>Además de desarrollar a medida, tenemos software local para necesidades específicas. Prueba antes de comprar.</p>
+</div>
+<div class="products">
+<article class="product">
+<span class="badge">Generador de QR</span><h3>QR Video Studio</h3><div class="price"></div><div class="compat">Windows 10 / 11 · aplicación local</div>
+<p>Genera códigos QR dinámicos y animados integrando videos o imágenes en movimiento de forma local.</p>
+<a class="btn btn-primary" href="productos.html">Ver producto→</a>
+</article>
+<article class="product">
+<span class="badge">Seguridad</span><h3>Encriptador Visual de Datos</h3><div class="price"></div><div class="compat">Windows 10 / 11 · aplicación local</div>
+<p>Oculta documentos, videos o archivos confidenciales cifrados dentro de imágenes PNG.</p>
+<a class="btn btn-primary" href="productos.html">Ver producto→</a>
+</article>
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="container">
+<div class="section-head">
+<div class="kicker">Tu camino</div><h2>Así es de sencillo empezar</h2>
+</div>
+<div class="process">
+<div class="step"><div class="step-num">1</div><h3>Cuéntanos</h3><p>Explícanos qué necesitas, aunque todavía no sepas exactamente qué solución buscas.</p></div>
+<div class="step"><div class="step-num">2</div><h3>Lo aterrizamos</h3><p>Revisamos el problema y definimos contigo la alternativa más razonable.</p></div>
+<div class="step"><div class="step-num">3</div><h3>Lo ponemos en marcha</h3><p>Pasamos de la idea a una solución concreta, con acompañamiento.</p></div>
+</div>
+</div>
+</section>
+
+<section class="cta">
+<div class="container">
+<div class="cta-box">
+<div><div class="kicker">Primer paso</div><h2>¿Qué quieres mejorar de tu negocio?</h2><p>Cuéntanos el problema. La primera conversación sirve para entender si podemos ayudarte y cómo.</p></div>
+<a class="btn btn-primary" href="#contacto">Solicitar diagnóstico →</a>
+</div>
+</div>
+</section>
+
+<section class="section section-alt" id="contacto">
+<div class="container contact-grid">
+<div class="contact-info">
+<div class="kicker">Contacto</div><h2>Hablemos de tu proyecto.</h2>
+<p>Atendemos requerimientos tecnológicos y contables. También puedes escribirnos directamente por WhatsApp.</p>
+<div class="contact-list">
+<div class="contact-item"><small>WhatsApp / Celular</small><b>+57 312 489 5999</b></div>
+<div class="contact-item"><small>Correo</small><b>jesusmreyes2021@hotmail.com</b></div>
+<div class="contact-item"><small>Tiempo de respuesta indicado</small><b>Menos de 24 horas hábiles</b></div>
+</div>
+<a class="btn btn-outline" style="margin-top:18px;width:100%" target="_blank" href="https://wa.me/3124895999?text=Hola%2C%20quiero%20conocer%20sus%20servicios.">💬 Escribir por WhatsApp</a>
+</div>
+<div class="form">
+<div id="success" class="success">¡Listo! Hemos preparado tu solicitud. Te contactaremos pronto.</div>
+<form id="leadForm">
+<div class="form-grid">
+<div class="field"><label for="nombre">Nombre / Empresa</label><input id="nombre" required placeholder="Ej. Juan Pérez / Comercializadora SAS"></div>
+<div class="field"><label for="telefono">WhatsApp / Teléfono</label><input id="telefono" required placeholder="+57 312..."></div>
+<div class="field full"><label for="correo">Correo electrónico</label><input id="correo" type="email" required placeholder="nombre@correo.com"></div>
+<div class="field full"><label for="servicio">¿Qué necesitas?</label>
+<select id="servicio"><option>General / Otra consulta</option><option>Área Tecnológica / Software</option><option>Área Contable</option><option>Mantenimiento de Hardware</option></select></div>
+<div class="field full"><label for="mensaje">Cuéntanos el problema</label><textarea id="mensaje" required placeholder="Ej. Necesito controlar inventario, ventas y movimientos..."></textarea></div>
+</div>
+<button class="btn btn-primary" type="submit">Enviar solicitud →</button>
+</form>
+</div>
+</div>
+</section>
+</main>
+
+<footer>
+<div class="container footer-inner"><span>© 2026 Sistemas & Contabilidad</span><span>Software · Contabilidad · Tecnología</span></div>
+</footer>
+
+<div class="modal" id="modal"><div class="modal-card"><button class="close" onclick="cerrarModal()">×</button><h3 id="modalTitle"></h3><p id="modalDesc"></p><ul id="modalList"></ul><button class="btn btn-primary" style="width:100%;margin-top:18px" id="modalCta">Me interesa →</button></div></div>
+
+<script>
+const menuBtn=document.getElementById('menuBtn'),nav=document.getElementById('navLinks');
+menuBtn.addEventListener('click',()=>nav.classList.toggle('open'));
+document.querySelectorAll('.nav-links a').forEach(a=>a.addEventListener('click',()=>nav.classList.remove('open')));
+
+function irContacto(servicio){
+ document.getElementById('servicio').value=servicio;
+ document.getElementById('contacto').scrollIntoView({behavior:'smooth'});
+ document.getElementById('mensaje').focus();
+}
+
+const modalData={
+ software:{title:'Área Tecnológica / Software',desc:'Sistemas web y aplicaciones a medida para automatizar procesos y mejorar el control operativo.',list:['Diagnóstico de requerimientos','Soluciones para comercio y empresas de servicios','Automatización de procesos','Paneles de administración y control','Soporte de despliegue']},
+ contabilidad:{title:'Área Contable',desc:'Servicios y asesoría para organizar la información financiera y apoyar la toma de decisiones.',list:['Declaraciones de renta','Facturación electrónica','Estados financieros','Reportes gerenciales','Consultoría personalizada']},
+ mantenimiento:{title:'Mantenimiento de Hardware',desc:'Mantenimiento preventivo y correctivo para mantener computadores y equipos operativos.',list:['Diagnóstico de equipos','Limpieza y optimización','Revisión de componentes','Instalación y actualización de software','Plan de mantenimiento programado']}
+};
+function abrirModal(key){
+ const d=modalData[key];document.getElementById('modalTitle').textContent=d.title;document.getElementById('modalDesc').textContent=d.desc;
+ document.getElementById('modalList').innerHTML=d.list.map(x=>'<li>'+x+'</li>').join('');
+ document.getElementById('modalCta').onclick=()=>{cerrarModal();irContacto(d.title)};
+ document.getElementById('modal').style.display='flex';
+}
+function cerrarModal(){document.getElementById('modal').style.display='none'}
+window.addEventListener('click',e=>{if(e.target===document.getElementById('modal'))cerrarModal()});
+
+document.getElementById('leadForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const nombre=document.getElementById('nombre').value.trim(),tel=document.getElementById('telefono').value.trim(),correo=document.getElementById('correo').value.trim(),serv=document.getElementById('servicio').value,mensaje=document.getElementById('mensaje').value.trim();
+ const text=encodeURIComponent(`Hola, soy ${nombre}.%0A%0ASolicito información sobre: ${serv}.%0A%0ATeléfono: ${tel}%0ACorreo: ${correo}%0A%0AMensaje: ${mensaje}`);
+ window.open('https://wa.me/3124895999?text='+text,'_blank');
+ document.getElementById('success').style.display='block';
+});
+</script>
 </body>
 </html>
