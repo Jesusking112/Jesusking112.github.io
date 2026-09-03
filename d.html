@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es" class="bg-fondo">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diagnóstico de conexión — Supabase</title>
+  <style>
+    :root{
+      --fondo:#0b0f19; --tarjeta:#111827; --borde:#374151; --texto:#f3f4f6;
+      --suave:#9ca3af; --azul:#2563eb; --ok:#22c55e; --err:#ef4444; --warn:#f59e0b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; background:var(--fondo); color:var(--texto);
+      font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; line-height:1.5;
+      padding:24px;
+    }
+    .contenedor{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:20px}
+    header h1{font-size:22px; margin:0 0 4px}
+    header p{color:var(--suave); margin:0; font-size:14px}
+    .info{
+      background:var(--tarjeta); border:1px solid var(--borde); border-radius:10px; padding:14px 16px;
+      font-size:13px; word-break:break-all;
+    }
+    .info b{color:var(--suave); font-weight:600}
+    .fila{display:flex; gap:12px; flex-wrap:wrap}
+    button{
+      flex:1; min-width:200px; border:0; border-radius:10px; padding:14px 16px; cursor:pointer;
+      font-size:15px; font-weight:700; color:#fff; background:var(--azul); transition:filter .15s;
+    }
+    button:hover{filter:brightness(1.1)}
+    button:disabled{opacity:.5; cursor:not-allowed}
+    .tarjeta{
+      background:var(--tarjeta); border:1px solid var(--borde); border-radius:10px; overflow:hidden;
+    }
+    .tarjeta h2{
+      font-size:15px; margin:0; padding:12px 16px; border-bottom:1px solid var(--borde);
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+    }
+    .estado{font-size:12px; font-weight:700; padding:3px 10px; border-radius:999px; background:#1f2937; color:var(--suave)}
+    .estado.ok{background:rgba(34,197,94,.15); color:var(--ok)}
+    .estado.err{background:rgba(239,68,68,.15); color:var(--err)}
+    .estado.run{background:rgba(245,158,11,.15); color:var(--warn)}
+    pre{
+      margin:0; padding:14px 16px; font-size:12.5px; white-space:pre-wrap; word-break:break-word;
+      font-family:'Courier New',monospace; color:#e5e7eb; max-height:320px; overflow:auto;
+    }
+    .veredicto{
+      background:var(--tarjeta); border:1px solid var(--borde); border-radius:10px; padding:16px;
+      font-size:14px;
+    }
+    .veredicto b{color:#fff}
+    code{background:#1f2937; padding:2px 6px; border-radius:5px; font-size:12px}
+  </style>
+</head>
+<body>
+  <main class="contenedor">
+    <header>
+      <h1>Diagnóstico de conexión</h1>
+      <p>Dos pruebas independientes para saber dónde está el fallo: la red/dominio o la Edge Function.</p>
+    </header>
+
+    <div class="info">
+      <div><b>Origen del navegador:</b> <span id="origen">—</span></div>
+      <div><b>Proyecto Supabase:</b> <span id="proyecto">—</span></div>
+    </div>
+
+    <div class="fila">
+      <button id="btnA">Prueba A — REST directo (sin function)</button>
+      <button id="btnB">Prueba B — Edge Function (clever-service)</button>
+    </div>
+
+    <section class="tarjeta">
+      <h2>Prueba A — REST directo a tabla <code>pruebas_cors</code> <span class="estado" id="estadoA">en espera</span></h2>
+      <pre id="logA">Pulsa "Prueba A" para escribir y leer un valor directamente en Supabase.</pre>
+    </section>
+
+    <section class="tarjeta">
+      <h2>Prueba B — Edge Function <span class="estado" id="estadoB">en espera</span></h2>
+      <pre id="logB">Pulsa "Prueba B" para llamar a la función igual que el login.</pre>
+    </section>
+
+    <div class="veredicto" id="veredicto">
+      El veredicto aparecerá aquí después de correr las pruebas.
+    </div>
+  </main>
+
+  <script>
+    // === CONFIG (tomada de tu modulo_conexion.js) ===
+    const PROYECTO = "https://djbvgglroelnescxkjcw.supabase.co";
+    const ANON_KEY = "sb_publishable_v0wAgT-Bbui1ytwpARw4lg_vnKOttEX";
+    const FUNCION  = PROYECTO + "/functions/v1/clever-service";
+    const REST     = PROYECTO + "/rest/v1/pruebas_cors";
+
+    const $ = (id) => document.getElementById(id);
+    $("origen").textContent = window.location.origin + "  (" + window.location.href + ")";
+    $("proyecto").textContent = PROYECTO;
+
+    let resA = null, resB = null;
+
+    function setEstado(el, clase, txt){ el.className = "estado " + clase; el.textContent = txt; }
+    function log(el, ...partes){ el.textContent = partes.join("\n"); }
+
+    function describirError(e){
+      // Un fetch que revienta con TypeError "Failed to fetch" = red o CORS bloqueado.
+      if (e && e.name === "TypeError") {
+        return "TypeError (" + e.message + ")\n\n=> El navegador BLOQUEÓ la respuesta. "
+          + "Causas típicas: CORS (el servidor no devolvió Access-Control-Allow-Origin válido), "
+          + "o no se pudo alcanzar el servidor (red/DNS/bloqueo).";
+      }
+      return (e && (e.name + ": " + e.message)) || String(e);
+    }
+
+    // ---------- PRUEBA A: REST directo (NO pasa por la Edge Function) ----------
+    async function pruebaA(){
+      $("btnA").disabled = true;
+      setEstado($("estadoA"), "run", "corriendo…");
+      const lineas = [];
+      const valor = "prueba_" + Date.now();
+      lineas.push("Escribiendo en la tabla pruebas_cors el valor: " + valor);
+      log($("logA"), ...lineas);
+
+      try {
+        // INSERT directo por PostgREST
+        const rIns = await fetch(REST, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": ANON_KEY,
+            "Authorization": "Bearer " + ANON_KEY,
+            "Prefer": "return=representation",
+          },
+          body: JSON.stringify({ valor: valor }),
+        });
+        lineas.push("");
+        lineas.push("INSERT -> HTTP " + rIns.status + " " + rIns.statusText);
+        lineas.push("Access-Control-Allow-Origin: " + (rIns.headers.get("access-control-allow-origin") || "(no enviado)"));
+        const textoIns = await rIns.text();
+        lineas.push("Respuesta: " + (textoIns || "(vacía)"));
+        log($("logA"), ...lineas);
+
+        // SELECT para confirmar
+        const rSel = await fetch(REST + "?select=*&order=id.desc&limit=3", {
+          headers: { "apikey": ANON_KEY, "Authorization": "Bearer " + ANON_KEY },
+        });
+        lineas.push("");
+        lineas.push("SELECT -> HTTP " + rSel.status + " " + rSel.statusText);
+        const textoSel = await rSel.text();
+        lineas.push("Últimos registros: " + textoSel);
+        log($("logA"), ...lineas);
+
+        const ok = rIns.ok && rSel.ok;
+        resA = ok;
+        setEstado($("estadoA"), ok ? "ok" : "err", ok ? "OK" : "HTTP error");
+        if (!ok) {
+          lineas.push("");
+          lineas.push("=> Llegó al servidor pero respondió con error (probablemente falta la tabla o su policy RLS). Mira el SQL al final del veredicto.");
+          log($("logA"), ...lineas);
+        }
+      } catch (e) {
+        resA = false;
+        setEstado($("estadoA"), "err", "bloqueado");
+        lineas.push("");
+        lineas.push("ERROR: " + describirError(e));
+        log($("logA"), ...lineas);
+      }
+      $("btnA").disabled = false;
+      veredicto();
+    }
+
+    // ---------- PRUEBA B: Edge Function (igual que el login) ----------
+    async function pruebaB(){
+      $("btnB").disabled = true;
+      setEstado($("estadoB"), "run", "corriendo…");
+      const lineas = [];
+      lineas.push("Llamando a: " + FUNCION);
+      lineas.push('Cuerpo: { "accion": "obtener_modos" }  (acción de solo lectura)');
+      log($("logB"), ...lineas);
+
+      try {
+        const r = await fetch(FUNCION, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": ANON_KEY,
+            "Authorization": "Bearer " + ANON_KEY,
+            "X-Session-Token": "",
+          },
+          body: JSON.stringify({ accion: "obtener_modos" }),
+        });
+        lineas.push("");
+        lineas.push("HTTP " + r.status + " " + r.statusText);
+        lineas.push("Access-Control-Allow-Origin: " + (r.headers.get("access-control-allow-origin") || "(no enviado)"));
+        const texto = await r.text();
+        lineas.push("Respuesta: " + (texto || "(vacía)"));
+        log($("logB"), ...lineas);
+
+        resB = r.ok || r.status === 200;
+        setEstado($("estadoB"), resB ? "ok" : "err", resB ? "OK" : ("HTTP " + r.status));
+      } catch (e) {
+        resB = false;
+        setEstado($("estadoB"), "err", "bloqueado");
+        lineas.push("");
+        lineas.push("ERROR: " + describirError(e));
+        log($("logB"), ...lineas);
+      }
+      $("btnB").disabled = false;
+      veredicto();
+    }
+
+    function veredicto(){
+      if (resA === null && resB === null) return;
+      let html = "<b>Veredicto:</b><br>";
+      if (resA === true && resB === false) {
+        html += "El REST directo FUNCIONA pero la Edge Function NO. => El problema está <b>en la Edge Function</b> (CORS o el código de la función), no en GitHub ni en la red. Revisa que hayas <b>redesplegado</b> la función tras cambiar corsHeaders.";
+      } else if (resA === false && resB === false) {
+        html += "Ninguna prueba llega al servidor. => El problema es <b>de red/dominio</b>: el navegador no alcanza Supabase (bloqueo, DNS, extensión, o dominio mal configurado). No es la función.";
+      } else if (resA === true && resB === true) {
+        html += "Ambas FUNCIONAN. => La conexión está bien. Si el login aún falla, el problema está en la <b>lógica del login</b> (credenciales, captcha o una acción concreta), no en CORS.";
+      } else if (resA === false && resB === true) {
+        html += "La función FUNCIONA y el REST directo no (probablemente solo falta la tabla de prueba o su RLS). La conexión con tu app está OK.";
+      } else {
+        html += "Corre ambas pruebas para un diagnóstico completo.";
+      }
+      html += "<br><br><b>Para la Prueba A necesitas esta tabla temporal</b> (córrela en Supabase → SQL Editor):<br>"
+        + "<code>create table if not exists pruebas_cors (id bigint generated always as identity primary key, valor text, creado timestamptz default now());</code><br>"
+        + "<code>alter table pruebas_cors enable row level security;</code><br>"
+        + "<code>create policy \"anon todo pruebas\" on pruebas_cors for all to anon using (true) with check (true);</code>";
+      $("veredicto").innerHTML = html;
+    }
+
+    $("btnA").addEventListener("click", pruebaA);
+    $("btnB").addEventListener("click", pruebaB);
+  </script>
+</body>
+</html>
