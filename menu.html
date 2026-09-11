@@ -11,9 +11,9 @@
       const s = JSON.parse(sessionStorage.getItem("sesion") || "null");
       if (s && s.token && s.Modo) {
         const modo = Number(s.Modo);
-        if (modo === 3) {
+        if (modo === 3 || modo === 5 || modo === 7 || modo === 9 || modo === 11) {
           window.location.replace("01_agenda_cita.html");
-        } else if (modo === 4) {
+        } else if (modo === 4 || modo === 6 || modo === 8 || modo === 10 || modo === 12) {
           window.location.replace("01_gestion_agenda.html");
         }
       }
