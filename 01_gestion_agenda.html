@@ -100,6 +100,123 @@
     border-radius: 6px; cursor: pointer; width: 100%; font-weight: 500;
   }
   .btn-motivo-item:hover { border-color: var(--primario, #3b82f6); }
+
+  /* Diseño móvil: controles apilados y calendario desplazable con hora fija. */
+  .selector-dia-movil {
+    display: none;
+  }
+
+  .ayuda-movil-calendario {
+    display: none;
+    margin: 8px 0 10px;
+    padding: 9px 11px;
+    border: 1px solid var(--borde, #374151);
+    border-radius: 8px;
+    color: var(--tenue, #9ca3af);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  @media (max-width: 700px) {
+    body { overflow-x: hidden; }
+    .wrap { width: 100%; padding: 12px; }
+    .top { align-items: flex-start; gap: 10px; }
+    .top h1 { font-size: 21px; line-height: 1.15; }
+    .top p { font-size: 13px; margin-top: 4px; }
+    .top nav {
+      width: 100%;
+      margin-left: 0 !important;
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .top nav a { text-align: center; min-height: 40px; display: flex; align-items: center; justify-content: center; }
+    .seccion { padding: 14px; border-radius: 12px; }
+    .seccion h3 { font-size: 17px; }
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; }
+    .tab { min-height: 42px; padding: 9px 6px; font-size: 13px; }
+    .barra-controles { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .barra-controles .campo, .barra-controles > div { min-width: 0 !important; width: 100%; }
+    .barra-controles button { width: 100%; min-height: 42px; }
+    input, select, button { font-size: 16px; }
+    .barra-acciones { display: grid; grid-template-columns: 1fr 1fr; }
+    .barra-acciones button { min-height: 44px; }
+    .contador-pill { grid-column: 1 / -1; margin-left: 0; text-align: center; }
+    #panelAvanzado .barra-controles { grid-template-columns: 1fr 1fr; }
+    #avDias { display: grid !important; grid-template-columns: 1fr 1fr; }
+    #avDias label { min-height: 40px; display: flex; align-items: center; }
+    .ayuda-movil-calendario { display: block; }
+    .selector-dia-movil {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      margin: 10px 0 12px;
+    }
+    .selector-dia-movil button {
+      min-height: 42px;
+      border: 1px solid var(--borde, #374151);
+      border-radius: 9px;
+      background: var(--tarjeta-2, #0f172a);
+      color: var(--tenue, #9ca3af);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .selector-dia-movil button.activo {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, .14);
+      color: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, .12);
+    }
+    .selector-dia-movil button small { display: block; font-size: 10px; opacity: .75; font-weight: 500; margin-top: 2px; }
+    .tabla-scroll {
+      width: 100%;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--borde, #374151);
+      border-radius: 10px;
+      scrollbar-width: thin;
+    }
+    table.semana {
+      min-width: 0;
+      width: 100%;
+      table-layout: fixed;
+      margin: 0;
+    }
+    table.semana th, table.semana td { min-width: 0; padding: 7px 5px; }
+    table.semana th:not(:first-child), table.semana td:not(:first-child) { display: none; }
+    table.semana.mobile-dia-0 th:nth-child(2), table.semana.mobile-dia-0 td:nth-child(2),
+    table.semana.mobile-dia-1 th:nth-child(3), table.semana.mobile-dia-1 td:nth-child(3),
+    table.semana.mobile-dia-2 th:nth-child(4), table.semana.mobile-dia-2 td:nth-child(4),
+    table.semana.mobile-dia-3 th:nth-child(5), table.semana.mobile-dia-3 td:nth-child(5),
+    table.semana.mobile-dia-4 th:nth-child(6), table.semana.mobile-dia-4 td:nth-child(6),
+    table.semana.mobile-dia-5 th:nth-child(7), table.semana.mobile-dia-5 td:nth-child(7),
+    table.semana.mobile-dia-6 th:nth-child(8), table.semana.mobile-dia-6 td:nth-child(8) { display: table-cell; }
+    table.semana th:first-child, table.semana td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      width: 72px;
+      background: var(--tarjeta, #111827);
+      box-shadow: 5px 0 8px rgba(0,0,0,.18);
+    }
+    table.semana th:not(:first-child), table.semana td:not(:first-child) { width: auto; }
+    table.semana thead th:first-child { z-index: 3; }
+    table.semana .set-dia { gap: 3px; flex-direction: column; }
+    table.semana .set-dia button { min-height: 30px; padding: 3px 4px; font-size: 11px; }
+    table.semana .celda-toggle { width: 100%; min-height: 42px; padding: 7px 4px; }
+    .leyenda { gap: 10px; font-size: 12px; }
+    .modal-fondo .modal { width: calc(100% - 24px); max-height: 90vh; overflow-y: auto; padding: 16px; }
+    .acciones { display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .acciones button { min-height: 44px; width: 100%; }
+  }
+
+  @media (max-width: 380px) {
+    .wrap { padding: 8px; }
+    .seccion { padding: 11px; }
+    .barra-acciones { grid-template-columns: 1fr; }
+    #panelAvanzado .barra-controles { grid-template-columns: 1fr; }
+    table.semana { min-width: 610px; }
+  }
 </style>
 </head>
 
@@ -212,7 +329,9 @@
         o tocar una casilla suelta para cambiar solo esa hora.
       </p>
 
-      <div class="tabla-scroll">
+      <p class="ayuda-movil-calendario">Selecciona un día para ver sus horarios. La hora queda fija a la izquierda y puedes tocar cada casilla para activarla o desactivarla.</p>
+      <div class="selector-dia-movil" id="selectorDiaMovil" aria-label="Seleccionar día en móvil"></div>
+      <div class="tabla-scroll" tabindex="0" aria-label="Calendario semanal">
         <table class="semana" id="tablaSemana"></table>
       </div>
 
@@ -416,6 +535,27 @@
       if (el) el.textContent = n + (n === 1 ? " hora activa" : " horas activas");
     }
 
+    let diaMovilSeleccionado = 0;
+
+    function construirSelectorDiaMovil() {
+      const selector = $("selectorDiaMovil");
+      const tabla = $("tablaSemana");
+      if (!selector || !tabla) return;
+
+      selector.innerHTML = A.DIAS_ORDEN.map((dia, indice) =>
+        '<button type="button" class="' + (indice === diaMovilSeleccionado ? "activo" : "") + '" data-dia-movil="' + indice + '">' +
+        A.esc(A.DIAS[dia]) + '<small>Ver horarios</small></button>'
+      ).join("");
+
+      tabla.className = "semana mobile-dia-" + diaMovilSeleccionado;
+      selector.querySelectorAll("[data-dia-movil]").forEach((boton) => {
+        boton.addEventListener("click", () => {
+          diaMovilSeleccionado = Number(boton.getAttribute("data-dia-movil"));
+          construirSelectorDiaMovil();
+        });
+      });
+    }
+
     function construirTabla() {
       const tabla = $("tablaSemana");
       if (!tabla) return;
@@ -442,6 +582,7 @@
       });
       html += "</tbody>";
       tabla.innerHTML = html;
+      construirSelectorDiaMovil();
 
       tabla.querySelectorAll(".celda-toggle").forEach((b) =>
         b.addEventListener("click", () => togglear(Number(b.getAttribute("data-dia")), b.getAttribute("data-hora"))));
