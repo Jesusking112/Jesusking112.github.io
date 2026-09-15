@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gestión de reservas · Módulo 03</title>
+  <link rel="stylesheet" href="03_reservas.css">
+</head>
+<body>
+  <main class="wrap wide">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Módulo 03 · independiente</p>
+        <h1>Gestión de reservas</h1>
+        <p class="lead">Escribe el nombre de tu negocio y la clave del equipo. Si es nuevo, se crea solo.</p>
+      </div>
+      <nav class="nav">
+        <a class="btn" id="verPublica" href="#" target="_blank" rel="noopener" hidden>Ver página de clientes</a>
+      </nav>
+    </header>
+
+    <section class="card" id="login">
+      <div class="grid">
+        <label class="field">Nombre de tu negocio<input id="nombreNegocio" placeholder="Ej. Local Central" autocomplete="off"></label>
+        <label class="field">Clave del equipo<input id="clave" type="password" placeholder="mínimo 4 caracteres" autocomplete="current-password"></label>
+      </div>
+      <label class="field" id="creacionField" style="display:none">Clave de creación (solo negocios nuevos)<input id="claveCreacion" type="password" placeholder="requerida para crear un negocio nuevo" autocomplete="off"></label>
+      <div class="actions">
+        <button class="btn primary" id="btnEntrar">Entrar</button>
+      </div>
+      <p class="muted">La primera vez crea tu negocio con esa clave. Con la clave del equipo entras y editas horarios. Para crear/editar personas se pide una clave de administrador (al principio es la misma; puedes cambiarla dentro). Crear un negocio nuevo exige además una <b>clave de creación</b> que controla el administrador del sistema.</p>
+      <p id="loginMsg" class="message" role="status"></p>
+    </section>
+
+    <div id="panel" hidden>
+      <section class="card" id="enlaceClientes" hidden></section>
+
+      <details class="acc" open>
+        <summary><span class="acc-ico">1</span> Citas <span class="acc-sub">ver y cancelar reservas</span></summary>
+        <div class="acc-body">
+          <div class="month-bar">
+            <button class="btn" id="mesPrev">Anterior</button>
+            <h3 id="mesTitulo" style="margin:0"></h3>
+            <button class="btn" id="mesNext">Siguiente</button>
+            <button class="btn" id="citasRefrescar" title="Actualizar sin recargar la página" aria-label="Actualizar citas">Actualizar</button>
+          </div>
+          <div id="calendario" class="calendar"></div>
+          <div id="citasDia" style="margin-top:14px"></div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-ico">2</span> Personas y roles <span class="acc-sub">crear, rol, activar/eliminar</span></summary>
+        <div class="acc-body">
+          <p class="muted">Crear, editar el rol o eliminar personas requiere la <b>clave de administrador</b>. El rol (estilista, barbero, uñas…) lo verá el cliente al reservar.</p>
+          <label class="field" style="max-width:320px;margin:10px 0">Clave de administrador
+            <input id="claveAdmin" type="password" placeholder="clave de admin" autocomplete="off">
+          </label>
+          <div id="personasList" class="lista-personas"></div>
+          <div class="sub-card">
+            <h3>Agregar persona</h3>
+            <div class="grid">
+              <label class="field">Nombre<input id="npNombre" placeholder="Ej. Ana"></label>
+              <label class="field">Rol<input id="npRol" placeholder="Ej. Estilista" list="rolesSugeridos"></label>
+            </div>
+            <datalist id="rolesSugeridos"></datalist>
+            <div class="actions"><button class="btn primary" id="btnAgregarPersona">Agregar persona</button></div>
+          </div>
+          <p id="personasMsg" class="message" role="status"></p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-ico">3</span> Disponibilidad por fechas <span class="acc-sub">cada persona dice cuándo atiende</span></summary>
+        <div class="acc-body">
+          <p class="muted">Elige una persona y marca sus horas por día. Usa las <b>ayudas en bloque</b> para configurar meses o semanas enteras de un clic; luego ajusta días sueltos si quieres.</p>
+
+          <label class="field" style="max-width:320px;margin:6px 0">Persona
+            <select id="selPersona"></select>
+          </label>
+
+          <div class="sub-card">
+            <h3>Ayuda en bloque (rápido)</h3>
+            <div class="grid">
+              <label class="field">Desde<input id="bkDesde" type="date"></label>
+              <label class="field">Hasta<input id="bkHasta" type="date"></label>
+            </div>
+            <div class="field" style="margin-top:10px">
+              <span>Días de la semana</span>
+              <div class="dias-semana" id="bkDias"></div>
+              <div class="actions" style="margin-top:6px">
+                <button class="btn mini" type="button" data-preset="lv">Lunes a viernes</button>
+                <button class="btn mini" type="button" data-preset="ls">Lunes a sábado</button>
+                <button class="btn mini" type="button" data-preset="all">Toda la semana</button>
+                <button class="btn mini" type="button" data-preset="none">Ninguno</button>
+              </div>
+            </div>
+            <div class="grid" style="margin-top:10px">
+              <label class="field">Hora desde<select id="bkHoraIni"></select></label>
+              <label class="field">Hora hasta<select id="bkHoraFin"></select></label>
+            </div>
+            <div class="field" style="margin-top:10px">
+              <span>Qué hacer con esas horas</span>
+              <div class="choices" id="bkModo">
+                <button class="choice selected" type="button" data-modo="reemplazar">Dejar solo estas</button>
+                <button class="choice" type="button" data-modo="agregar">Agregar</button>
+                <button class="choice" type="button" data-modo="quitar">Quitar</button>
+              </div>
+            </div>
+            <div class="actions"><button class="btn primary" id="btnBulk">Aplicar al rango</button></div>
+            <p id="bulkMsg" class="message" role="status"></p>
+          </div>
+
+          <div class="sub-card">
+            <div class="month-bar">
+              <h3 style="margin:0">Calendario del año (desde hoy)</h3>
+              <span class="muted" id="dispResumen"></span>
+              <button class="btn" id="dispRefrescar" title="Actualizar sin recargar la página" aria-label="Actualizar disponibilidad">Actualizar</button>
+            </div>
+            <p class="muted">Toca un día para marcar/ajustar sus horas. El número es la cantidad de horas ese día.</p>
+            <div id="semanas" class="semanas"></div>
+          </div>
+          <p id="dispMsg" class="message" role="status"></p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-ico">4</span> Configuración <span class="acc-sub">horario, intervalo, claves</span></summary>
+        <div class="acc-body">
+          <div class="grid">
+            <label class="field">Nombre visible<input id="cfgNombre"></label>
+            <label class="field">Intervalo (min)
+              <select id="cfgIntervalo">
+                <option value="15">15</option><option value="20">20</option>
+                <option value="30" selected>30</option><option value="45">45</option>
+                <option value="60">60</option>
+              </select>
+            </label>
+            <label class="field">Apertura<input id="cfgInicio" type="time" value="09:00"></label>
+            <label class="field">Cierre<input id="cfgFin" type="time" value="20:00"></label>
+            <label class="field">Anticipación mínima (horas)<input id="cfgAntic" type="number" min="0" value="0"></label>
+            <label class="field">Días máximos adelante<input id="cfgMaxDias" type="number" min="1" max="366" value="365"></label>
+            <label class="field">Cambiar clave del equipo (opcional)<input id="cfgClaveNueva" type="password" placeholder="deja vacío para no cambiar"></label>
+          </div>
+
+          <div class="sub-card">
+            <h3>Cabecera que ven tus clientes</h3>
+            <p class="muted">Teléfono de contacto y hasta dos logos (pega el enlace de una imagen). Todo es opcional.</p>
+            <div class="grid">
+              <label class="field">Teléfono / WhatsApp<input id="cfgTelefono" placeholder="Ej. +34 600 000 000"></label>
+              <label class="field">Logo 1 (enlace de imagen)<input id="cfgLogo1" placeholder="https://…"></label>
+              <label class="field">Logo 2 (enlace de imagen)<input id="cfgLogo2" placeholder="https://…"></label>
+            </div>
+          </div>
+
+          <label class="check"><input id="cfgActivo" type="checkbox"> Negocio activo (acepta reservas)</label>
+          <div class="actions"><button class="btn primary" id="btnGuardarCfg">Guardar configuración</button></div>
+          <p id="cfgMsg" class="message" role="status"></p>
+
+          <div class="sub-card">
+            <h3>Clave de administrador</h3>
+            <p class="muted">Solo el administrador debe conocerla. Sirve para crear/editar/eliminar personas y sus roles.</p>
+            <div class="grid">
+              <label class="field">Clave de admin actual<input id="adActual" type="password" autocomplete="off" placeholder="si no la separaste, usa la del equipo"></label>
+              <label class="field">Nueva clave de admin<input id="adNueva" type="password" autocomplete="off"></label>
+            </div>
+            <div class="actions"><button class="btn" id="btnSetAdmin">Guardar clave de admin</button></div>
+            <p id="adMsg" class="message" role="status"></p>
+          </div>
+        </div>
+      </details>
+    </div>
+  </main>
+
+  <dialog id="dlgDia" class="dlg">
+    <form method="dialog">
+      <h3 id="dlgTitulo" style="margin:0 0 4px">Día</h3>
+      <p class="muted" id="dlgSub" style="margin:0 0 12px"></p>
+      <div id="dlgSlots" class="choices"></div>
+      <div class="actions" style="justify-content:space-between">
+        <div>
+          <button class="btn mini" type="button" id="dlgTodo">Todas</button>
+          <button class="btn mini" type="button" id="dlgNada">Ninguna</button>
+        </div>
+        <div>
+          <button class="btn" type="button" id="dlgCerrar">Cancelar</button>
+          <button class="btn primary" type="button" id="dlgGuardar">Guardar día</button>
+        </div>
+      </div>
+      <p id="dlgMsg" class="message" role="status"></p>
+    </form>
+  </dialog>
+
+  <script src="03_reservas.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var api = window.Reservas.api, esc = window.Reservas.esc;
+    var $ = function (id) { return document.getElementById(id); };
+    var DIAS = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+    var DIAS3 = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+    var MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+    var sesion = { slug: "", clave: "" };
+    var personas = [];              //[{id, nombre, rol, activo}]
+    var cfg = null;
+    var mesRef = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    var citasMes = [];
+    var dispMap = {};               //'YYYY-MM-DD' -> [horas] de la persona seleccionada
+    var dlgFecha = null;            //fecha que edita el diálogo
+
+    function setMsg(id, t, err) { var m = $(id); if (!m) return; m.textContent = t || ""; m.className = "message" + (err ? " err" : ""); }
+    function iso(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+    function claveAdmin() { return ($("claveAdmin").value || "").trim(); }
+
+    function slots() {
+      var a = $("cfgInicio").value || cfg && cfg.hora_inicio || "09:00";
+      var c = $("cfgFin").value || cfg && cfg.hora_fin || "20:00";
+      var paso = Number($("cfgIntervalo").value) || (cfg && cfg.intervalo_min) || 30;
+      var out = [], ini = a.split(":").map(Number), fin = c.split(":").map(Number);
+      var min = ini[0] * 60 + ini[1], top = fin[0] * 60 + fin[1];
+      for (; min < top; min += paso) out.push(String(Math.floor(min / 60)).padStart(2, "0") + ":" + String(min % 60).padStart(2, "0"));
+      return out;
+    }
+
+    function slugify(txt) {
+      return String(txt || "").trim().toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+    }
+
+    $("btnEntrar").addEventListener("click", entrar);
+    $("clave").addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) entrar(); });
+    $("nombreNegocio").addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) $("clave").focus(); });
+
+    async function entrar() {
+      var nombre = $("nombreNegocio").value.trim();
+      var clave = $("clave").value;
+      var slug = slugify(nombre);
+      if (!nombre) return setMsg("loginMsg", "Escribe el nombre de tu negocio.", true);
+      if (!slug) return setMsg("loginMsg", "El nombre debe tener al menos una letra o número.", true);
+      if (clave.length < 4) return setMsg("loginMsg", "La clave debe tener al menos 4 caracteres.", true);
+
+      $("btnEntrar").disabled = true; setMsg("loginMsg", "Entrando…");
+      try {
+        var r;
+        try { r = await api.gConfig(slug, clave); }
+        catch (e) {
+          if (/no existe/i.test(e.message)) {
+            var claveCreacion = ($("claveCreacion").value || "").trim();
+            if (!claveCreacion) {
+              $("creacionField").style.display = "";
+              $("claveCreacion").focus();
+              throw new Error("Este negocio es nuevo. Escribe la clave de creación para crearlo.");
+            }
+            await api.gCrear(slug, nombre, clave, claveCreacion);
+            r = await api.gConfig(slug, clave);
+          }
+          else throw e;
+        }
+        sesion.slug = slug; sesion.clave = clave; cfg = r.local;
+        $("claveAdmin").value = clave; //por defecto la de admin = la de equipo al inicio
+        var enlace = new URL("03_reservas_publico.html", location.href);
+        enlace.searchParams.set("slug", slug);
+        $("verPublica").href = enlace.href; $("verPublica").hidden = false;
+        setMsg("loginMsg", "");
+        $("login").hidden = true; $("panel").hidden = false;
+        mostrarEnlaceClientes(enlace.href);
+        pintarConfig(); initBulkUI();
+        await cargarPersonas();
+        renderCalendario(); await cargarCitasMes();
+      } catch (e) { setMsg("loginMsg", e.message, true); }
+      finally { $("btnEntrar").disabled = false; }
+    }
+
+    function mostrarEnlaceClientes(url) {
+      var host = $("enlaceClientes"); if (!host) return;
+      host.hidden = false;
+      host.innerHTML =
+        '<h2>Enlace para tus clientes</h2>' +
+        '<p class="muted">Comparte este enlace (WhatsApp, Instagram, etc.). Cualquiera puede reservar sin cuenta.</p>' +
+        '<div class="actions" style="align-items:center">' +
+          '<input id="linkBox" readonly value="' + esc(url) + '">' +
+          '<button class="btn" id="btnCopiar">Copiar enlace</button>' +
+          '<a class="btn" href="' + esc(url) + '" target="_blank" rel="noopener">Abrir</a>' +
+        '</div>';
+      $("btnCopiar").onclick = async function () {
+        try { await navigator.clipboard.writeText(url); } catch (e) { $("linkBox").select(); try { document.execCommand("copy"); } catch (_) {} }
+        $("btnCopiar").textContent = "¡Copiado!";
+        setTimeout(function () { $("btnCopiar").textContent = "Copiar enlace"; }, 1600);
+      };
+    }
+
+    function pintarConfig() {
+      $("cfgNombre").value = cfg.nombre || "";
+      $("cfgIntervalo").value = String(cfg.intervalo_min || 30);
+      $("cfgInicio").value = cfg.hora_inicio || "09:00";
+      $("cfgFin").value = cfg.hora_fin || "20:00";
+      $("cfgAntic").value = cfg.anticipacion_horas || 0;
+      $("cfgMaxDias").value = cfg.max_dias_adelante || 365;
+      $("cfgActivo").checked = cfg.activo !== false;
+      $("cfgTelefono").value = cfg.telefono || "";
+      $("cfgLogo1").value = cfg.logo1_url || "";
+      $("cfgLogo2").value = cfg.logo2_url || "";
+    }
+    $("btnGuardarCfg").addEventListener("click", async function () {
+      var cambios = {
+        nombre: $("cfgNombre").value.trim(), intervalo_min: Number($("cfgIntervalo").value),
+        hora_inicio: $("cfgInicio").value, hora_fin: $("cfgFin").value,
+        anticipacion_horas: Number($("cfgAntic").value), max_dias_adelante: Number($("cfgMaxDias").value),
+        activo: $("cfgActivo").checked,
+        telefono: $("cfgTelefono").value.trim(),
+        logo1_url: $("cfgLogo1").value.trim(),
+        logo2_url: $("cfgLogo2").value.trim()
+      };
+      if ($("cfgClaveNueva").value) cambios.clave_nueva = $("cfgClaveNueva").value;
+      try {
+        var r = await api.gGuardarConfig(sesion.slug, sesion.clave, cambios);
+        if (cambios.clave_nueva) sesion.clave = cambios.clave_nueva;
+        cfg = Object.assign(cfg, cambios); $("cfgClaveNueva").value = "";
+        setMsg("cfgMsg", r.mensaje); initBulkUI();
+      } catch (e) { setMsg("cfgMsg", e.message, true); }
+    });
+    $("btnSetAdmin").addEventListener("click", async function () {
+      var actual = $("adActual").value || sesion.clave, nueva = $("adNueva").value;
+      if (!nueva || nueva.length < 4) return setMsg("adMsg", "La nueva clave de admin debe tener al menos 4 caracteres.", true);
+      try {
+        var r = await api.aSetClave(sesion.slug, actual, nueva);
+        $("claveAdmin").value = nueva; $("adActual").value = ""; $("adNueva").value = "";
+        setMsg("adMsg", r.mensaje);
+      } catch (e) { setMsg("adMsg", e.message, true); }
+    });
+
+    async function cargarPersonas() {
+      var r = await api.gPersonas(sesion.slug, sesion.clave);
+      personas = r.personas || [];
+      renderPersonas(); rellenarSelPersona(); rellenarRolesSugeridos();
+    }
+    function rellenarRolesSugeridos() {
+      var roles = {}; personas.forEach(function (p) { if (p.rol) roles[p.rol] = 1; });
+      $("rolesSugeridos").innerHTML = Object.keys(roles).map(function (r) { return '<option value="' + esc(r) + '">'; }).join("");
+    }
+    function renderPersonas() {
+      if (!personas.length) { $("personasList").innerHTML = '<p class="muted">Aún no hay personas. Agrega la primera abajo.</p>'; return; }
+      $("personasList").innerHTML = personas.map(function (p) {
+        return '<div class="persona-row' + (p.activo === false ? " inactiva" : "") + '">' +
+          '<input class="pn" data-id="' + p.id + '" value="' + esc(p.nombre) + '" title="Nombre">' +
+          '<input class="pr" data-id="' + p.id + '" value="' + esc(p.rol || "") + '" placeholder="rol" list="rolesSugeridos" title="Rol">' +
+          '<label class="check inline"><input type="checkbox" class="pa" data-id="' + p.id + '" ' + (p.activo !== false ? "checked" : "") + '> activa</label>' +
+          '<button class="btn mini" data-guardar="' + p.id + '">Guardar</button>' +
+          '<button class="btn mini danger" data-eliminar="' + p.id + '">Eliminar</button>' +
+        '</div>';
+      }).join("");
+      $("personasList").querySelectorAll("[data-guardar]").forEach(function (b) {
+        b.onclick = function () { guardarPersona(Number(b.dataset.guardar)); };
+      });
+      $("personasList").querySelectorAll("[data-eliminar]").forEach(function (b) {
+        b.onclick = function () { eliminarPersona(Number(b.dataset.eliminar)); };
+      });
+    }
+    async function guardarPersona(id) {
+      if (!claveAdmin()) return setMsg("personasMsg", "Escribe la clave de administrador (arriba de la lista).", true);
+      var row = $("personasList");
+      var nombre = row.querySelector('.pn[data-id="' + id + '"]').value.trim();
+      var rol = row.querySelector('.pr[data-id="' + id + '"]').value.trim();
+      var activo = row.querySelector('.pa[data-id="' + id + '"]').checked;
+      try {
+        var r = await api.aEditarPersona(sesion.slug, claveAdmin(), id, { nombre: nombre, rol: rol, activo: activo });
+        setMsg("personasMsg", r.mensaje); await cargarPersonas();
+      } catch (e) { setMsg("personasMsg", e.message, true); }
+    }
+    async function eliminarPersona(id) {
+      if (!claveAdmin()) return setMsg("personasMsg", "Escribe la clave de administrador (arriba de la lista).", true);
+      if (!confirm("¿Eliminar a esta persona y toda su disponibilidad y citas?")) return;
+      try {
+        var r = await api.aEliminarPersona(sesion.slug, claveAdmin(), id);
+        setMsg("personasMsg", r.mensaje); await cargarPersonas(); await cargarDisponibilidad();
+      } catch (e) { setMsg("personasMsg", e.message, true); }
+    }
+    $("btnAgregarPersona").addEventListener("click", async function () {
+      if (!claveAdmin()) return setMsg("personasMsg", "Escribe la clave de administrador (arriba de la lista).", true);
+      var nombre = $("npNombre").value.trim(), rol = $("npRol").value.trim();
+      if (!nombre) return setMsg("personasMsg", "Escribe el nombre de la persona.", true);
+      try {
+        var r = await api.aCrearPersona(sesion.slug, claveAdmin(), nombre, rol);
+        $("npNombre").value = ""; $("npRol").value = "";
+        setMsg("personasMsg", r.mensaje); await cargarPersonas();
+      } catch (e) { setMsg("personasMsg", e.message, true); }
+    });
+
+    function rellenarSelPersona() {
+      var activas = personas.filter(function (p) { return p.activo !== false; });
+      var actual = $("selPersona").value;
+      $("selPersona").innerHTML = activas.map(function (p) {
+        return '<option value="' + p.id + '">' + esc(p.nombre) + (p.rol ? " · " + esc(p.rol) : "") + "</option>";
+      }).join("") || '<option value="">Crea personas primero</option>';
+      if (actual && activas.some(function (p) { return String(p.id) === actual; })) $("selPersona").value = actual;
+      cargarDisponibilidad();
+    }
+    $("selPersona").addEventListener("change", cargarDisponibilidad);
+
+    function rangoAnio() {
+      var hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+      var dias = (cfg && cfg.max_dias_adelante) || 365;
+      var fin = new Date(hoy); fin.setDate(fin.getDate() + dias);
+      return { desde: hoy, hasta: fin };
+    }
+    async function cargarDisponibilidad() {
+      var pid = Number($("selPersona").value);
+      if (!pid) { dispMap = {}; renderSemanas(); return; }
+      var r0 = rangoAnio();
+      try {
+        var r = await api.gDisponibilidad(sesion.slug, sesion.clave, pid, iso(r0.desde), iso(r0.hasta));
+        dispMap = {};
+        (r.dias || []).forEach(function (d) { dispMap[d.fecha] = d.horas || []; });
+        renderSemanas();
+      } catch (e) { setMsg("dispMsg", e.message, true); }
+    }
+    function renderSemanas() {
+      var r0 = rangoAnio(), host = $("semanas");
+      var ini = new Date(r0.desde); ini.setDate(ini.getDate() - ini.getDay());
+      var totalDias = 0, htmlHead = "<div class='sem-head'>" + DIAS3.map(function (d) { return "<b>" + d + "</b>"; }).join("") + "</div>";
+      var filas = "", cursor = new Date(ini), mesActual = -1;
+      while (cursor <= r0.hasta) {
+        var etiqueta = "";
+        var celdas = "";
+        for (var i = 0; i < 7; i++) {
+          var f = new Date(cursor);
+          var enRango = f >= r0.desde && f <= r0.hasta;
+          var key = iso(f);
+          var n = enRango && dispMap[key] ? dispMap[key].length : 0;
+          if (enRango && f.getMonth() !== mesActual) { mesActual = f.getMonth(); etiqueta = MESES[mesActual] + " " + f.getFullYear(); }
+          if (enRango) {
+            totalDias += n > 0 ? 1 : 0;
+            celdas += '<button type="button" class="sem-dia' + (n ? " tiene" : "") + '" data-fecha="' + key + '">' +
+              '<span class="sd-d">' + f.getDate() + '</span>' + (n ? '<span class="sd-n">' + n + '</span>' : '') + '</button>';
+          } else {
+            celdas += '<span class="sem-dia vacia"></span>';
+          }
+          cursor.setDate(cursor.getDate() + 1);
+        }
+        filas += (etiqueta ? '<div class="sem-mes">' + etiqueta + '</div>' : '') + '<div class="sem-fila">' + celdas + '</div>';
+      }
+      host.innerHTML = htmlHead + filas;
+      host.querySelectorAll("[data-fecha]").forEach(function (b) { b.onclick = function () { abrirDia(b.dataset.fecha); }; });
+      var nombre = ($("selPersona").selectedOptions[0] || {}).textContent || "";
+      $("dispResumen").textContent = nombre ? (totalDias + " día(s) con horario · " + nombre) : "";
+    }
+
+    function abrirDia(fecha) {
+      dlgFecha = fecha;
+      var d = new Date(fecha + "T00:00:00");
+      $("dlgTitulo").textContent = DIAS[d.getDay()] + " " + d.getDate() + " de " + MESES[d.getMonth()];
+      $("dlgSub").textContent = "Marca las horas que atiende ese día.";
+      setMsg("dlgMsg", "");
+      var actuales = new Set(dispMap[fecha] || []);
+      $("dlgSlots").innerHTML = slots().map(function (h) {
+        return '<button type="button" class="choice slot-h' + (actuales.has(h) ? " selected" : "") + '" data-h="' + h + '">' + h + '</button>';
+      }).join("") || '<p class="muted">Configura el horario del negocio primero (sección Configuración).</p>';
+      $("dlgSlots").querySelectorAll("[data-h]").forEach(function (b) {
+        b.onclick = function () { b.classList.toggle("selected"); };
+      });
+      if (typeof $("dlgDia").showModal === "function") $("dlgDia").showModal();
+      else $("dlgDia").setAttribute("open", "");
+    }
+    function cerrarDlg() { var d = $("dlgDia"); if (d.close) d.close(); else d.removeAttribute("open"); }
+    $("dlgCerrar").addEventListener("click", cerrarDlg);
+    $("dlgTodo").addEventListener("click", function () { $("dlgSlots").querySelectorAll(".slot-h").forEach(function (b) { b.classList.add("selected"); }); });
+    $("dlgNada").addEventListener("click", function () { $("dlgSlots").querySelectorAll(".slot-h").forEach(function (b) { b.classList.remove("selected"); }); });
+    $("dlgGuardar").addEventListener("click", async function () {
+      var pid = Number($("selPersona").value);
+      if (!pid) return setMsg("dlgMsg", "Selecciona una persona.", true);
+      var horas = Array.prototype.map.call($("dlgSlots").querySelectorAll(".slot-h.selected"), function (b) { return b.dataset.h; });
+      try {
+        await api.gSetDia(sesion.slug, sesion.clave, pid, dlgFecha, horas);
+        if (horas.length) dispMap[dlgFecha] = horas; else delete dispMap[dlgFecha];
+        renderSemanas(); cerrarDlg(); setMsg("dispMsg", "Día actualizado: " + dlgFecha + " (" + horas.length + " horas).");
+      } catch (e) { setMsg("dlgMsg", e.message, true); }
+    });
+
+    function initBulkUI() {
+      $("bkDias").innerHTML = DIAS.map(function (d, i) {
+        return '<label class="check inline"><input type="checkbox" class="bkd" value="' + i + '">' + DIAS3[i] + '</label>';
+      }).join("");
+      var hs = slots(); var opts = hs.map(function (h) { return '<option value="' + h + '">' + h + '</option>'; }).join("");
+      $("bkHoraIni").innerHTML = opts;
+      var cierre = $("cfgFin").value || (cfg && cfg.hora_fin) || "20:00";
+      $("bkHoraFin").innerHTML = opts + '<option value="' + cierre + '">' + cierre + ' (cierre)</option>';
+      if (hs.length) { $("bkHoraIni").value = hs[0]; $("bkHoraFin").value = cierre; }
+      var r0 = rangoAnio(); $("bkDesde").value = iso(r0.desde); $("bkHasta").value = iso(r0.hasta);
+    }
+    $("bkModo").querySelectorAll("[data-modo]").forEach(function (b) {
+      b.onclick = function () {
+        $("bkModo").querySelectorAll(".choice").forEach(function (x) { x.classList.remove("selected"); });
+        b.classList.add("selected");
+      };
+    });
+    document.querySelectorAll("[data-preset]").forEach(function (b) {
+      b.onclick = function () {
+        var p = b.dataset.preset, set = { lv: [1,2,3,4,5], ls: [1,2,3,4,5,6], all: [0,1,2,3,4,5,6], none: [] }[p] || [];
+        $("bkDias").querySelectorAll(".bkd").forEach(function (chk) { chk.checked = set.indexOf(Number(chk.value)) >= 0; });
+      };
+    });
+    function horasEntre(ini, fin) {
+      return slots().filter(function (h) { return h >= ini && h < fin; });
+    }
+    $("btnBulk").addEventListener("click", async function () {
+      var pid = Number($("selPersona").value);
+      if (!pid) return setMsg("bulkMsg", "Selecciona una persona.", true);
+      var desde = $("bkDesde").value, hasta = $("bkHasta").value;
+      if (!desde || !hasta) return setMsg("bulkMsg", "Elige el rango de fechas.", true);
+      var dias = Array.prototype.map.call($("bkDias").querySelectorAll(".bkd:checked"), function (c) { return Number(c.value); });
+      var modo = ($("bkModo").querySelector(".choice.selected") || {}).dataset.modo || "reemplazar";
+      var horas = horasEntre($("bkHoraIni").value, $("bkHoraFin").value);
+      if (modo !== "reemplazar" && !horas.length) return setMsg("bulkMsg", "El rango de horas está vacío.", true);
+      setMsg("bulkMsg", "Aplicando…");
+      try {
+        var r = await api.gBulk(sesion.slug, sesion.clave, pid, { desde: desde, hasta: hasta, dias: dias, horas: horas, modo: modo });
+        setMsg("bulkMsg", r.mensaje);
+        await cargarDisponibilidad();
+      } catch (e) { setMsg("bulkMsg", e.message, true); }
+    });
+
+    function renderCalendario() {
+      var y = mesRef.getFullYear(), m = mesRef.getMonth();
+      var first = new Date(y, m, 1), last = new Date(y, m + 1, 0);
+      $("mesTitulo").textContent = MESES[m] + " " + y;
+      var conteo = {};
+      citasMes.forEach(function (c) { if (c.estado === "reservada") { var d = Number(c.fecha.slice(8, 10)); conteo[d] = (conteo[d] || 0) + 1; } });
+      var html = DIAS3.map(function (d) { return "<b>" + d + "</b>"; }).join("");
+      for (var i = 0; i < first.getDay(); i++) html += '<div class="cal-cell empty"></div>';
+      for (var day = 1; day <= last.getDate(); day++) {
+        var c = conteo[day] || 0;
+        html += '<div class="cal-cell" data-dia="' + day + '" style="cursor:pointer"><div class="d">' + day + "</div>" +
+          (c ? '<div class="c">' + c + " cita" + (c > 1 ? "s" : "") + "</div>" : "") + "</div>";
+      }
+      $("calendario").innerHTML = html;
+      $("calendario").querySelectorAll("[data-dia]").forEach(function (cell) { cell.onclick = function () { verCitasDia(Number(cell.dataset.dia)); }; });
+    }
+    function verCitasDia(day) {
+      var y = mesRef.getFullYear(), m = mesRef.getMonth();
+      var fecha = y + "-" + String(m + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+      var delDia = citasMes.filter(function (c) { return c.fecha === fecha; });
+      if (!delDia.length) { $("citasDia").innerHTML = '<p class="muted">Sin citas el ' + fecha + ".</p>"; return; }
+      var mapa = {}; personas.forEach(function (p) { mapa[p.id] = p.nombre + (p.rol ? " · " + p.rol : ""); });
+      $("citasDia").innerHTML = "<h3 style='margin:0 0 8px'>Citas del " + fecha + "</h3>" +
+        delDia.map(function (c) {
+          var activa = c.estado === "reservada";
+          return '<div class="persona-row"><span>' + esc(c.hora) + " · " + esc(c.nombre_cliente) +
+            (c.contacto ? " (" + esc(c.contacto) + ")" : "") + " · " + esc(mapa[c.persona_id] || "?") +
+            (activa ? "" : ' <span class="chip">cancelada</span>') + " · #" + c.id + "</span>" +
+            (activa ? '<button class="btn mini danger" data-cancelar="' + c.id + '">Cancelar</button>' : "") + "</div>";
+        }).join("");
+      $("citasDia").querySelectorAll("[data-cancelar]").forEach(function (b) {
+        b.onclick = async function () {
+          if (!confirm("¿Cancelar la cita #" + b.dataset.cancelar + "?")) return;
+          try { await api.gCancelar(sesion.slug, sesion.clave, Number(b.dataset.cancelar)); await cargarCitasMes(); verCitasDia(day); }
+          catch (e) { alert(e.message); }
+        };
+      });
+    }
+    async function cargarCitasMes() {
+      try {
+        var r = await api.gCitasMes(sesion.slug, sesion.clave, mesRef.getFullYear(), mesRef.getMonth() + 1);
+        citasMes = r.citas || []; renderCalendario();
+      } catch (e) { setMsg("cfgMsg", e.message, true); }
+    }
+    $("mesPrev").addEventListener("click", function () { mesRef.setMonth(mesRef.getMonth() - 1); cargarCitasMes(); $("citasDia").innerHTML = ""; });
+    $("mesNext").addEventListener("click", function () { mesRef.setMonth(mesRef.getMonth() + 1); cargarCitasMes(); $("citasDia").innerHTML = ""; });
+    async function refrescarBoton(btn, fn) {
+      if (!btn) return;
+      var prev = btn.textContent;
+      btn.disabled = true; btn.textContent = "Actualizando…";
+      try { await fn(); } finally { btn.disabled = false; btn.textContent = prev; }
+    }
+    $("citasRefrescar").addEventListener("click", function () {
+      refrescarBoton(this, async function () { await cargarCitasMes(); $("citasDia").innerHTML = ""; });
+    });
+    $("dispRefrescar").addEventListener("click", function () {
+      refrescarBoton(this, async function () { await cargarPersonas(); await cargarDisponibilidad(); });
+    });
+  })();
+  </script>
+</body>
+</html>
