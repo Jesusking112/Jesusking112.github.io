@@ -43,7 +43,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .choice.selected{border-color:var(--accent);background:#0c4a6e;box-shadow:0 0 0 1px var(--accent)}
 .choice:disabled,.choice.off{opacity:.32;cursor:not-allowed;background:#0f172a}
 
-/* Pasos numerados */
 .step{padding:16px 0;border-bottom:1px solid var(--line-soft)}
 .step:last-child{border-bottom:0}
 .step-head{display:flex;gap:12px;align-items:center;margin-bottom:12px}
@@ -59,7 +58,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .clave-box{font-size:22px;font-weight:800;letter-spacing:.06em;color:var(--accent);
   background:#0f172a;border:1px dashed var(--accent);border-radius:10px;padding:12px;text-align:center;margin-top:8px}
 
-/* Gestión: plantilla semanal y calendario */
 .week{display:grid;grid-template-columns:repeat(7,minmax(96px,1fr));gap:8px}
 .day{border:1px solid var(--line);border-radius:10px;padding:10px;background:#0f172a}
 .day h3{font-size:13px;margin:0 0 8px}
@@ -75,13 +73,11 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .tag-persona{display:flex;gap:8px;align-items:center;margin:6px 0}
 .tag-persona input[type=text]{flex:1}
 
-/* Botones pequeños y checks en línea */
 .btn.mini{padding:6px 10px;font-size:13px;border-radius:8px}
 .check{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:14px;margin-top:12px}
 .check.inline{margin:0;font-size:13px}
 .check input{width:auto}
 
-/* Secciones desplegables (acordeón) */
 .acc{background:color-mix(in srgb,var(--card) 94%,transparent);border:1px solid var(--line);
   border-radius:16px;margin-top:14px;overflow:hidden;box-shadow:0 16px 44px #0003}
 .acc>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;
@@ -95,11 +91,9 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .acc-sub{color:var(--muted);font-weight:500;font-size:13px}
 .acc-body{padding:4px 20px 22px;border-top:1px solid var(--line-soft)}
 
-/* Sub-tarjetas dentro de una sección */
 .sub-card{border:1px solid var(--line-soft);border-radius:12px;background:#0f172a;padding:16px;margin-top:14px}
 .sub-card h3{margin:0 0 10px;font-size:15px}
 
-/* Personas */
 .lista-personas{display:flex;flex-direction:column;gap:8px}
 .persona-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px solid var(--line-soft);
   border-radius:10px;padding:8px 10px;background:#0f172a}
@@ -107,10 +101,8 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .persona-row .pn{flex:1;min-width:120px}
 .persona-row .pr{width:130px;flex:none}
 
-/* Selector de días de la semana (ayuda en bloque) */
 .dias-semana{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
 
-/* Calendario del año por semanas */
 .semanas{margin-top:10px}
 .sem-head{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
 .sem-head b{text-align:center;color:var(--muted);font-size:12px}
@@ -124,7 +116,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .sem-dia .sd-n{margin-top:2px;font-size:11px;font-weight:800;color:#a5f3fc;background:#082f49;border-radius:999px;padding:1px 7px}
 .sem-dia.vacia{border:0;background:transparent;cursor:default}
 
-/* Chip de rol en botones de persona */
 .rol-chip{display:inline-block;margin-left:8px;font-size:11px;font-weight:700;color:#a5f3fc;
   background:#082f49;border:1px solid var(--accent);border-radius:999px;padding:2px 8px}
 
@@ -134,11 +125,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .dlg::backdrop{background:#0009}
 .slot-h{min-width:72px}
 
-/* ============================================================
-   VISTA PÚBLICA DEL CLIENTE (03_reservas_publico.html)
-   Cabecera: logo1 · logo2 / nombre · tel��fono
-   Cuerpo: asistente de un paso a la vez.
-   ============================================================ */
 .pub{max-width:760px;margin:auto;padding:22px 16px 64px}
 
 /* Cabecera de logos */
@@ -149,7 +135,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
   border-radius:10px;display:block}
 .logo-slot:not(.has){min-height:0}
 
-/* Nombre + teléfono */
 .pub-id{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
   padding-bottom:8px;margin-bottom:6px}
 .pub-name h1{font-size:clamp(24px,5vw,38px);margin:2px 0}
@@ -162,7 +147,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .pub-phone .pp-txt small{color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 .pub-phone .pp-txt b{font-size:15px}
 
-/* Asistente */
 .wizard{margin-top:8px}
 .wz-bar{display:flex;align-items:center;gap:12px;margin-bottom:8px;min-height:34px}
 .wz-back{border:1px solid var(--line);background:#111827;color:var(--text);border-radius:9px;
@@ -184,13 +168,11 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .wz-head h2{font-size:20px;margin:0 0 2px}
 .btn.big{padding:13px 20px;font-size:16px;width:100%;justify-content:center;text-align:center}
 
-/* Resumen en confirmación */
 .resumen{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .resumen>div{border:1px solid var(--line-soft);border-radius:12px;background:#0f172a;padding:12px}
 .resumen small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
 .resumen b{font-size:15px}
 
-/* Tarjetas de persona */
 .persona-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .persona-card{display:flex;align-items:center;gap:11px;text-align:left;cursor:pointer;font:inherit;
   border:1px solid var(--line);border-radius:14px;background:#172033;color:var(--text);padding:12px}
@@ -203,7 +185,6 @@ input:focus,select:focus{outline:none;border-color:var(--accent)}
 .persona-card .pc-info small{color:#a5f3fc;font-size:12px;font-weight:700;line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Ventana para cancelar (desplegable) */
 .cancel-box{padding:0;overflow:hidden}
 .cancel-box>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;
   padding:16px 20px;font-weight:700;user-select:none}
