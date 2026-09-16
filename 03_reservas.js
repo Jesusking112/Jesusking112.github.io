@@ -1,11 +1,3 @@
-/* ============================================================
-   MÓDULO 03 · RESERVAS — Cliente compartido
-   100% INDEPENDIENTE. NO usa la Edge Function.
-   Llama DIRECTO a Supabase por PostgREST:
-     POST /rest/v1/rpc/<funcion>   con la anon key.
-   Toda la seguridad vive en las funciones SQL (SECURITY DEFINER)
-   y en la RLS de las tablas (ver supabase_reservas.sql).
-   ============================================================ */
 (function () {
   "use strict";
 
