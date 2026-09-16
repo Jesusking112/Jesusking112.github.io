@@ -36,7 +36,6 @@ input,select{width:100%;border:1px solid var(--line);border-radius:10px;backgrou
 input:focus,select:focus{outline:none;border-color:var(--accent)}
 .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
 
-/* Botonera de opciones (meses, días, horas, personas) */
 .choices{display:flex;flex-wrap:wrap;gap:9px}
 .choice{border:1px solid var(--line);border-radius:10px;background:#172033;color:var(--text);
   padding:10px 14px;cursor:pointer;font:inherit;font-weight:600;min-width:64px;text-align:center}
