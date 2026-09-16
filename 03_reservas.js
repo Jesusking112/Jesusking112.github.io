@@ -1,6 +1,7 @@
 (function () {
   "use strict";
 
+  
   const SUPABASE_URL = "https://djbvgglroelnescxkjcw.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_v0wAgT-Bbui1ytwpARw4lg_vnKOttEX";
   const REST_RPC = SUPABASE_URL + "/rest/v1/rpc/";
