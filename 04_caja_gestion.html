@@ -141,9 +141,9 @@
         </div>
       </details>
 
-      <!-- ===== 7) Clientes ===== -->
+      <!-- ===== 3) Clientes ===== -->
       <details class="acc">
-        <summary><span class="acc-ico">7</span> Clientes <span class="acc-sub">directorio y contacto</span></summary>
+        <summary><span class="acc-ico">3</span> Clientes <span class="acc-sub">directorio y contacto</span></summary>
         <div class="acc-body">
           <p class="muted">Los clientes también se crean solos al registrar una venta con su nombre. Eliminar requiere la <b>clave de administrador</b>.</p>
           <div id="cliTabla" class="tabla-scroll"></div>
@@ -157,24 +157,6 @@
             <div class="actions"><button class="btn primary" id="btnAgregarCliente">Guardar cliente</button></div>
           </div>
           <p id="cliMsg" class="message" role="status"></p>
-        </div>
-      </details>
-
-      <!-- ===== 3) Movimientos ===== -->
-      <details class="acc">
-        <summary><span class="acc-ico">3</span> Movimientos <span class="acc-sub">historial, filtro y exportar</span></summary>
-        <div class="acc-body">
-          <div class="range-bar">
-            <label class="field">Desde<input id="movDesde" type="date"></label>
-            <label class="field">Hasta<input id="movHasta" type="date"></label>
-            <label class="field">Tipo
-              <select id="movFiltroTipo"><option value="">Todos</option><option value="ingreso">Ingresos</option><option value="egreso">Egresos</option></select>
-            </label>
-            <button class="btn primary" id="movListar">Ver</button>
-            <button class="btn" id="movCsv">Descargar CSV</button>
-          </div>
-          <div id="movTabla" class="tabla-scroll"></div>
-          <p id="movListMsg" class="message" role="status"></p>
         </div>
       </details>
 
@@ -227,7 +209,7 @@
 
       <!-- ===== 6) Personas ===== -->
       <details class="acc">
-        <summary><span class="acc-ico">6</span> Personas <span class="acc-sub">quién atiende</span></summary>
+        <summary><span class="acc-ico">6</span> Personal <span class="acc-sub">quién atiende</span></summary>
         <div class="acc-body">
           <p class="muted">Gestionar personas requiere la <b>clave de administrador</b> (arriba, en Inventario).</p>
           <div id="perTabla" class="tabla-scroll"></div>
@@ -243,28 +225,76 @@
         </div>
       </details>
 
+      <!-- ===== 7) Movimientos ===== -->
+      <details class="acc">
+        <summary><span class="acc-ico">7</span> Movimientos <span class="acc-sub">historial, filtro y exportar</span></summary>
+        <div class="acc-body">
+          <div id="movCandado" class="sub-card" style="text-align:center">
+            <h3 style="margin-top:0">Sector protegido</h3>
+            <p class="muted">Ingresa la clave de administrador para consultar el historial de movimientos.</p>
+            <div class="range-bar" style="justify-content:center">
+              <label class="field">Clave del administrador<input id="movClave" type="password" autocomplete="off"></label>
+              <button class="btn primary" id="movDesbloquear">Ver sector</button>
+            </div>
+            <p id="movCandadoMsg" class="message" role="status"></p>
+          </div>
+
+          <div id="movProtegido" hidden>
+            <div class="range-bar" style="justify-content:flex-end;margin-bottom:12px">
+              <button class="btn" id="movBloquear">Bloquear</button>
+            </div>
+            <div class="range-bar">
+              <label class="field">Desde<input id="movDesde" type="date"></label>
+              <label class="field">Hasta<input id="movHasta" type="date"></label>
+              <label class="field">Tipo
+                <select id="movFiltroTipo"><option value="">Todos</option><option value="ingreso">Ingresos</option><option value="egreso">Egresos</option></select>
+              </label>
+              <button class="btn primary" id="movListar">Ver</button>
+              <button class="btn" id="movCsv">Descargar CSV</button>
+            </div>
+            <div id="movTabla" class="tabla-scroll"></div>
+            <p id="movListMsg" class="message" role="status"></p>
+          </div>
+        </div>
+      </details>
+
       <!-- ===== 8) Configuración ===== -->
       <details class="acc">
         <summary><span class="acc-ico">8</span> Configuración <span class="acc-sub">moneda y claves</span></summary>
         <div class="acc-body">
-          <div class="grid">
-            <label class="field">Nombre visible<input id="cfgNombre"></label>
-            <label class="field">Símbolo de moneda<input id="cfgMoneda" placeholder="$, €, S/…" maxlength="6"></label>
-            <label class="field">Cambiar clave del equipo (opcional)<input id="cfgClaveNueva" type="password" placeholder="deja vacío para no cambiar"></label>
-          </div>
-          <label class="check"><input id="cfgActivo" type="checkbox"> Negocio activo</label>
-          <div class="actions"><button class="btn primary" id="btnGuardarCfg">Guardar configuración</button></div>
-          <p id="cfgMsg" class="message" role="status"></p>
-
-          <div class="sub-card">
-            <h3>Clave de administrador</h3>
-            <p class="muted">Solo el administrador debe conocerla. Sirve para gestionar catálogos (servicios, inventario, personas) y eliminar clientes.</p>
-            <div class="grid">
-              <label class="field">Clave de admin actual<input id="adActual" type="password" autocomplete="off" placeholder="si no la separaste, usa la del equipo"></label>
-              <label class="field">Nueva clave de admin<input id="adNueva" type="password" autocomplete="off"></label>
+          <div id="cfgCandado" class="sub-card" style="text-align:center">
+            <h3 style="margin-top:0">Sector protegido</h3>
+            <p class="muted">Ingresa la clave de administrador para modificar las configuraciones del negocio.</p>
+            <div class="range-bar" style="justify-content:center">
+              <label class="field">Clave del administrador<input id="cfgClave" type="password" autocomplete="off"></label>
+              <button class="btn primary" id="cfgDesbloquear">Ver sector</button>
             </div>
-            <div class="actions"><button class="btn" id="btnSetAdmin">Guardar clave de admin</button></div>
-            <p id="adMsg" class="message" role="status"></p>
+            <p id="cfgCandadoMsg" class="message" role="status"></p>
+          </div>
+
+          <div id="cfgProtegido" hidden>
+            <div class="range-bar" style="justify-content:flex-end;margin-bottom:12px">
+              <button class="btn" id="cfgBloquear">Bloquear</button>
+            </div>
+            <div class="grid">
+              <label class="field">Nombre visible<input id="cfgNombre"></label>
+              <label class="field">Símbolo de moneda<input id="cfgMoneda" placeholder="$, €, S/…" maxlength="6"></label>
+              <label class="field">Cambiar clave del equipo (opcional)<input id="cfgClaveNueva" type="password" placeholder="deja vacío para no cambiar"></label>
+            </div>
+            <label class="check"><input id="cfgActivo" type="checkbox"> Negocio activo</label>
+            <div class="actions"><button class="btn primary" id="btnGuardarCfg">Guardar configuración</button></div>
+            <p id="cfgMsg" class="message" role="status"></p>
+
+            <div class="sub-card">
+              <h3>Clave de administrador</h3>
+              <p class="muted">Solo el administrador debe conocerla. Sirve para gestionar catálogos (servicios, inventario, personas) y eliminar clientes.</p>
+              <div class="grid">
+                <label class="field">Clave de admin actual<input id="adActual" type="password" autocomplete="off" placeholder="si no la separaste, usa la del equipo"></label>
+                <label class="field">Nueva clave de admin<input id="adNueva" type="password" autocomplete="off"></label>
+              </div>
+              <div class="actions"><button class="btn" id="btnSetAdmin">Guardar clave de admin</button></div>
+              <p id="adMsg" class="message" role="status"></p>
+            </div>
           </div>
         </div>
       </details>
@@ -275,3 +305,4 @@
   <script src="04_1_caja.js"></script>
 </body>
 </html>
+
