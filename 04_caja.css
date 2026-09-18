@@ -1,8 +1,5 @@
 /* ============================================================
-   MÓDULO 04 · CAJA — Estilos (independiente, misma familia
-   visual del proyecto). Rediseño enfocado en FACILIDAD DE USO
-   en PC y móvil: tipografía legible, áreas de toque grandes,
-   jerarquía clara y acciones primarias evidentes.
+   MÓDULO 04 · CAJA — Estilos (independiente)
    ============================================================ */
 :root{
   color-scheme:dark;
@@ -11,7 +8,7 @@
   --ok:#34d399; --ok-bg:#064e3b; --danger:#f87171; --danger-line:#ef4444;
   --in:#34d399; --eg:#fb923c; --warn:#fbbf24;
   --radius:18px; --radius-sm:12px;
-  --tap:48px;              /* alto mínimo cómodo para dedo */
+  --tap:48px;              /*alto mínimo cómodo para dedo */
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -28,7 +25,7 @@ body{
   background-attachment:fixed;
   min-height:100vh;
 }
-/* Capa decorativa: figuras geométricas sutiles que no empalagan */
+
 body::before{
   content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;
   background-image:
@@ -39,7 +36,6 @@ body::before{
 .wrap{max-width:940px;margin:auto;padding:28px 16px 96px;position:relative;z-index:1}
 .wrap.wide{max-width:1120px}
 
-/* ---------- Cabecera ---------- */
 header.top{margin-bottom:20px;position:relative;padding-left:18px}
 header.top::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:5px;border-radius:999px;
   background:linear-gradient(180deg,var(--accent),var(--accent-2) 55%,var(--in));box-shadow:0 0 18px color-mix(in srgb,var(--accent) 45%,transparent)}
@@ -50,7 +46,7 @@ h2{font-size:18px;margin:0 0 14px}
 p.lead{color:var(--muted);margin:4px 0 0;font-size:16px}
 .muted{color:var(--muted);font-size:14px}
 
-/* ---------- Botones ---------- */
+
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   min-height:var(--tap);border:1px solid var(--line);background:#182338;color:var(--text);
@@ -67,7 +63,6 @@ p.lead{color:var(--muted);margin:4px 0 0;font-size:16px}
 .btn.mini{min-height:38px;padding:6px 12px;font-size:13px;border-radius:10px}
 .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 
-/* ---------- Tarjetas ---------- */
 .card{position:relative;background:
     linear-gradient(180deg,color-mix(in srgb,var(--card) 92%,transparent),color-mix(in srgb,var(--card-2) 96%,transparent));
   border:1px solid var(--line);border-radius:var(--radius);padding:24px;
@@ -75,7 +70,6 @@ p.lead{color:var(--muted);margin:4px 0 0;font-size:16px}
 .card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
   background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent) 60%,transparent),color-mix(in srgb,var(--accent-2) 60%,transparent),transparent)}
 
-/* ---------- Formularios ---------- */
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .field{display:flex;flex-direction:column;gap:7px;font-weight:600}
 label.field, .field > span{color:var(--muted);font-size:13.5px;font-weight:600}
@@ -95,7 +89,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .message.err{color:var(--danger);font-weight:600}
 .chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12px;color:var(--muted)}
 
-/* ---------- Selector de opciones (tipo de movimiento) ---------- */
 .choices{display:flex;flex-wrap:wrap;gap:10px}
 .choice{
   flex:1 1 160px;min-height:var(--tap);border:1.5px solid var(--line);border-radius:12px;
@@ -105,7 +98,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .choice:hover{border-color:var(--accent)}
 .choice.selected{border-color:var(--accent);background:#0c4a6e;box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 45%,transparent)}
 
-/* ---------- Acordeón ---------- */
 .acc{background:
     linear-gradient(180deg,color-mix(in srgb,var(--card) 90%,transparent),color-mix(in srgb,var(--card-2) 96%,transparent));
   border:1px solid var(--line);border-radius:var(--radius);margin-top:14px;overflow:hidden;
@@ -127,19 +119,16 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .acc-body{padding:6px 20px 24px;border-top:1px solid var(--line-soft)}
 .acc-body > .muted:first-child{margin-top:14px}
 
-/* ---------- Sub-tarjetas ---------- */
 .sub-card{border:1px solid var(--line-soft);border-radius:var(--radius-sm);
   background:linear-gradient(180deg,color-mix(in srgb,var(--card-2) 90%,transparent),var(--card-2));
   padding:18px;margin-top:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
 .sub-card h3{margin:0 0 12px;font-size:16px;display:flex;align-items:center;gap:8px}
 .sub-card h3::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--accent);box-shadow:0 0 8px var(--accent);flex:none}
 
-/* ---------- Barras de rango/fecha ---------- */
 .range-bar,.month-bar{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 .range-bar .field{min-width:150px}
 .month-bar{align-items:center}
 
-/* ---------- KPIs ---------- */
 .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0}
 .kpi{position:relative;border:1px solid var(--line);border-radius:var(--radius-sm);
   background:linear-gradient(180deg,#132038,#0e1729);padding:18px;overflow:hidden}
@@ -154,7 +143,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 .report-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 
-/* ---------- Tablas ---------- */
 .tabla-scroll{overflow-x:auto;margin-top:14px;-webkit-overflow-scrolling:touch;border-radius:var(--radius-sm)}
 .tabla{width:100%;border-collapse:collapse;font-size:14.5px;min-width:min(100%,520px)}
 .tabla th,.tabla td{text-align:left;padding:12px 12px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
@@ -165,40 +153,33 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .txt-in{color:var(--in);font-weight:700} .txt-eg{color:var(--eg);font-weight:700} .txt-bajo{color:var(--warn);font-weight:700}
 .mini-table{margin-top:8px}
 
-/* ---------- Badges ---------- */
 .badge{display:inline-block;border-radius:999px;padding:3px 11px;font-size:11px;font-weight:800}
 .badge.in{background:#064e3b;color:#a7f3d0;border:1px solid #059669}
 .badge.eg{background:#3f1d1d;color:#fed7aa;border:1px solid #ea580c}
 
-/* ---------- Alertas de stock ---------- */
 .alerta{border:1px solid var(--warn);background:#3a2e07;color:#fde68a;border-radius:var(--radius-sm);padding:14px 16px;margin:12px 0;font-weight:700;font-size:14.5px}
 .pill-bajo{display:inline-block;margin-left:6px;font-size:10px;font-weight:800;color:#3a2e07;background:var(--warn);border-radius:999px;padding:2px 8px}
 .ajuste{display:inline-flex;gap:6px}
 
-/* ---------- Cierre de caja ---------- */
 .cierre-nums{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:10px}
 .cierre-nums>div{border:1px solid var(--line-soft);border-radius:var(--radius-sm);background:#0b1220;padding:14px}
 .cierre-nums small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-weight:700}
 .cierre-nums b{font-size:20px}
 .cierre-met{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
 
-/* ============================================================
-   MÓVIL — áreas de toque grandes y acciones a ancho completo
-   ============================================================ */
 @media(max-width:820px){
   .wrap{padding:20px 14px 96px}
   .grid{grid-template-columns:1fr}
   .card{padding:18px}
   .acc>summary{padding:16px 16px;font-size:16px;gap:12px}
   .acc-body{padding:6px 16px 20px}
-  .acc-sub{display:block;flex-basis:100%;margin-left:48px;margin-top:-6px}   /* subtítulo visible en móvil */
+  .acc-sub{display:block;flex-basis:100%;margin-left:48px;margin-top:-6px}
   .acc>summary{flex-wrap:wrap}
   .kpis{grid-template-columns:1fr}
   .report-grid{grid-template-columns:1fr}
   .cierre-nums{grid-template-columns:repeat(2,1fr)}
   .range-bar,.month-bar{gap:10px}
   .range-bar .field{min-width:0;flex:1 1 46%}
-  /* Acciones primarias grandes y a ancho completo */
   .actions{gap:10px}
   .actions .btn{flex:1 1 100%}
   .range-bar .btn{flex:1 1 46%}
@@ -209,14 +190,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   .range-bar .field,.range-bar .btn{flex:1 1 100%}
 }
 
-/* ============================================================
-   GRÁFICAS (SVG puro, sin librerías)
-   ============================================================ */
 .charts-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0}
 .chart-card{margin:0}
 .chart-wrap{margin-top:6px}
 
-/* --- Dona --- */
 .dona-box{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .dona{width:150px;height:150px;flex:0 0 auto}
 .dona-num{fill:var(--text);font-size:22px;font-weight:800}
@@ -227,7 +204,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .lg-label{color:var(--text);font-weight:600;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lg-val{color:var(--muted);font-weight:700;white-space:nowrap}
 
-/* --- Barras horizontales --- */
 .barras{display:flex;flex-direction:column;gap:12px}
 .barra-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:5px}
 .barra-label{color:var(--text);font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
