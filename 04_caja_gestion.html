@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Caja · Módulo 04</title>
+  <link rel="stylesheet" href="04_caja.css">
+</head>
+<body>
+  <main class="wrap wide">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Gestion de finanzas - modulo 4</p>
+        <h1>Caja y administración</h1>
+        <!--<p class="lead">Escribe el nombre de tu negocio y la clave del equipo. Si es nuevo, se crea solo.</p>-->
+      </div>
+    </header>
+
+    <section class="card" id="login">
+      <div class="grid">
+        <label class="field">Nombre de tu negocio<input id="nombreNegocio" placeholder="Ej. local 1" autocomplete="off"></label>
+        <label class="field">Clave del equipo<input id="clave" type="password" placeholder="mínimo 4 caracteres" autocomplete="current-password"></label>
+      </div>
+      <label class="field" id="creacionField" style="display:none">Clave de creación (solo negocios nuevos)<input id="claveCreacion" type="password" placeholder="requerida para crear un negocio nuevo" autocomplete="off"></label>
+      <div class="actions">
+        <button class="btn primary" id="btnEntrar">Entrar</button>
+      </div>
+      <p class="muted">La primera vez crea tu negocio con esa clave. La clave del equipo sirve para registrar movimientos y ver reportes. Para gestionar catálogos (servicios, inventario, personas) se pide una clave de administrador (al principio es la misma). Crear un negocio nuevo exige además una <b>clave de creación</b>.</p>
+      <p id="loginMsg" class="message" role="status"></p>
+    </section>
+
+    <div id="panel" hidden>
+
+      <!-- ===== 1) Balance / Resumen ===== -->
+      <details class="acc" open>
+        <summary><span class="acc-ico">1</span> Balance y resumen <span class="acc-sub">ingresos, egresos y cierre del día</span></summary>
+        <div class="acc-body">
+
+          <!-- Candado: solo el admin con la clave especial ve este sector -->
+          <div id="balCandado" class="sub-card" style="text-align:center">
+            <h3 style="margin-top:0">Sector protegido</h3>
+            <p class="muted">Este apartado (balance, cierre y retención) es solo para el administrador. Escribe la clave para verlo.</p>
+            <div class="range-bar" style="justify-content:center">
+              <label class="field">Clave del administrador<input id="balClave" type="password" autocomplete="off"></label>
+              <button class="btn primary" id="balDesbloquear">Ver sector</button>
+            </div>
+            <p id="balCandadoMsg" class="message" role="status"></p>
+          </div>
+
+          <div id="balProtegido" hidden>
+          <div class="range-bar" style="justify-content:flex-end;margin-bottom:12px">
+            <button class="btn" id="balBloquear" title="Ocultar de nuevo el sector">Bloquear</button>
+          </div>
+          <div class="range-bar">
+            <label class="field">Desde<input id="balDesde" type="date"></label>
+            <label class="field">Hasta<input id="balHasta" type="date"></label>
+            <button class="btn" id="balHoy">Hoy</button>
+            <button class="btn" id="balMes">Este mes</button>
+            <button class="btn primary" id="balAplicar">Ver balance</button>
+            <button class="btn" id="balRefrescar" title="Actualizar sin recargar la página">Actualizar</button>
+          </div>
+
+          <div class="kpis" id="kpis"></div>
+
+          <div class="charts-row">
+            <div class="sub-card chart-card">
+              <h3>Ingresos vs egresos</h3>
+              <div id="chartIngEg" class="chart-wrap"><p class="muted">Elige un rango y toca “Ver balance”.</p></div>
+            </div>
+            <div class="sub-card chart-card">
+              <h3>Movimiento por categoría</h3>
+              <div id="chartCategorias" class="chart-wrap"><p class="muted">Sin datos todavía.</p></div>
+            </div>
+          </div>
+
+          <div class="report-grid">
+            <div class="sub-card">
+              <h3>Por categoría</h3>
+              <div id="porCategoria" class="mini-table"></div>
+            </div>
+            <div class="sub-card">
+              <h3>Ingresos por método</h3>
+              <div id="chartMetodo" class="chart-wrap"></div>
+              <div id="porMetodo" class="mini-table"></div>
+            </div>
+          </div>
+
+          <div class="sub-card">
+            <div class="month-bar">
+              <h3 style="margin:0">Cierre de caja del día</h3>
+              <input id="cierreFecha" type="date" style="max-width:180px">
+              <button class="btn" id="cierreVer">Ver cierre</button>
+            </div>
+            <div id="cierre" class="cierre"></div>
+          </div>
+
+          <div class="sub-card">
+            <h3>Clientes que más gastan (retención)</h3>
+            <p class="muted">En el rango elegido arriba. Útil para saber quién vuelve y quién no.</p>
+            <div id="retencion" class="mini-table"></div>
+          </div>
+          <p id="balMsg" class="message" role="status"></p>
+          </div><!-- /balProtegido -->
+        </div>
+      </details>
+
+      <!-- ===== 2) Registrar movimiento ===== -->
+      <details class="acc">
+        <summary><span class="acc-ico">2</span> Registrar movimiento <span class="acc-sub">ingreso o egreso rápido</span></summary>
+        <div class="acc-body">
+          <div class="choices" id="movTipo" style="margin-bottom:12px">
+            <button class="choice selected" type="button" data-tipo="ingreso">Ingreso (venta)</button>
+            <button class="choice" type="button" data-tipo="egreso">Egreso (gasto)</button>
+          </div>
+
+          <div class="sub-card">
+            <p class="muted">Elige un servicio/producto del catálogo para rellenar concepto y precio, o escribe a mano.</p>
+            <label class="field" style="max-width:360px">Servicio / producto (opcional)
+              <select id="movServicio"><option value="">— Escribir a mano —</option></select>
+            </label>
+            <div class="grid" style="margin-top:12px">
+              <label class="field">Concepto<input id="movConcepto" placeholder="Ej. Corte de cabello / Compra de tinte"></label>
+              <label class="field">Monto<input id="movMonto" type="number" min="0" step="0.01" placeholder="0.00"></label>
+              <label class="field">Cantidad<input id="movCantidad" type="number" min="0" step="1" value="1"></label>
+              <label class="field">Fecha<input id="movFecha" type="date"></label>
+              <label class="field">Categoría<input id="movCategoria" placeholder="Ej. Servicios, Productos, Renta…" list="catSugeridas"></label>
+              <label class="field">Método de pago<input id="movMetodo" placeholder="Efectivo, Tarjeta…" list="metodosSugeridos"></label>
+              <label class="field">Cliente (quién llega)<input id="movCliente" placeholder="Nombre del cliente" list="clientesSugeridos"></label>
+              <label class="field">Atendió (persona)<select id="movPersona"><option value="">—</option></select></label>
+              <label class="field"><span id="movInvLabel">Producto de inventario (al vender, descuenta stock)</span><select id="movInventario"><option value="">— No afecta inventario —</option></select></label>
+              <label class="field">Nota<input id="movNota" placeholder="opcional"></label>
+            </div>
+            <datalist id="catSugeridas"></datalist>
+            <datalist id="metodosSugeridos">
+              <option value="Efectivo"><option value="Tarjeta"><option value="Transferencia"><option value="Otro">
+            </datalist>
+            <datalist id="clientesSugeridos"></datalist>
+            <div class="actions"><button class="btn primary" id="btnRegistrar">Registrar movimiento</button></div>
+            <p id="movMsg" class="message" role="status"></p>
+          </div>
+        </div>
+      </details>
+
+      <!-- ===== 7) Clientes ===== -->
+      <details class="acc">
+        <summary><span class="acc-ico">7</span> Clientes <span class="acc-sub">directorio y contacto</span></summary>
+        <div class="acc-body">
+          <p class="muted">Los clientes también se crean solos al registrar una venta con su nombre. Eliminar requiere la <b>clave de administrador</b>.</p>
+          <div id="cliTabla" class="tabla-scroll"></div>
+          <div class="sub-card">
+            <h3>Agregar / editar cliente</h3>
+            <div class="grid">
+              <label class="field">Nombre<input id="cpNombre" placeholder="Ej. María López"></label>
+              <label class="field">Contacto<input id="cpContacto" placeholder="Teléfono, correo…"></label>
+              <label class="field">Nota<input id="cpNota" placeholder="opcional"></label>
+            </div>
+            <div class="actions"><button class="btn primary" id="btnAgregarCliente">Guardar cliente</button></div>
+          </div>
+          <p id="cliMsg" class="message" role="status"></p>
+        </div>
+      </details>
+
+      <!-- ===== 3) Movimientos ===== -->
+      <details class="acc">
+        <summary><span class="acc-ico">3</span> Movimientos <span class="acc-sub">historial, filtro y exportar</span></summary>
+        <div class="acc-body">
+          <div class="range-bar">
+            <label class="field">Desde<input id="movDesde" type="date"></label>
+            <label class="field">Hasta<input id="movHasta" type="date"></label>
+            <label class="field">Tipo
+              <select id="movFiltroTipo"><option value="">Todos</option><option value="ingreso">Ingresos</option><option value="egreso">Egresos</option></select>
+            </label>
+            <button class="btn primary" id="movListar">Ver</button>
+            <button class="btn" id="movCsv">Descargar CSV</button>
+          </div>
+          <div id="movTabla" class="tabla-scroll"></div>
+          <p id="movListMsg" class="message" role="status"></p>
+        </div>
+      </details>
+
+      <!-- ===== 4) Inventario ===== -->
+      <details class="acc">
+        <summary><span class="acc-ico">4</span> Inventario <span class="acc-sub" id="invSub">stock y alertas</span></summary>
+        <div class="acc-body">
+          <p class="muted">Ver y ajustar stock usa la clave del equipo. Crear/editar/eliminar productos requiere la <b>clave de administrador</b>.</p>
+          <label class="field" style="max-width:320px;margin:8px 0">Clave de administrador<input id="claveAdmin" type="password" placeholder="clave de admin" autocomplete="off"></label>
+          <div id="invAviso"></div>
+          <div id="invTabla" class="tabla-scroll"></div>
+          <div class="sub-card">
+            <h3>Agregar producto</h3>
+            <div class="grid">
+              <label class="field">Nombre<input id="ipNombre" placeholder="Ej. Shampoo 1L"></label>
+              <label class="field">SKU / código<input id="ipSku" placeholder="opcional"></label>
+              <label class="field">Stock actual<input id="ipStock" type="number" step="0.01" value="0"></label>
+              <label class="field">Stock mínimo (alerta)<input id="ipMin" type="number" step="0.01" value="0"></label>
+              <label class="field">Costo<input id="ipCosto" type="number" step="0.01" value="0"></label>
+              <label class="field">Precio venta<input id="ipPrecio" type="number" step="0.01" value="0"></label>
+              <label class="field">Unidad<input id="ipUnidad" placeholder="u, ml, kg…" value="u"></label>
+            </div>
+            <div class="actions"><button class="btn primary" id="btnAgregarProducto">Agregar producto</button></div>
+          </div>
+          <p id="invMsg" class="message" role="status"></p>
+        </div>
+      </details>
+
+      <!-- ===== 5) Servicios y precios ===== -->
+      <details class="acc">
+        <summary><span class="acc-ico">5</span> Servicios y precios <span class="acc-sub">catálogo rápido</span></summary>
+        <div class="acc-body">
+          <p class="muted">Plantillas para registrar rápido (nombre + precio general). Gestionar requiere la <b>clave de administrador</b> (arriba, en Inventario).</p>
+          <div id="servTabla" class="tabla-scroll"></div>
+          <div class="sub-card">
+            <h3>Agregar servicio / producto</h3>
+            <div class="grid">
+              <label class="field">Nombre<input id="spNombre" placeholder="Ej. Corte, Manicure, Tinte…"></label>
+              <label class="field">Precio<input id="spPrecio" type="number" step="0.01" value="0"></label>
+              <label class="field">Tipo
+                <select id="spTipo"><option value="servicio">Servicio</option><option value="producto">Producto</option></select>
+              </label>
+              <label class="field">Liga a inventario (opcional)<select id="spInventario"><option value="">— Ninguno —</option></select></label>
+            </div>
+            <div class="actions"><button class="btn primary" id="btnAgregarServicio">Agregar</button></div>
+          </div>
+          <p id="servMsg" class="message" role="status"></p>
+        </div>
+      </details>
+
+      <!-- ===== 6) Personas ===== -->
+      <details class="acc">
+        <summary><span class="acc-ico">6</span> Personas <span class="acc-sub">quién atiende</span></summary>
+        <div class="acc-body">
+          <p class="muted">Gestionar personas requiere la <b>clave de administrador</b> (arriba, en Inventario).</p>
+          <div id="perTabla" class="tabla-scroll"></div>
+          <div class="sub-card">
+            <h3>Agregar persona</h3>
+            <div class="grid">
+              <label class="field">Nombre<input id="ppNombre" placeholder="Ej. Nella"></label>
+              <label class="field">Rol<input id="ppRol" placeholder="Ej. Estilista"></label>
+            </div>
+            <div class="actions"><button class="btn primary" id="btnAgregarPersona">Agregar persona</button></div>
+          </div>
+          <p id="perMsg" class="message" role="status"></p>
+        </div>
+      </details>
+
+      <!-- ===== 8) Configuración ===== -->
+      <details class="acc">
+        <summary><span class="acc-ico">8</span> Configuración <span class="acc-sub">moneda y claves</span></summary>
+        <div class="acc-body">
+          <div class="grid">
+            <label class="field">Nombre visible<input id="cfgNombre"></label>
+            <label class="field">Símbolo de moneda<input id="cfgMoneda" placeholder="$, €, S/…" maxlength="6"></label>
+            <label class="field">Cambiar clave del equipo (opcional)<input id="cfgClaveNueva" type="password" placeholder="deja vacío para no cambiar"></label>
+          </div>
+          <label class="check"><input id="cfgActivo" type="checkbox"> Negocio activo</label>
+          <div class="actions"><button class="btn primary" id="btnGuardarCfg">Guardar configuración</button></div>
+          <p id="cfgMsg" class="message" role="status"></p>
+
+          <div class="sub-card">
+            <h3>Clave de administrador</h3>
+            <p class="muted">Solo el administrador debe conocerla. Sirve para gestionar catálogos (servicios, inventario, personas) y eliminar clientes.</p>
+            <div class="grid">
+              <label class="field">Clave de admin actual<input id="adActual" type="password" autocomplete="off" placeholder="si no la separaste, usa la del equipo"></label>
+              <label class="field">Nueva clave de admin<input id="adNueva" type="password" autocomplete="off"></label>
+            </div>
+            <div class="actions"><button class="btn" id="btnSetAdmin">Guardar clave de admin</button></div>
+            <p id="adMsg" class="message" role="status"></p>
+          </div>
+        </div>
+      </details>
+    </div>
+  </main>
+
+  <script src="04_caja.js"></script>
+  <script src="04_1_caja.js"></script>
+</body>
+</html>
