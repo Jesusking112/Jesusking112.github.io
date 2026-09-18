@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plataforma de Servicios · Panel Principal</title>
+  
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0a0f1e; 
+      --card: #121a2e; 
+      --card-2: #0f172a; 
+      --line: #2b3a55; 
+      --line-soft: #1c2740;
+      --text: #f8fafc; 
+      --muted: #9fb2cc; 
+      --accent: #38bdf8; 
+      --accent-2: #818cf8; 
+      --accent-ink: #04283a;
+      --ok: #34d399; 
+      --ok-bg: #064e3b; 
+      --danger: #f87171; 
+      --danger-line: #ef4444;
+      --in: #34d399; 
+      --eg: #fb923c; 
+      --warn: #fbbf24;
+      --radius: 18px; 
+      --radius-sm: 12px;
+      --tap: 48px;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font: 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      background:
+        radial-gradient(900px 500px at 12% -8%, rgba(56, 189, 248, .16), transparent 60%),
+        radial-gradient(760px 480px at 92% 4%, rgba(129, 140, 248, .15), transparent 58%),
+        radial-gradient(680px 620px at 78% 108%, rgba(52, 211, 153, .10), transparent 60%),
+        linear-gradient(180deg, #0b1224 0%, #0a0f1e 45%, #080c17 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .55;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(148, 163, 184, .14) 1px, transparent 0),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220' fill='none'%3E%3Ccircle cx='40' cy='40' r='26' stroke='%2338bdf8' stroke-width='1.2' stroke-opacity='.18'/%3E%3Crect x='150' y='24' width='42' height='42' rx='10' stroke='%23818cf8' stroke-width='1.2' stroke-opacity='.16' transform='rotate(18 171 45)'/%3E%3Cpath d='M30 170l24-42 24 42z' stroke='%2334d399' stroke-width='1.2' stroke-opacity='.15'/%3E%3Ccircle cx='176' cy='168' r='16' stroke='%23fb923c' stroke-width='1.2' stroke-opacity='.15'/%3E%3C/svg%3E");
+      background-size: 26px 26px, 260px 260px;
+    }
+
+    .wrap {
+      max-width: 1120px;
+      margin: auto;
+      padding: 32px 20px 120px;
+      position: relative;
+      z-index: 1;
+    }
+
+    header.top {
+      margin-bottom: 28px;
+      position: relative;
+      padding-left: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    header.top::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 5px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--accent), var(--accent-2) 55%, var(--in));
+      box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent);
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-size: 12px;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      margin: 6px 0;
+      letter-spacing: -.01em;
+      background: linear-gradient(120deg, #f8fafc 20%, #bae6fd 60%, #c7d2fe);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    p.lead {
+      color: var(--muted);
+      margin: 4px 0 0;
+      font-size: 16px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: var(--tap);
+      border: 1px solid var(--line);
+      background: #182338;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px 20px;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .08s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      background: #1d2b45;
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-ink);
+      box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 28%, transparent);
+    }
+
+    .btn.primary:hover {
+      background: #5ccbf7;
+      border-color: #5ccbf7;
+      box-shadow: 0 10px 28px color-mix(in srgb, var(--accent) 42%, transparent);
+    }
+
+    .btn.whatsapp {
+      background: #25d366;
+      border-color: #25d366;
+      color: #042f14;
+      box-shadow: 0 8px 22px rgba(37, 211, 102, 0.3);
+    }
+
+    .btn.whatsapp:hover {
+      background: #34e075;
+      border-color: #34e075;
+      box-shadow: 0 10px 28px rgba(37, 211, 102, 0.45);
+    }
+
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .module-card {
+      position: relative;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--card) 92%, transparent), color-mix(in srgb, var(--card-2) 96%, transparent));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 20px 50px #0006, inset 0 1px 0 rgba(255, 255, 255, .04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      transition: border-color .25s ease, transform .2s ease, box-shadow .25s ease;
+    }
+
+    .module-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 60%, transparent), color-mix(in srgb, var(--accent-2) 60%, transparent), transparent);
+      opacity: 0.6;
+    }
+
+    .module-card:hover {
+      border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+      transform: translateY(-3px);
+      box-shadow: 0 26px 60px #0008, inset 0 1px 0 rgba(255, 255, 255, .08);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .module-badge {
+      display: grid;
+      place-items: center;
+      background: linear-gradient(160deg, #0ea5e9, #1e40af);
+      color: #e0f2fe;
+      border-radius: 14px;
+      width: 48px;
+      height: 48px;
+      flex: none;
+      font-size: 22px;
+      box-shadow: 0 6px 16px #0006;
+    }
+
+    .status-badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      background: #064e3b;
+      color: #a7f3d0;
+      border: 1px solid #059669;
+    }
+
+    .card-body h3 {
+      font-size: 20px;
+      margin: 0 0 8px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .card-body p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      margin: 0 0 20px;
+    }
+
+    .card-actions {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--line-soft);
+    }
+
+    .card-actions .btn {
+      width: 100%;
+    }
+
+    .support-card {
+      margin-top: 36px;
+      background: linear-gradient(180deg, #0d281e 0%, #091a14 100%);
+      border: 1px solid #134e38;
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      flex-wrap: wrap;
+    }
+
+    .support-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .support-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(37, 211, 102, 0.15);
+      border: 1px solid rgba(37, 211, 102, 0.3);
+      display: grid;
+      place-items: center;
+      font-size: 26px;
+      flex: none;
+    }
+
+    .float-wa {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 99;
+      background: #25d366;
+      color: #042f14;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+      text-decoration: none;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .float-wa:hover {
+      transform: scale(1.08);
+      box-shadow: 0 14px 32px rgba(37, 211, 102, 0.6);
+    }
+
+    @media (max-width: 768px) {
+      .wrap { padding: 20px 14px 96px; }
+      .support-card { flex-direction: column; align-items: stretch; text-align: center; }
+      .support-info { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="wrap">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Plataforma de Servicios desarollado por SITC</p>
+        <h1>Panel Principal</h1>
+        <p class="lead">Selecciona un módulo para gestionar tu negocio o contacta a soporte.</p>
+      </div>
+    </header>
+
+    <section class="modules-grid" id="gridModulos"></section>
+
+    <!-- Seccion de Soporte WhatsApp Directo -->
+    <section class="support-card">
+      <div class="support-info">
+        <div class="support-icon">💬</div>
+        <div>
+          <h3 style="margin: 0 0 4px; font-size: 18px; color: #e2f8eb;">¿Necesitas ayuda o soporte técnico?</h3>
+          <p style="margin: 0; color: #a3e6c0; font-size: 14px;">Contacta directamente con nuestro equipo por WhatsApp.</p>
+        </div>
+      </div>
+      <a id="btnWhatsappSoporte" href="#" target="_blank" rel="noopener noreferrer" class="btn whatsapp">
+        Escribir a Soporte
+      </a>
+    </section>
+
+  </main>
+
+  <!-- Botón Flotante Directo de WhatsApp -->
+  <a id="btnWhatsappFlotante" href="#" target="_blank" rel="noopener noreferrer" class="float-wa" title="Soporte Directo">
+    💬
+  </a>
+
+  <script>
+    /* =================================================================
+       1. NÚMERO DE WHATSAPP Y MENSAJE DE SOPORTE (CAMBIA EN 1 LÍNEA)
+       ================================================================= */
+    const TEL_WHATSAPP = "573124895999";
+    const MSG_WHATSAPP = "Hola, necesito ayuda con la plataforma.";
+
+    /* =================================================================
+       2. ARREGLO DE MÓDULOS ( AGREGA O QUITA MÓDULOS EN 1 SOLA LÍNEA )
+       ================================================================= */
+    const SERVICIOS = [
+      { titulo: "Reservas y Agenda", desc: "Gestión de citas, asignación de turnos y atención a clientes.", icono: "📅", enlace: "03_reservas_gestion.html", badge: "Módulo 03" },
+      { titulo: "Caja y Administración", desc: "Control de ingresos, egresos, balance del día e inventarios.", icono: "💰", enlace: "04_caja_gestion.html", badge: "Módulo 04" }
+
+    ];
+
+    function renderizarModulos() {
+      const contenedor = document.getElementById("gridModulos");
+      contenedor.innerHTML = "";
+
+      SERVICIOS.forEach(mod => {
+        const tarjeta = document.createElement("article");
+        tarjeta.className = "module-card";
+        tarjeta.innerHTML = `
+          <div>
+            <div class="card-top">
+              <span class="module-badge">${mod.icono || '📌'}</span>
+              <span class="status-badge">${mod.badge || 'Módulo'}</span>
+            </div>
+            <div class="card-body">
+              <h3>${mod.titulo}</h3>
+              <p>${mod.desc}</p>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a href="${mod.enlace}" class="btn primary">Acceder al módulo →</a>
+          </div>
+        `;
+        contenedor.appendChild(tarjeta);
+      });
+    }
+
+    function configurarSoporteWhatsapp() {
+      const urlWhatsapp = `https://wa.me/${TEL_WHATSAPP}?text=${encodeURIComponent(MSG_WHATSAPP)}`;
+      document.getElementById("btnWhatsappSoporte").href = urlWhatsapp;
+      document.getElementById("btnWhatsappFlotante").href = urlWhatsapp;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderizarModulos();
+      configurarSoporteWhatsapp();
+    });
+  </script>
+</body>
+</html>
