@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reservar cita</title>
+  <link rel="stylesheet" href="03_reservas.css">
+</head>
+<body>
+  <main class="pub">
+    <header class="pub-top">
+      <div class="logo-slot" id="logo1"></div>
+      <div class="logo-slot right" id="logo2"></div>
+    </header>
+
+    <section class="pub-id">
+      <div class="pub-name">
+        <p class="eyebrow">Reserva online</p>
+        <h1 id="titulo">Reservar cita</h1>
+      </div>
+      <a class="pub-phone" id="phone" hidden>
+        <span class="pp-ico" aria-hidden="true">✆</span>
+        <span class="pp-txt"><small>Contacto</small><b id="phoneNum"></b></span>
+      </a>
+    </section>
+
+    <section class="card wizard" id="wizard">
+      <!-- barra de progreso -->
+      <div class="wz-bar">
+        <button class="wz-back" id="wzBack" hidden aria-label="Volver">‹ Volver</button>
+        <div class="wz-steps" id="wzSteps" aria-hidden="true"></div>
+      </div>
+
+      <div class="wz-crumbs" id="wzCrumbs" hidden></div>
+
+      <div class="wz-stage" id="stage" aria-live="polite"></div>
+
+      <p id="mensaje" class="message" role="status"></p>
+      <div id="confirmacion" class="notice" hidden></div>
+    </section>
+
+    <details class="card cancel-box">
+      <summary>
+        <span class="cb-ico" aria-hidden="true">×</span>
+        <span>¿Necesitas cancelar una cita?</span>
+      </summary>
+      <div class="cb-body">
+        <div class="grid">
+          <label class="field">Número de cita<input id="cancelId" inputmode="numeric" placeholder="Ej. 42"></label>
+          <label class="field">Tu clave<input id="cancelClave" type="password" autocomplete="off"></label>
+        </div>
+        <div class="actions"><button class="btn danger" id="btnCancelar">Cancelar cita</button></div>
+        <p id="cancelMsg" class="message" role="status"></p>
+      </div>
+    </details>
+  </main>
+
+  <script src="03_reservas.js"></script>
+  <script src="03_2_reservas.js"></script>
+</body>
+</html>

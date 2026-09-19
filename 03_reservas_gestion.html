@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gestión de reservas · Módulo 03</title>
+  <link rel="stylesheet" href="03_reservas.css">
+</head>
+<body>
+  <main class="wrap wide">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Módulo 03 · independiente</p>
+        <h1>Gestión de reservas</h1>
+        <p class="lead">Escribe el nombre de tu negocio y la clave del equipo. Si es nuevo, se crea solo.</p>
+      </div>
+      <nav class="nav">
+        <a class="btn" id="verPublica" href="#" target="_blank" rel="noopener" hidden>Ver página de clientes</a>
+      </nav>
+    </header>
+
+    <section class="card" id="login">
+      <div class="grid">
+        <label class="field">Nombre de tu negocio<input id="nombreNegocio" placeholder="Ej. Local Central" autocomplete="off"></label>
+        <label class="field">Clave del equipo<input id="clave" type="password" placeholder="mínimo 4 caracteres" autocomplete="current-password"></label>
+      </div>
+      <label class="field" id="creacionField" style="display:none">Clave de creación (solo negocios nuevos)<input id="claveCreacion" type="password" placeholder="requerida para crear un negocio nuevo" autocomplete="off"></label>
+      <div class="actions">
+        <button class="btn primary" id="btnEntrar">Entrar</button>
+      </div>
+      <p class="muted">La primera vez crea tu negocio con esa clave. Con la clave del equipo entras y editas horarios. Para crear/editar personas se pide una clave de administrador (al principio es la misma; puedes cambiarla dentro). Crear un negocio nuevo exige además una <b>clave de creación</b> que controla el administrador del sistema.</p>
+      <p id="loginMsg" class="message" role="status"></p>
+    </section>
+
+    <div id="panel" hidden>
+      <section class="card" id="enlaceClientes" hidden></section>
+
+      <details class="acc" open>
+        <summary><span class="acc-ico">1</span> Citas <span class="acc-sub">ver y cancelar reservas</span></summary>
+        <div class="acc-body">
+          <div class="month-bar">
+            <button class="btn" id="mesPrev">Anterior</button>
+            <h3 id="mesTitulo" style="margin:0"></h3>
+            <button class="btn" id="mesNext">Siguiente</button>
+            <button class="btn" id="citasRefrescar" title="Actualizar sin recargar la página" aria-label="Actualizar citas">Actualizar</button>
+          </div>
+          <div id="calendario" class="calendar"></div>
+          <div id="citasDia" style="margin-top:14px"></div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-ico">2</span> Personas y roles <span class="acc-sub">crear, rol, activar/eliminar</span></summary>
+        <div class="acc-body">
+          <p class="muted">Crear, editar el rol o eliminar personas requiere la <b>clave de administrador</b>. El rol (estilista, barbero, uñas…) lo verá el cliente al reservar.</p>
+          <label class="field" style="max-width:320px;margin:10px 0">Clave de administrador
+            <input id="claveAdmin" type="password" placeholder="clave de admin" autocomplete="off">
+          </label>
+          <div id="personasList" class="lista-personas"></div>
+          <div class="sub-card">
+            <h3>Agregar persona</h3>
+            <div class="grid">
+              <label class="field">Nombre<input id="npNombre" placeholder="Ej. Ana"></label>
+              <label class="field">Rol<input id="npRol" placeholder="Ej. Estilista" list="rolesSugeridos"></label>
+            </div>
+            <datalist id="rolesSugeridos"></datalist>
+            <div class="actions"><button class="btn primary" id="btnAgregarPersona">Agregar persona</button></div>
+          </div>
+          <p id="personasMsg" class="message" role="status"></p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-ico">3</span> Disponibilidad por fechas <span class="acc-sub">cada persona dice cuándo atiende</span></summary>
+        <div class="acc-body">
+          <p class="muted">Elige una persona y marca sus horas por día. Usa las <b>ayudas en bloque</b> para configurar meses o semanas enteras de un clic; luego ajusta días sueltos si quieres.</p>
+
+          <label class="field" style="max-width:320px;margin:6px 0">Persona
+            <select id="selPersona"></select>
+          </label>
+
+          <div class="sub-card">
+            <h3>Ayuda en bloque (rápido)</h3>
+            <div class="grid">
+              <label class="field">Desde<input id="bkDesde" type="date"></label>
+              <label class="field">Hasta<input id="bkHasta" type="date"></label>
+            </div>
+            <div class="field" style="margin-top:10px">
+              <span>Días de la semana</span>
+              <div class="dias-semana" id="bkDias"></div>
+              <div class="actions" style="margin-top:6px">
+                <button class="btn mini" type="button" data-preset="lv">Lunes a viernes</button>
+                <button class="btn mini" type="button" data-preset="ls">Lunes a sábado</button>
+                <button class="btn mini" type="button" data-preset="all">Toda la semana</button>
+                <button class="btn mini" type="button" data-preset="none">Ninguno</button>
+              </div>
+            </div>
+            <div class="grid" style="margin-top:10px">
+              <label class="field">Hora desde<select id="bkHoraIni"></select></label>
+              <label class="field">Hora hasta<select id="bkHoraFin"></select></label>
+            </div>
+            <div class="field" style="margin-top:10px">
+              <span>Qué hacer con esas horas</span>
+              <div class="choices" id="bkModo">
+                <button class="choice selected" type="button" data-modo="reemplazar">Dejar solo estas</button>
+                <button class="choice" type="button" data-modo="agregar">Agregar</button>
+                <button class="choice" type="button" data-modo="quitar">Quitar</button>
+              </div>
+            </div>
+            <div class="actions"><button class="btn primary" id="btnBulk">Aplicar al rango</button></div>
+            <p id="bulkMsg" class="message" role="status"></p>
+          </div>
+
+          <div class="sub-card">
+            <div class="month-bar">
+              <h3 style="margin:0">Calendario del año (desde hoy)</h3>
+              <span class="muted" id="dispResumen"></span>
+              <button class="btn" id="dispRefrescar" title="Actualizar sin recargar la página" aria-label="Actualizar disponibilidad">Actualizar</button>
+            </div>
+            <p class="muted">Toca un día para marcar/ajustar sus horas. El número es la cantidad de horas ese día.</p>
+            <div id="semanas" class="semanas"></div>
+          </div>
+          <p id="dispMsg" class="message" role="status"></p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-ico">4</span> Configuración <span class="acc-sub">horario, intervalo, claves</span></summary>
+        <div class="acc-body">
+          <div class="grid">
+            <label class="field">Nombre visible<input id="cfgNombre"></label>
+            <label class="field">Intervalo (min)
+              <select id="cfgIntervalo">
+                <option value="15">15</option><option value="20">20</option>
+                <option value="30" selected>30</option><option value="45">45</option>
+                <option value="60">60</option>
+              </select>
+            </label>
+            <label class="field">Apertura<input id="cfgInicio" type="time" value="09:00"></label>
+            <label class="field">Cierre<input id="cfgFin" type="time" value="20:00"></label>
+            <label class="field">Anticipación mínima (horas)<input id="cfgAntic" type="number" min="0" value="0"></label>
+            <label class="field">Días máximos adelante<input id="cfgMaxDias" type="number" min="1" max="366" value="365"></label>
+            <label class="field">Cambiar clave del equipo (opcional)<input id="cfgClaveNueva" type="password" placeholder="deja vacío para no cambiar"></label>
+          </div>
+
+          <div class="grid">
+            <label class="field">Teléfono / WhatsApp<input id="cfgTelefono" placeholder="Ej. +34 600 000 000"></label>
+            
+            <label class="field">
+              Logo 1
+              <img id="prevLogo1" src="" style="max-height:40px; display:none; margin-bottom:5px; border-radius:4px;">
+              <input id="cfgLogo1File" type="file" accept="image/*">
+            </label>
+            
+            <label class="field">
+              Logo 2
+              <img id="prevLogo2" src="" style="max-height:40px; display:none; margin-bottom:5px; border-radius:4px;">
+              <input id="cfgLogo2File" type="file" accept="image/*">
+            </label>
+          </div>
+
+          <label class="check"><input id="cfgActivo" type="checkbox"> Negocio activo (acepta reservas)</label>
+          <div class="actions"><button class="btn primary" id="btnGuardarCfg">Guardar configuración</button></div>
+          <p id="cfgMsg" class="message" role="status"></p>
+
+          <div class="sub-card">
+            <h3>Clave de administrador</h3>
+            <p class="muted">Solo el administrador debe conocerla. Sirve para crear/editar/eliminar personas y sus roles.</p>
+            <div class="grid">
+              <label class="field">Clave de admin actual<input id="adActual" type="password" autocomplete="off" placeholder="si no la separaste, usa la del equipo"></label>
+              <label class="field">Nueva clave de admin<input id="adNueva" type="password" autocomplete="off"></label>
+            </div>
+            <div class="actions"><button class="btn" id="btnSetAdmin">Guardar clave de admin</button></div>
+            <p id="adMsg" class="message" role="status"></p>
+          </div>
+        </div>
+      </details>
+    </div>
+  </main>
+
+  <dialog id="dlgDia" class="dlg">
+    <form method="dialog">
+      <h3 id="dlgTitulo" style="margin:0 0 4px">Día</h3>
+      <p class="muted" id="dlgSub" style="margin:0 0 12px"></p>
+      <div id="dlgSlots" class="choices"></div>
+      <div class="actions" style="justify-content:space-between">
+        <div>
+          <button class="btn mini" type="button" id="dlgTodo">Todas</button>
+          <button class="btn mini" type="button" id="dlgNada">Ninguna</button>
+        </div>
+        <div>
+          <button class="btn" type="button" id="dlgCerrar">Cancelar</button>
+          <button class="btn primary" type="button" id="dlgGuardar">Guardar día</button>
+        </div>
+      </div>
+      <p id="dlgMsg" class="message" role="status"></p>
+    </form>
+  </dialog>
+
+  <script src="03_reservas.js"></script>
+  <script src="03_1_reservas.js"></script>
+</body>
+</html>
