@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070d1c">
+  <meta name="robots" content="noindex">
+  <title>Inventario y Remisiones</title>
+  <link rel="stylesheet" href="0021_estilos.css">
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="top-in">
+      <div class="marca"><span class="logo" id="logo-top" aria-hidden="true">IR</span><div><b id="neg-nombre">Cargando…</b><small id="yo-nombre"></small></div></div>
+      <div class="acciones"><span class="chip" id="vence-chip" hidden></span><button class="btn ghost mini" id="salir" type="button">Salir</button></div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Secciones">
+      <button class="tab" data-tab="vender" role="tab">Vender</button>
+      <button class="tab" data-tab="remisiones" role="tab">Remisiones <span class="badge" id="badge-pend" hidden></span></button>
+      <button class="tab" data-tab="inventario" role="tab">Inventario <span class="badge" id="badge-stock" hidden></span></button>
+      <button class="tab" data-tab="clientes" role="tab">Clientes</button>
+      <button class="tab" data-tab="codigos" role="tab">Códigos de barras</button>
+      <button class="tab" data-tab="reportes" role="tab" data-solo-admin>Reportes</button>
+      <button class="tab" data-tab="ajustes" role="tab">Ajustes</button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="vence-banda" id="vence-banda" role="status" hidden><div><b id="vence-titulo"></b><small id="vence-texto"></small></div><button class="btn mini ghost" id="vence-cerrar" type="button">Entendido</button></div>
+    <section data-panel="vender" hidden>
+      <div class="pos">
+        <div class="pila">
+          <div class="card">
+            <div class="card-h"><h2><span class="ico" aria-hidden="true">1</span>Agregar productos</h2></div>
+            <div class="escaner">
+              <label class="sr-only" for="v-buscar">Escanear, código corto o nombre</label>
+              <input id="v-buscar" autocomplete="off" placeholder="Escanea, escribe el código corto (ej. 104) o el nombre…">
+              <button class="btn" id="v-camara" type="button">Cámara</button>
+            </div>
+            <div class="ayuda-scan"><span><kbd>Enter</kbd> agrega el primero</span><span><kbd>↑</kbd><kbd>↓</kbd> moverse</span><span>Lector USB: solo dispara</span><span>Escribe <kbd>*</kbd> para buscar todo</span></div>
+            <div id="v-cam-box" hidden><div class="camara" id="v-cam"><div class="marco"></div><div class="laser"></div></div><p class="muted" style="margin:8px 0 0">Apunta al código de barras. Se agrega solo al leerlo.</p></div>
+            <div class="resultados" id="v-resultados"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h2><span class="ico" aria-hidden="true">2</span>Renglones de la remisión</h2>
+              <button class="btn mini ghost" id="v-libre" type="button">+ Renglón libre</button></div>
+            <label class="interruptor"><input type="checkbox" id="v-ver-importe" checked><span class="pista" aria-hidden="true"></span><span>Ver el importe de cada producto <small>(si lo apagas solo ves cantidad y precio; el total de abajo sigue igual)</small></span></label>
+            <div class="tabla-wrap"><table class="renglones" id="v-tabla">
+              <thead><tr><th class="cant">Cant.</th><th>Descripción</th><th class="prec">P. unit.</th><th class="imp" style="text-align:right">Importe</th><th><span class="sr-only">Quitar</span></th></tr></thead>
+              <tbody id="v-renglones"></tbody>
+            </table></div>
+            <p class="vacio" id="v-vacio">Aún no hay productos. Escanea o busca arriba.</p>
+          </div>
+        </div>
+
+        <aside class="pos-lado pila">
+          <div class="editando-banda" id="v-editando" role="status" hidden></div>
+          <div class="total-hero"><span>Total de la remisión</span><strong id="v-total">$0</strong><small id="v-resumen">0 renglones</small></div>
+          <div class="card">
+            <div class="card-h"><h2><span class="ico" aria-hidden="true">3</span>Cliente y pago</h2></div>
+            <form id="v-form" class="pila">
+              <label class="campo rel"><span>Cliente (escribe el nombre; si no existe se crea solo)</span>
+                <input name="cliente_nombre" id="v-cliente" required autocomplete="off">
+                <div class="sugerencias" id="v-sug" hidden></div>
+              </label>
+              <details><summary class="muted" style="cursor:pointer">Dirección, ciudad y documento (opcional)</summary>
+                <div class="campos" style="margin-top:10px">
+                  <label class="campo"><span>Dirección</span><input name="direccion"></label>
+                  <label class="campo"><span>Ciudad</span><input name="ciudad"></label>
+                  <label class="campo"><span id="v-etq-doc">RFC / NIT</span><input name="documento"></label>
+                  <label class="campo"><span>Teléfono</span><input name="telefono"></label>
+                </div>
+              </details>
+              <div class="campos">
+                <label class="campo"><span>Fecha</span><input type="date" name="fecha" id="v-fecha" required></label>
+                <label class="campo" id="v-estado-c"><span>Estado</span><select name="estado" id="v-estado"><option value="pendiente">Pendiente de pago</option><option value="parcial">Dejó un abono</option><option value="pagado">Ya pagó todo</option></select></label>
+                <label class="campo" id="v-abono-c" hidden><span>¿Cuánto abonó?</span><input type="number" name="abono" id="v-abono" min="0" step="0.01" inputmode="decimal"></label>
+                <label class="campo" id="v-metodo-c" hidden><span>Cómo pagó</span><select name="metodo">{{METODOS}}</select></label>
+                <label class="campo" id="v-ref-c" hidden><span>Referencia / Nº de depósito</span><input name="referencia"></label>
+              </div>
+              <label class="campo"><span>Notas (salen impresas)</span><input name="notas" maxlength="500"></label>
+              <button class="btn primario grande bloque" type="submit" id="v-guardar">Guardar remisión</button>
+              <button class="btn ghost bloque" type="button" id="v-limpiar">Vaciar</button>
+            </form>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section data-panel="remisiones" hidden>
+      <div class="kpis" id="r-kpis"></div>
+      <div class="card">
+        <div class="card-h"><h2>Remisiones</h2>
+          <div class="fila"><button class="btn mini" id="r-numero" type="button">Buscar por Nº</button><button class="btn mini" id="r-csv" type="button">Exportar CSV</button><button class="btn mini" id="r-pdf-todas" type="button">PDF de la lista</button></div>
+        </div>
+        <div class="buscador">
+          <label class="lupa"><span class="sr-only">Buscar</span><input id="r-buscar" placeholder="Nº, cliente, producto, referencia…"></label>
+          <div class="filtros-chip" id="r-rapido">
+            <button type="button" data-r="hoy">Hoy</button><button type="button" data-r="ayer">Ayer</button><button type="button" data-r="semana">Semana</button>
+            <button type="button" data-r="mes" class="on">Este mes</button><button type="button" data-r="30">30 días</button><button type="button" data-r="90">90 días</button><button type="button" data-r="pend">Todo lo pendiente</button>
+          </div>
+        </div>
+        <div class="buscador">
+          <details style="margin-top:10px">
+            <summary class="muted" style="cursor:pointer;margin-bottom:10px">Búsqueda avanzada / Filtros</summary>
+            <div class="buscador">
+              <label class="campo" style="flex:1"><span>Desde</span><input type="date" id="r-desde"></label>
+              <label class="campo" style="flex:1"><span>Hasta</span><input type="date" id="r-hasta"></label>
+              <label class="campo" style="flex:1"><span>Estado</span><select id="r-estado"><option value="">Todos menos anuladas</option><option value="debe">Deben algo (pendientes + abonadas)</option><option value="pendiente">Sin ningún pago</option><option value="parcial">Con abono (pago parcial)</option><option value="pagado">Pagadas completas</option><option value="anulada">Anuladas</option><option value="*">Todas</option></select></label>
+              <label class="campo" style="flex:1"><span>Método</span><select id="r-metodo"><option value="">Cualquiera</option>{{METODOS}}</select></label>
+              <label class="campo" style="flex:1"><span>Monto mín.</span><input type="number" id="r-min" min="0"></label>
+              <label class="campo" style="flex:1"><span>Monto máx.</span><input type="number" id="r-max" min="0"></label>
+              <label class="campo" style="flex:1"><span>Orden</span><select id="r-orden"><option value="num">Número (reciente)</option><option value="fecha">Fecha</option><option value="mayor">Mayor total</option><option value="cliente">Cliente A-Z</option></select></label>
+            </div>
+          </details>
+        </div>
+        <p class="conteo muted" id="r-conteo"></p>
+        <div class="lista" id="r-lista"></div>
+      </div>
+    </section>
+
+    <section data-panel="inventario" hidden>
+      <div class="kpis" id="i-kpis"></div>
+      <div class="card">
+        <div class="card-h"><h2>Productos</h2>
+          <div class="fila">
+            <div class="modo-vista" role="group" aria-label="Vista"><button type="button" data-vista="simple" class="on">Sencilla</button><button type="button" data-vista="detalle">Detallada</button></div>
+            <button class="btn mini primario" id="i-nuevo" type="button" data-solo-admin>+ Producto</button>
+            <button class="btn mini" id="i-importar" type="button" data-solo-admin>Importar lista</button>
+            <button class="btn mini" id="i-movs" type="button" data-solo-admin>Movimientos</button>
+            <button class="btn mini" id="i-csv" type="button">CSV</button>
+          </div>
+        </div>
+        <div class="buscador">
+          <label class="lupa"><span class="sr-only">Buscar</span><input id="i-buscar" placeholder="Nombre, presentación, código, categoría…"></label>
+          <div class="filtros-chip" id="i-chips">
+            <button type="button" data-f="" class="on">Todos</button><button type="button" data-f="bajo">Stock bajo</button><button type="button" data-f="cero">Agotados</button><button type="button" data-f="inactivo" data-solo-admin>Ocultos</button>
+          </div>
+        </div>
+        <details style="margin-bottom:12px">
+          <summary class="muted" style="cursor:pointer;margin-bottom:10px">Búsqueda avanzada / Filtros</summary>
+          <div class="filtros-avz">
+            <select id="i-cat" aria-label="Categoría"><option value="">Todas las categorías</option></select>
+            <select id="i-uni" aria-label="Unidad"><option value="">Todas las unidades</option></select>
+            <input type="number" id="i-pmin" placeholder="Precio mín." aria-label="Precio mínimo" min="0">
+            <input type="number" id="i-pmax" placeholder="Precio máx." aria-label="Precio máximo" min="0">
+            <select id="i-orden" aria-label="Orden"><option value="nombre">Nombre A-Z</option><option value="valor">Mayor valor en stock</option><option value="stock">Menos stock</option><option value="precio">Mayor precio</option><option value="vendido">Más vendido (30 días)</option><option value="corto">Código corto</option></select>
+          </div>
+        </details>
+        <p class="conteo muted" id="i-conteo"></p>
+        <div id="i-lista"></div>
+      </div>
+    </section>
+
+    <section data-panel="clientes" hidden>
+      <div class="card">
+        <div class="card-h"><h2>Clientes</h2>
+          <div class="fila"><button class="btn mini primario" id="c-nuevo" type="button">+ Cliente</button><button class="btn mini" id="c-csv" type="button">CSV</button></div></div>
+        <div class="buscador">
+          <label class="lupa"><span class="sr-only">Buscar</span><input id="c-buscar" placeholder="Nombre, teléfono, ciudad, documento…"></label>
+          <div class="filtros-chip" id="c-chips">
+            <button type="button" data-f="" class="on">Todos</button><button type="button" data-f="debe">Con saldo pendiente</button><button type="button" data-f="sin">Sin compras</button><button type="button" data-f="inactivo">Sin comprar 60+ días</button>
+          </div>
+          <select id="c-orden" aria-label="Orden"><option value="nombre">Nombre A-Z</option><option value="total">Más compras ($)</option><option value="pendiente">Mayor pendiente</option><option value="ultima">Compra más reciente</option></select>
+        </div>
+        <p class="conteo muted" id="c-conteo"></p>
+        <div class="lista" id="c-lista"></div>
+      </div>
+    </section>
+
+    <section data-panel="codigos" hidden>
+      <div class="card">
+        <div class="card-h"><h2>Etiquetas de código de barras</h2>
+          <div class="fila"><button class="btn mini" id="e-todas" type="button">Marcar visibles</button><button class="btn mini" id="e-ninguna" type="button">Desmarcar</button>
+            <button class="btn mini primario" id="e-descargar" type="button">Descargar marcadas (PNG)</button><button class="btn mini" id="e-imprimir" type="button">Imprimir hoja</button></div></div>
+        <p class="muted" style="margin-top:0">Cada etiqueta trae el nombre, el código de barras y el código corto de 3 dígitos (por si el lector falla). El archivo se descarga con el nombre del producto.</p>
+        <div class="buscador">
+          <label class="lupa"><span class="sr-only">Buscar</span><input id="e-buscar" placeholder="Buscar producto o código…"></label>
+          <label class="check"><input type="checkbox" id="e-precio"> Mostrar precio en la etiqueta</label>
+          <label class="campo"><span>Copias por producto (imprimir)</span><input type="number" id="e-copias" min="1" max="50" value="1" style="width:90px"></label>
+        </div>
+        <div class="etiquetas" id="e-lista"></div>
+      </div>
+    </section>
+
+    <section data-panel="reportes" hidden>
+      <div class="card">
+        <div class="card-h"><h2>Reportes</h2><div class="fila"><button class="btn mini" id="p-imprimir" type="button">Imprimir / PDF</button></div></div>
+        <div class="buscador">
+          <label class="campo" style="flex:1"><span>Desde</span><input type="date" id="p-desde"></label>
+          <label class="campo" style="flex:1"><span>Hasta</span><input type="date" id="p-hasta"></label>
+          <div class="filtros-chip" id="p-rapido"><button type="button" data-r="semana">Semana</button><button type="button" data-r="mes" class="on">Mes</button><button type="button" data-r="90">90 días</button><button type="button" data-r="año">Año</button></div>
+          <button class="btn primario" id="p-ver" type="button">Ver</button>
+        </div>
+        <div class="filtros-chip" id="p-tipo" style="margin-bottom:12px">
+          <button type="button" data-t="general" class="on">Resumen</button><button type="button" data-t="productos">Por producto</button><button type="button" data-t="clientes">Por cliente</button>
+          <button type="button" data-t="cliente1">Un cliente a detalle</button><button type="button" data-t="producto1">Un producto a detalle</button><button type="button" data-t="vendedores">Por vendedor</button><button type="button" data-t="precios">Precios cambiados</button>
+        </div>
+        <div id="p-filtro-uno" class="buscador" hidden><label class="campo rel" style="flex:1"><span id="p-uno-etq">Cliente</span><input id="p-uno" list="p-uno-lista" autocomplete="off"><datalist id="p-uno-lista"></datalist></label></div>
+        <div id="p-salida"></div>
+      </div>
+    </section>
+
+    <section data-panel="ajustes" hidden>
+      <div class="grid2">
+        <div class="card" data-solo-admin>
+          <div class="card-h"><h2>Datos de la remisión</h2></div>
+          <form id="a-neg" class="pila">
+            <div class="fila" style="gap:14px;align-items:flex-start">
+              <div class="logo-caja" id="a-logo-caja"><span>Sin logo</span></div>
+              <div class="pila" style="flex:1">
+                <label class="btn" style="cursor:pointer">Subir logo<input type="file" id="a-logo" accept="image/png,image/jpeg,image/webp" hidden></label>
+                <button class="btn ghost" type="button" id="a-logo-quitar">Quitar logo</button>
+                <p class="muted" style="margin:0;font-size:12.5px">PNG con fondo transparente se ve mejor. Se reduce solo.</p>
+              </div>
+            </div>
+            <div class="campos">
+              <label class="campo"><span>Nombre del negocio</span><input name="nombre" required></label>
+              <label class="campo"><span>Línea arriba del logo</span><input name="razon" placeholder="COMERCIALIZADORA"></label>
+              <label class="campo"><span>Lema</span><input name="lema" placeholder="Nueces, semillas y más"></label>
+              <label class="campo"><span>Dirección</span><input name="direccion"></label>
+              <label class="campo"><span>Ciudad</span><input name="ciudad"></label>
+              <label class="campo"><span>Teléfono</span><input name="telefono"></label>
+              <label class="campo"><span>Celular / WhatsApp</span><input name="celular"></label>
+              <label class="campo"><span>Nombre del documento</span><input name="etiqueta_doc" placeholder="RFC / NIT"></label>
+              <label class="campo"><span>Documento del negocio</span><input name="documento"></label>
+              <label class="campo"><span>Moneda (cantidad con letra)</span><input name="moneda" placeholder="PESOS"></label>
+              <label class="campo"><span>Color de la remisión</span><input name="color" type="color" value="#1f2937"></label>
+              <label class="campo"><span>Siguiente Nº de remisión</span><input name="sig_remision" type="number" min="1"></label>
+            </div>
+            <label class="campo"><span>Texto al pie (cuenta para depósito, condiciones…)</span><textarea name="pie" rows="2"></textarea></label>
+            <div class="fila-btns"><button class="btn primario" type="submit">Guardar</button></div>
+          </form>
+        </div>
+        <div class="pila">
+          <div class="card" data-solo-admin>
+            <div class="card-h"><h2>Vista previa</h2></div>
+            <div id="a-vista"></div>
+          </div>
+          <div class="card" data-solo-admin>
+            <div class="card-h"><h2>Usuarios</h2><button class="btn mini primario" id="a-usr-nuevo" type="button">+ Usuario</button></div>
+            <p class="muted" style="margin-top:0">El <b>vendedor</b> vende, cobra y ve inventario. El <b>administrador</b> además edita productos, precios, anula y ve reportes.</p>
+            <div class="lista corta" id="a-usuarios"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Mi clave</h2></div>
+            <form id="a-clave" class="pila">
+              <label class="campo"><span>Clave actual</span><input type="password" name="actual" required autocomplete="current-password"></label>
+              <label class="campo"><span>Clave nueva</span><input type="password" name="nueva" required minlength="4" autocomplete="new-password"></label>
+              <div class="fila-btns"><button class="btn" type="submit">Cambiar</button></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="0021_api.js"></script>
+  <script src="0021_remision.js"></script>
+  <script src="0021_panel.js"></script>
+</body>
+</html>
