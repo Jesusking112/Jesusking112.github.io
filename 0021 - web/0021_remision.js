@@ -109,7 +109,7 @@
     .marca .lema { display: block; font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; }
     .datos { font-size: 12.5px; color: #333; min-width: 0; overflow-wrap: anywhere; }
     .medio { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
-    .logo2 { flex: none; max-height: 72px; max-width: 110px; object-fit: contain; }
+    .logo2 { flex: none; max-height: 92px; max-width: 140px; object-fit: contain; }
     .folio { border: 1.5px solid var(--c); border-radius: 12px; overflow: hidden; text-align: center; }
     .folio .t { background: color-mix(in srgb, var(--c) 14%, #fff); color: var(--c); font-weight: 800; letter-spacing: .12em; font-size: 11px; padding: 3px; }
     .folio .n { font: 700 22px "Courier New", monospace; color: #b91c1c; padding: 6px 4px; }
