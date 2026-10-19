@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070d1c">
+  <meta name="robots" content="noindex">
+  <title>0021 · Panel del proveedor</title>
+  <link rel="stylesheet" href="0021_estilos.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-in">
+      <div class="marca"><span class="logo" aria-hidden="true">IR</span><div><b>Panel de creacion</b><small>Crear y controlar negocios</small></div></div>
+      <div class="acciones"><a class="btn ghost mini" href="0021_inicio.html">Inicio</a><button class="btn ghost mini" id="salir" type="button" hidden>Salir</button></div>
+    </div>
+  </header>
+
+  <main class="wrap estrecho" id="v-login">
+    <div id="motivo"></div>
+    <div class="card">
+      <h2 style="margin-bottom:14px">Clave de creacion</h2>
+      <form id="f-cr" class="pila">
+        <label class="campo"><span>Clave </span><input name="clave" type="password" required autocomplete="current-password"></label>
+        <button class="btn primario grande bloque" type="submit">Entrar</button>
+      </form>
+    </div>
+  </main>
+
+  <main class="wrap" id="v-panel" hidden>
+    <div class="cabeza-panel"><div><p class="eyebrow">Negocios</p><h1>Tus clientes del sistema</h1><p class="muted">Crea un negocio y comparte el usuario y la clave del administrador.</p></div></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="card">
+      <div class="card-h"><h2><span class="ico" aria-hidden="true">+</span>Crear negocio</h2></div>
+      <form id="f-crear" class="pila">
+        <div class="campos">
+          <label class="campo"><span>Nombre del negocio</span><input name="nombre" required placeholder="Comercializadora Brega"></label>
+          <label class="campo"><span>Nombre del administrador</span><input name="nombre_admin" placeholder="Opcional"></label>
+          <label class="campo"><span>Usuario del administrador</span><input name="usuario" required autocapitalize="none" placeholder="brega.admin"></label>
+          <label class="campo"><span>Clave</span><input name="clave" required minlength="4"></label>
+          <label class="campo"><span>Meses de servicio (0 = sin vencimiento)</span><input name="meses" type="number" min="0" max="36" value="1"></label>
+          <label class="campo"><span>Días de prueba gratis (0 = sin prueba; si pones días, reemplaza los meses)</span><input name="dias_prueba" type="number" min="0" max="365" value="0" inputmode="numeric"></label>
+          <label class="campo"><span>Primer número de remisión</span><input name="inicio_remision" type="number" min="1" value="1"></label>
+        </div>
+        <div class="fila-btns"><button class="btn primario" type="submit">Crear negocio</button></div>
+      </form>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Negocios</h2></div>
+      <div class="buscador">
+        <label class="lupa"><span class="sr-only">Buscar</span><input id="buscar" placeholder="Buscar negocio o usuario…"></label>
+        <div class="filtros-chip" id="filtro">
+          <button type="button" data-f="" class="on">Todos</button><button type="button" data-f="activo">Activos</button>
+          <button type="button" data-f="vence">Vencen en 7 días</button><button type="button" data-f="bloq">Vencidos / suspendidos</button>
+        </div>
+        <span class="conteo" id="conteo"></span>
+      </div>
+      <div class="lista" id="lista"></div>
+    </div>
+  </main>
+
+  <script src="0021_api.js"></script>
+  <script src="0021_creador.js"></script>
+</body>
+</html>
