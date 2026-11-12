@@ -76,7 +76,7 @@
   function css(c, anchoMm) {
     return ".tk{width:" + anchoMm + "mm;min-width:" + anchoMm + "mm;padding:" + c.margenMm + "mm;background:#fff;color:#000;font-family:" + c.fuente + ";line-height:1.2;box-sizing:border-box}" +
       ".tk *{box-sizing:border-box}" +
-      ".tk .n{font-size:" + /* c.letraNombre + */ "px;font-weight:800;text-align:center;word-break:break-word}" +
+      ".tk .n{font-size:" + c.letraNombre + "px;font-weight:800;text-align:center;word-break:break-word}" +
       ".tk .ct{font-size:" + c.letraContacto + "px;text-align:center;margin-top:2px;word-break:break-word}" +
       ".tk .dt{font-size:" + c.letraDatos + "px;display:flex;justify-content:space-between;gap:6px;margin-top:4px}" +
       ".tk hr{border:0;border-top:1px dashed #000;margin:5px 0}" +
@@ -89,7 +89,7 @@
   }
   function html(d, c) {
     return '<div class="tk">' +
-      '<div class="n">' + e(d.nombre) + "</div>" +
+      '<div class="n">' + /* e(d.nombre) + */ "</div>" +
       (d.contacto ? '<div class="ct">Tel. ' + e(d.contacto) + "</div>" : "") +
       (d.extra ? '<div class="ct">' + e(d.extra) + "</div>" : "") +
       ((c.mostrarNumero && d.numero) || (c.mostrarFecha && d.fecha) ? '<div class="dt"><span>' + (c.mostrarNumero && d.numero ? "Nº " + e(d.numero) : "") + "</span><span>" + (c.mostrarFecha ? e(d.fecha) : "") + "</span></div>" : "") +
