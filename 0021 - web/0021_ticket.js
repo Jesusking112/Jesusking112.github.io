@@ -76,7 +76,7 @@
   function css(c, anchoMm) {
     return ".tk{width:" + anchoMm + "mm;min-width:" + anchoMm + "mm;padding:" + c.margenMm + "mm;background:#fff;color:#000;font-family:" + c.fuente + ";line-height:1.2;box-sizing:border-box}" +
       ".tk *{box-sizing:border-box}" +
-      /* ".tk .n{font-size:" + c.letraNombre + "px;font-weight:800;text-align:center;word-break:break-word}" + */
+      ".tk .n{font-size:" + /* c.letraNombre + */ "px;font-weight:800;text-align:center;word-break:break-word}" +
       ".tk .ct{font-size:" + c.letraContacto + "px;text-align:center;margin-top:2px;word-break:break-word}" +
       ".tk .dt{font-size:" + c.letraDatos + "px;display:flex;justify-content:space-between;gap:6px;margin-top:4px}" +
       ".tk hr{border:0;border-top:1px dashed #000;margin:5px 0}" +
