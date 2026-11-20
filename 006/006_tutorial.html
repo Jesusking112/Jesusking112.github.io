@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guía de uso · Conjuntos</title>
+<meta name="description" content="Tutorial paso a paso del sistema de conjuntos residenciales: administración, casas y portería.">
+<style>
+  :root{
+    --tinta:#0f1b33; --texto:#334155; --suave:#64748b; --linea:#e2e8f0;
+    --fondo:#f6f8fc; --papel:#ffffff; --azul:#1d4ed8; --azul-claro:#e8efff;
+    --verde:#047857; --verde-claro:#e7f6ef; --ambar:#b45309; --ambar-claro:#fff4e0;
+    --rojo:#b91c1c; --rojo-claro:#fdecec;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--fondo);color:var(--texto);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  h1,h2,h3,h4{color:var(--tinta);line-height:1.25;margin:0 0 .5rem;text-wrap:balance}
+  p{margin:0 0 .8rem}
+  a{color:var(--azul)}
+  code,kbd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em;background:#eef2f8;border:1px solid var(--linea);border-radius:6px;padding:.05rem .35rem;color:var(--tinta)}
+  .btn-ui{display:inline-block;font-weight:600;font-size:.88em;color:#fff;background:var(--tinta);border-radius:999px;padding:.05rem .6rem;white-space:nowrap}
+  .tab-ui{display:inline-block;font-weight:600;font-size:.88em;color:var(--azul);background:var(--azul-claro);border-radius:6px;padding:.05rem .45rem;white-space:nowrap}
+
+  .layout{display:flex;max-width:1180px;margin:0 auto;gap:2rem;padding:1.5rem}
+  nav.indice{flex:0 0 250px;position:sticky;top:1.5rem;align-self:flex-start;max-height:calc(100vh - 3rem);overflow:auto}
+  main{flex:1;min-width:0}
+
+  .indice .caja{background:var(--papel);border:1px solid var(--linea);border-radius:14px;padding:1rem}
+  .indice h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--suave);margin-bottom:.6rem}
+  .indice ol{list-style:none;margin:0;padding:0}
+  .indice li a{display:block;padding:.35rem .55rem;border-radius:8px;text-decoration:none;color:var(--texto);font-size:.94rem}
+  .indice li a:hover{background:var(--azul-claro);color:var(--azul)}
+  .indice li.sub a{padding-left:1.4rem;font-size:.86rem;color:var(--suave)}
+  .indice .acciones{display:flex;flex-direction:column;gap:.5rem;margin-top:1rem}
+  button.imprimir{font:inherit;font-weight:600;border:0;border-radius:10px;padding:.7rem 1rem;background:var(--azul);color:#fff;cursor:pointer}
+  button.imprimir:hover{background:#1e40af}
+  button.secundario{background:var(--papel);color:var(--tinta);border:1px solid var(--linea)}
+  button.secundario:hover{background:#eef2f8}
+
+  .portada{background:linear-gradient(135deg,#0f1b33 0%,#1e3a8a 100%);color:#e6edff;border-radius:20px;padding:2.5rem 2rem;margin-bottom:2rem}
+  .portada h1{color:#fff;font-size:2.1rem;margin-bottom:.6rem}
+  .portada p{color:#c7d4f5;max-width:60ch;font-size:1.05rem}
+  .portada .etiqueta{display:inline-block;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.12);border-radius:999px;padding:.25rem .7rem;margin-bottom:1rem}
+
+  section.parte{background:var(--papel);border:1px solid var(--linea);border-radius:18px;padding:2rem;margin-bottom:2rem}
+  section.parte > header{display:flex;gap:1rem;align-items:flex-start;border-bottom:1px solid var(--linea);padding-bottom:1.2rem;margin-bottom:1.5rem}
+  .insignia{flex:0 0 auto;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;color:#fff}
+  .i-creador{background:#7c3aed}.i-admin{background:var(--azul)}.i-casa{background:var(--verde)}.i-guardia{background:var(--ambar)}.i-gen{background:var(--tinta)}
+  section.parte > header h2{font-size:1.6rem;margin-bottom:.2rem}
+  section.parte > header p{margin:0;color:var(--suave)}
+  h3{font-size:1.18rem;margin-top:1.8rem;padding-top:.2rem}
+  h3:first-of-type{margin-top:0}
+
+  .roles{display:flex;flex-wrap:wrap;gap:1rem;margin:1rem 0}
+  .rol{flex:1 1 220px;border:1px solid var(--linea);border-radius:14px;padding:1rem;text-decoration:none;color:inherit;background:var(--papel);transition:border-color .15s}
+  .rol:hover{border-color:var(--azul)}
+  .rol strong{display:block;color:var(--tinta);margin:.6rem 0 .2rem}
+  .rol span{font-size:.92rem;color:var(--suave)}
+  .rol .insignia{width:40px;height:40px;font-size:1rem;border-radius:10px}
+
+  ol.pasos{list-style:none;counter-reset:paso;margin:1rem 0;padding:0}
+  ol.pasos > li{counter-increment:paso;position:relative;padding:0 0 1rem 3rem;margin:0}
+  ol.pasos > li::before{content:counter(paso);position:absolute;left:0;top:0;width:2rem;height:2rem;border-radius:50%;background:var(--azul-claro);color:var(--azul);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.95rem}
+  ol.pasos > li::after{content:"";position:absolute;left:calc(1rem - 1px);top:2.2rem;bottom:.2rem;width:2px;background:var(--linea)}
+  ol.pasos > li:last-child::after{display:none}
+  ol.pasos > li > strong:first-child{color:var(--tinta);display:block}
+
+  .nota{border-radius:12px;padding:.85rem 1rem;margin:1rem 0;border-left:4px solid}
+  .nota > b{display:block;color:var(--tinta);margin-bottom:.15rem}
+  .nota p:last-child{margin:0}
+  .tip{background:var(--verde-claro);border-color:var(--verde)}
+  .ojo{background:var(--ambar-claro);border-color:var(--ambar)}
+  .peligro{background:var(--rojo-claro);border-color:var(--rojo)}
+  .info{background:var(--azul-claro);border-color:var(--azul)}
+
+  table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.95rem}
+  th,td{text-align:left;padding:.6rem .7rem;border-bottom:1px solid var(--linea);vertical-align:top}
+  th{background:#f1f5fb;color:var(--tinta);font-weight:700}
+  .tabla{overflow-x:auto;border:1px solid var(--linea);border-radius:12px}
+  .tabla table{margin:0}
+
+  .rejilla{display:flex;flex-wrap:wrap;gap:1rem;margin:1rem 0}
+  .tarjeta{flex:1 1 240px;border:1px solid var(--linea);border-radius:12px;padding:1rem;background:#fbfcfe}
+  .tarjeta h4{font-size:1rem;margin-bottom:.3rem}
+  .tarjeta p{font-size:.93rem;margin:0}
+
+  .lista-check{list-style:none;padding:0;margin:.8rem 0}
+  .lista-check li{position:relative;padding-left:1.7rem;margin-bottom:.45rem}
+  .lista-check li::before{content:"";position:absolute;left:.15rem;top:.45rem;width:.9rem;height:.5rem;border-left:2.5px solid var(--verde);border-bottom:2.5px solid var(--verde);transform:rotate(-45deg)}
+
+  details{border:1px solid var(--linea);border-radius:12px;padding:.2rem 1rem;margin-bottom:.6rem;background:#fbfcfe}
+  details summary{cursor:pointer;font-weight:600;color:var(--tinta);padding:.6rem 0;list-style-position:outside}
+  details[open]{background:var(--papel)}
+  details > div{padding-bottom:.8rem}
+
+  .pie{text-align:center;color:var(--suave);font-size:.88rem;padding:1rem 0 2rem}
+
+  fieldset.elegir{border:1px solid var(--linea);border-radius:12px;padding:.7rem .8rem .8rem;margin:1rem 0 .8rem;display:flex;flex-direction:column;gap:.35rem}
+  fieldset.elegir legend{float:left;width:100%;font-weight:700;font-size:.92rem;padding:0;margin-bottom:.25rem}
+  fieldset.elegir label{display:flex;align-items:center;gap:.5rem;font-size:.92rem;cursor:pointer;padding:.15rem 0}
+  fieldset.elegir input{width:1.05rem;height:1.05rem;accent-color:currentColor;cursor:pointer}
+  fieldset.elegir .rapidos{display:flex;gap:.4rem;margin-top:.35rem}
+  fieldset.elegir .rapidos button{flex:1;font:inherit;font-size:.82rem;padding:.35rem .4rem;border:1px solid var(--linea);border-radius:8px;background:transparent;color:inherit;cursor:pointer}
+  fieldset.elegir .rapidos button:hover{border-color:currentColor}
+  .solo-esta{order:9;margin-left:auto;align-self:flex-start;flex:none;font:inherit;font-size:.82rem;padding:.35rem .75rem;border:1px solid var(--linea);border-radius:999px;background:transparent;color:inherit;cursor:pointer}
+  .solo-esta:hover{border-color:currentColor}
+  .aviso-elegir{color:#e5484d;font-size:.85rem;margin:.2rem 0 0}
+
+  @media (max-width:900px){
+    .layout{flex-direction:column;padding:1rem}
+    nav.indice{position:static;max-height:none;flex:none}
+    .indice ol{display:flex;flex-wrap:wrap;gap:.4rem}
+    .indice li.sub{display:none}
+    .indice li a{border:1px solid var(--linea);border-radius:999px;padding:.3rem .75rem;font-size:.88rem}
+    fieldset.elegir{flex-direction:row;flex-wrap:wrap;gap:.3rem .9rem}
+    fieldset.elegir .rapidos{flex-basis:100%}
+    .solo-esta{font-size:.78rem;padding:.3rem .6rem}
+    .indice .acciones{flex-direction:row}
+    .indice .acciones button{flex:1;padding:.6rem .5rem;font-size:.9rem}
+    section.parte{padding:1.3rem}
+    .portada{padding:1.8rem 1.3rem}
+    .portada h1{font-size:1.6rem}
+  }
+
+  @media print{
+    @page{size:A4;margin:14mm 13mm}
+    body{background:#fff;font-size:11.5pt}
+    nav.indice,.no-imprimir{display:none !important}
+    .layout{display:block;padding:0;max-width:none}
+    .portada{-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:0;margin:0 0 1rem}
+    section.parte{border:0;padding:0;margin:0;break-before:page}
+    section.parte:first-of-type,section.parte.primera{break-before:auto}
+    .fuera,.solo-esta{display:none !important}
+    .insignia,.nota,th,ol.pasos>li::before,.btn-ui,.tab-ui{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    h3,h4{break-after:avoid}
+    ol.pasos>li,.nota,.tarjeta,details,tr{break-inside:avoid}
+    details summary{list-style:none}
+    a{color:inherit;text-decoration:none}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="indice" aria-label="Índice de la guía">
+    <div class="caja">
+      <h2>Contenido</h2>
+      <ol>
+        <li><a href="#empezar">Antes de empezar</a></li>
+        <li><a href="#entrar">Cómo entrar</a></li>
+        <li><a href="#admin">Administrador</a></li>
+        <li class="sub"><a href="#admin-primer-dia">Primer día</a></li>
+        <li class="sub"><a href="#admin-mes">Cada mes</a></li>
+        <li class="sub"><a href="#admin-pagos">Pagos</a></li>
+        <li class="sub"><a href="#admin-caja">Caja y reportes</a></li>
+        <li class="sub"><a href="#admin-plan">Mi plan</a></li>
+        <li><a href="#casa">Casa (residente)</a></li>
+        <li><a href="#guardia">Portería</a></li>
+        <li><a href="#creador">Creador</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+      </ol>
+      <fieldset class="elegir" id="elegir">
+        <legend>¿Qué quieres imprimir?</legend>
+        <label><input type="checkbox" value="portada" checked> Portada</label>
+        <label><input type="checkbox" value="empezar" checked> Antes de empezar</label>
+        <label><input type="checkbox" value="entrar" checked> Cómo entrar</label>
+        <label><input type="checkbox" value="admin" checked> Administrador</label>
+        <label><input type="checkbox" value="casa" checked> Casa (residente)</label>
+        <label><input type="checkbox" value="guardia" checked> Portería</label>
+        <label><input type="checkbox" value="creador" checked> Creador</label>
+        <label><input type="checkbox" value="preguntas" checked> Preguntas frecuentes</label>
+        <div class="rapidos">
+          <button type="button" id="selTodo">Marcar todo</button>
+          <button type="button" id="selNada">Quitar todo</button>
+        </div>
+      </fieldset>
+      <div class="acciones">
+        <button type="button" class="imprimir" id="btnPdf">Imprimir lo elegido (PDF)</button>
+        <button type="button" class="imprimir secundario" id="btnAbrir">Abrir todas las respuestas</button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="portada">
+      <span class="etiqueta">Guía de uso</span>
+      <h1>Tu conjunto, paso a paso</h1>
+      <p>Esta guía explica todo lo que necesitas para usar el sistema, sin conocimientos técnicos. Busca tu papel (administrador, casa o portería) y sigue solo esa parte.</p>
+    </div>
+
+    <!-- ANTES DE EMPEZAR -->
+    <section class="parte" id="empezar">
+      <header>
+        <div class="insignia i-gen" aria-hidden="true">?</div>
+        <div><h2>Antes de empezar</h2><p>Lee esto una vez. Toma dos minutos.</p></div>
+      </header>
+
+      <h3>¿Quién eres tú? Ve directo a tu parte</h3>
+      <div class="roles">
+        <a class="rol" href="#admin"><div class="insignia i-admin" aria-hidden="true">A</div><strong>Administrador</strong><span>Maneja casas, cobros, pagos, caja y reportes del conjunto.</span></a>
+        <a class="rol" href="#casa"><div class="insignia i-casa" aria-hidden="true">C</div><strong>Casa o apartamento</strong><span>Ve lo que debe, paga, anuncia visitas y recibe avisos.</span></a>
+        <a class="rol" href="#guardia"><div class="insignia i-guardia" aria-hidden="true">P</div><strong>Portería</strong><span>Deja entrar a los anunciados, pregunta a las casas y recibe paquetes.</span></a>
+      </div>
+
+      <h3>Tres cosas que funcionan igual en todas las pantallas</h3>
+      <div class="rejilla">
+        <div class="tarjeta"><h4>La sesión se queda guardada</h4><p>Entras una sola vez en tu celular o computador. No tienes que poner la clave cada vez. Solo se cierra si tocas <span class="btn-ui">Salir</span>.</p></div>
+        <div class="tarjeta"><h4>Todo se actualiza solo</h4><p>No tienes que recargar la página. Los datos se refrescan solos cada pocos segundos mientras la pantalla está abierta.</p></div>
+        <div class="tarjeta"><h4>Cada lista tiene buscador</h4><p>Arriba de cada lista hay una caja para buscar. Escribe un nombre, número de casa, placa o referencia y la lista se filtra al instante.</p></div>
+      </div>
+
+      <div class="nota info"><b>El pitido</b><p>Portería y las casas pueden escuchar un aviso sonoro cuando pasa algo importante (llega una visita, responden una pregunta). Para que suene, toca <span class="btn-ui">Activar sonido</span> una vez al abrir la pantalla. El navegador no deja sonar nada hasta que lo toques.</p></div>
+    </section>
+
+    <!-- ENTRAR -->
+    <section class="parte" id="entrar">
+      <header>
+        <div class="insignia i-gen" aria-hidden="true">1</div>
+        <div><h2>Cómo entrar</h2><p>Todos entran por la misma página.</p></div>
+      </header>
+      <ol class="pasos">
+        <li><strong>Abre el enlace de inicio</strong>Es el enlace que te compartió tu administración (o el creador del sistema si eres el administrador). Guárdalo en favoritos o agrégalo a la pantalla de inicio del celular.</li>
+        <li><strong>Escribe tu usuario</strong>Se ve parecido a <code>torres-casa12</code>. Escríbelo tal cual, sin espacios.</li>
+        <li><strong>Escribe tu clave</strong>Si quieres revisar lo que escribiste, toca <span class="btn-ui">Ver</span>.</li>
+        <li><strong>Toca <span class="btn-ui">Entrar</span></strong>El sistema te lleva solo a tu pantalla: administración, casa o portería. No tienes que elegir nada.</li>
+      </ol>
+      <div class="nota ojo"><b>¿No te deja entrar?</b><p>Revisa mayúsculas y espacios. Si sigue fallando, pídele al administrador que revise tu usuario en la pestaña <span class="tab-ui">Usuarios</span>. Si aparece un aviso de que el conjunto está bloqueado, el administrador debe renovar el plan (ver <a href="#admin-plan">Mi plan</a>).</p></div>
+    </section>
+
+    <!-- ADMIN -->
+    <section class="parte" id="admin">
+      <header>
+        <div class="insignia i-admin" aria-hidden="true">A</div>
+        <div><h2>Administrador del conjunto</h2><p>Todo lo que necesitas para manejar el conjunto, organizado en pestañas.</p></div>
+      </header>
+
+      <h3>Mapa de pestañas</h3>
+      <div class="tabla"><table>
+        <thead><tr><th scope="col">Pestaña</th><th scope="col">Para qué sirve</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tab-ui">Resumen</span></td><td>Cómo va el mes: cuánto se recaudó, quién pagó, quién no, gráficas de recaudo y gastos.</td></tr>
+          <tr><td><span class="tab-ui">Casas</span></td><td>Lista de casas o apartamentos, propietarios, teléfonos y coeficientes. Crear una por una o importar la lista.</td></tr>
+          <tr><td><span class="tab-ui">Usuarios</span></td><td>Accesos de las casas, de portería y de otros administradores.</td></tr>
+          <tr><td><span class="tab-ui">Servicios</span></td><td>Cuotas que se cobran cada mes (administración, agua, vigilancia…) y cómo se reparten.</td></tr>
+          <tr><td><span class="tab-ui">Cobros</span></td><td>Generar el cobro del mes en un clic, cobros extraordinarios e intereses de mora.</td></tr>
+          <tr><td><span class="tab-ui">Pagos</span></td><td>Comprobantes que envían las casas para aprobar o rechazar, y pagos en efectivo.</td></tr>
+          <tr><td><span class="tab-ui">Caja</span></td><td>Entradas y gastos del conjunto (proveedores, arreglos, nómina…).</td></tr>
+          <tr><td><span class="tab-ui">Portería</span></td><td>Historial de visitas y paquetes.</td></tr>
+          <tr><td><span class="tab-ui">Comunicados</span></td><td>Avisos que ven todas las casas (cortes de agua, asambleas…).</td></tr>
+          <tr><td><span class="tab-ui">Reportes</span></td><td>Informes en PDF por rango de fechas.</td></tr>
+          <tr><td><span class="tab-ui">Mi plan</span></td><td>Estado de tu suscripción y cómo pagarla.</td></tr>
+          <tr><td><span class="tab-ui">Ajustes</span></td><td>Datos del conjunto, dónde pagan las casas, WhatsApp para comprobantes, mora.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3 id="admin-primer-dia">Primer día: dejar todo listo</h3>
+      <p>Haz esto una sola vez, en este orden. Después el sistema trabaja casi solo.</p>
+      <ol class="pasos">
+        <li><strong>Configura los datos de pago</strong>Ve a <span class="tab-ui">Ajustes</span>. Llena los datos del conjunto y, en <em>¿Dónde pagan las casas?</em>, escribe Nequi, Daviplata, llave, cuenta bancaria y titular. Pon también el WhatsApp que recibirá los comprobantes. Toca <span class="btn-ui">Guardar ajustes</span>.</li>
+        <li><strong>Crea las casas</strong>Ve a <span class="tab-ui">Casas</span>. Para pocas casas usa <span class="btn-ui">Nueva casa</span>. Para muchas, usa <span class="btn-ui">Importar lista</span> y pega la lista copiada de Excel (una casa por línea).</li>
+        <li><strong>Crea los usuarios de las casas de un solo clic</strong>En <span class="tab-ui">Casas</span> o <span class="tab-ui">Usuarios</span>, toca <span class="btn-ui">Crear usuarios automáticos</span>. El sistema genera usuario y clave para cada casa que no tenga.</li>
+        <li><strong>Entrega los accesos</strong>Justo después aparecen los usuarios y claves para enviarlos <span class="btn-ui">Por WhatsApp</span> o descargarlos en <span class="btn-ui">CSV</span>.</li>
+        <li><strong>Crea el usuario de portería</strong>En <span class="tab-ui">Usuarios</span> toca <span class="btn-ui">Nuevo usuario</span> y elige el rol Portería. Comparte usuario y clave con el vigilante.</li>
+        <li><strong>Crea los servicios</strong>En <span class="tab-ui">Servicios</span> toca <span class="btn-ui">Nuevo servicio</span> por cada cuota mensual. Elige cómo se reparte (ver tabla abajo).</li>
+      </ol>
+      <div class="nota peligro"><b>Las claves automáticas se ven una sola vez</b><p>Por seguridad, las claves no se guardan visibles. Envíalas o descarga el CSV en ese momento. Si alguien pierde la suya, créale una nueva desde <span class="tab-ui">Usuarios</span>.</p></div>
+
+      <h4>Formas de repartir un servicio</h4>
+      <div class="tabla"><table>
+        <thead><tr><th scope="col">Forma</th><th scope="col">Cómo funciona</th><th scope="col">Ejemplo</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Valor fijo por casa</strong></td><td>Cada casa paga el mismo valor.</td><td>Administración: $150.000 cada casa.</td></tr>
+          <tr><td><strong>Dividir el total entre todas</strong></td><td>Escribes el total y se divide en partes iguales.</td><td>Factura de agua común de $900.000 entre 30 casas = $30.000.</td></tr>
+          <tr><td><strong>Por coeficiente</strong></td><td>Cada casa paga según su coeficiente de propiedad (lo pones en la ficha de la casa).</td><td>Un apartamento más grande paga más.</td></tr>
+          <tr><td><strong>Solo algunas casas</strong></td><td>Eliges qué casas pagan.</td><td>Parqueadero solo a quien tiene carro.</td></tr>
+          <tr><td><strong>Valor distinto por casa</strong></td><td>Escribes el valor de cada casa a mano.</td><td>Consumo de gas medido por casa.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="nota tip"><b>¿Tu conjunto cobra una cuota de administración fija?</b><p>Créala como un servicio más, con <em>Valor fijo por casa</em>. En <span class="tab-ui">Servicios</span> hay una sección de <em>Ideas comunes en conjuntos</em> para crearlos más rápido.</p></div>
+
+      <h3 id="admin-mes">Cada mes (5 minutos)</h3>
+      <ol class="pasos">
+        <li><strong>Genera el cobro del mes</strong>Ve a <span class="tab-ui">Cobros</span> y toca <span class="btn-ui">Generar servicios del mes</span>. Se cobran todos los servicios activos a todas las casas. Si lo tocas dos veces no se duplica.</li>
+        <li><strong>¿Hay algo extra?</strong>Para un gasto puntual (por ejemplo "Arreglo de fachada"), usa <span class="btn-ui">Generar cobro</span>. Antes de confirmar, revisa la <span class="btn-ui">Vista previa</span> con lo que pagará cada casa.</li>
+        <li><strong>Aplica la mora si corresponde</strong>Pasada la fecha límite, toca <span class="btn-ui">Aplicar intereses de mora</span>. El porcentaje se configura en <span class="tab-ui">Ajustes</span> &gt; <em>Cobro y mora</em>.</li>
+        <li><strong>Revisa quién pagó</strong>En <span class="tab-ui">Resumen</span> verás <em>Estado de las casas este mes</em> con filtros: Pagaron, Abonaron, No han pagado, Con mora.</li>
+        <li><strong>Publica un comunicado si hace falta</strong>En <span class="tab-ui">Comunicados</span> toca <span class="btn-ui">Nuevo comunicado</span> y luego <span class="btn-ui">Publicar</span>. Todas las casas lo ven en su pantalla.</li>
+      </ol>
+
+      <h3 id="admin-pagos">Pagos de las casas</h3>
+      <p>Las casas pagan por Nequi, Daviplata, transferencia o en efectivo, y luego reportan el pago. Tú solo confirmas.</p>
+      <ol class="pasos">
+        <li><strong>Abre <span class="tab-ui">Pagos</span> &gt; <em>Por validar</em></strong>Ahí llega cada pago que reportó una casa, con valor, método y referencia.</li>
+        <li><strong>Compara con tu cuenta o con el comprobante de WhatsApp</strong>Si el dinero llegó, toca Aprobar. Si no, toca Rechazar y escribe el motivo.</li>
+        <li><strong>Efectivo o pago en persona</strong>Toca <span class="btn-ui">Registrar pago</span>, elige la casa y el valor. Queda aprobado de inmediato.</li>
+      </ol>
+      <div class="nota info"><b>¿A qué deuda se aplica el pago?</b><p>Siempre a la deuda más vieja primero. Si la casa paga de más, el sobrante queda como saldo a favor para el siguiente cobro.</p></div>
+
+      <h3 id="admin-caja">Caja, gastos y reportes</h3>
+      <ol class="pasos">
+        <li><strong>Registra cada gasto</strong>En <span class="tab-ui">Caja</span> toca <span class="btn-ui">Registrar movimiento</span>. Elige entrada o gasto, concepto, proveedor, categoría y valor.</li>
+        <li><strong>Mira las gráficas</strong>En <span class="tab-ui">Resumen</span> verás entradas contra gastos, gastos por categoría y recaudo de los últimos meses.</li>
+        <li><strong>Saca un reporte en PDF</strong>En <span class="tab-ui">Reportes</span> elige el rango (Este mes, Mes anterior, Últimos 3 o 6 meses, Este año o fechas exactas), elige el tipo de informe y descárgalo. En la ventana de impresión elige <em>Guardar como PDF</em>.</li>
+        <li><strong>¿Necesitas la información en Excel?</strong>Las listas tienen el botón <span class="btn-ui">Exportar CSV</span>, que se abre en Excel o Google Sheets.</li>
+      </ol>
+      <div class="nota tip"><b>Para la asamblea</b><p>Descarga el reporte de caja del año y el de cartera (quién debe) del mismo rango. Son los dos documentos que más se piden.</p></div>
+
+      <h3 id="admin-plan">Mi plan (tu suscripción)</h3>
+      <ol class="pasos">
+        <li><strong>Revisa cuántos días te quedan</strong>En <span class="tab-ui">Mi plan</span> se ve el estado y la fecha de vencimiento.</li>
+        <li><strong>Paga</strong>Escanea el QR o copia el número con el botón Copiar. Elige cuántos meses pagas.</li>
+        <li><strong>Reporta el pago</strong>Toca <span class="btn-ui">Reportar mi pago</span>, escribe la referencia y envía el comprobante con el botón de WhatsApp.</li>
+        <li><strong>Listo</strong>Cuando se aprueba, la fecha de vencimiento se extiende sola. En <em>Historial de pagos de la suscripción</em> ves todos tus pagos.</li>
+      </ol>
+      <div class="nota ojo"><b>Si se vence</b><p>Hay 5 días de gracia. Después nadie del conjunto puede entrar. En la página de inicio aparece <em>Ver cómo renovar</em> con los datos de pago, para que puedas pagar aunque no puedas entrar.</p></div>
+    </section>
+
+    <!-- CASA -->
+    <section class="parte" id="casa">
+      <header>
+        <div class="insignia i-casa" aria-hidden="true">C</div>
+        <div><h2>Casa o apartamento</h2><p>Lo que puedes hacer desde tu celular.</p></div>
+      </header>
+
+      <h3>Ver lo que debes y pagar</h3>
+      <ol class="pasos">
+        <li><strong>Abre <em>Lo que debo</em></strong>Ves cada cobro pendiente: servicio, mes y valor. Arriba está el total.</li>
+        <li><strong>Paga por el medio que prefieras</strong>Aparecen los datos del conjunto (Nequi, Daviplata, llave, cuenta). Tócalos para copiarlos.</li>
+        <li><strong>Reporta el pago</strong>Toca <span class="btn-ui">Reportar pago</span>, escribe el valor y la referencia o número de la transacción.</li>
+        <li><strong>Envía el comprobante</strong>Usa el botón de WhatsApp: abre el chat de la administración con el mensaje ya escrito. Solo adjunta la foto o captura.</li>
+        <li><strong>Espera la aprobación</strong>En <em>Mis pagos recientes</em> verás si quedó aprobado o rechazado. Toca <span class="btn-ui">Ver historial completo</span> para ver todos.</li>
+      </ol>
+      <div class="nota tip"><b>Paz y salvo</b><p>Cuando estás al día, puedes descargar tu paz y salvo desde <em>Mi cuenta</em>.</p></div>
+
+      <h3>Anunciar una visita</h3>
+      <ol class="pasos">
+        <li><strong>Toca <span class="btn-ui">Anunciar visita</span></strong></li>
+        <li><strong>Escribe los datos</strong>Nombre (por ejemplo "Carlos Ruiz"), y si quieres la placa del carro y una nota ("Trae herramientas").</li>
+        <li><strong>Guarda</strong>Portería ya ve a esa persona como autorizada. Cuando llega, la dejan entrar sin llamarte.</li>
+      </ol>
+
+      <h3>Cuando portería te pregunta</h3>
+      <p>Si llega alguien que no anunciaste, portería te pregunta desde su pantalla. Suena un pitido y aparece la pregunta en <em>Visitas</em>. Toca permitir o no permitir. Para escuchar el pitido toca antes <span class="btn-ui">Activar sonido</span>.</p>
+
+      <h3>Paquetes y avisos</h3>
+      <ul class="lista-check">
+        <li>En <em>Paquetes en portería</em> ves lo que llegó a tu nombre y está esperando.</li>
+        <li>En <em>Avisos</em> lees los comunicados de la administración. Usa el buscador para encontrar uno viejo.</li>
+      </ul>
+    </section>
+
+    <!-- GUARDIA -->
+    <section class="parte" id="guardia">
+      <header>
+        <div class="insignia i-guardia" aria-hidden="true">P</div>
+        <div><h2>Portería</h2><p>Tu pantalla de turno. Déjala abierta todo el turno.</p></div>
+      </header>
+
+      <div class="nota peligro"><b>Al empezar el turno</b><p>Toca <span class="btn-ui">Activar sonido</span>. Si no lo tocas, no vas a escuchar cuando una casa responda.</p></div>
+
+      <h3>Llega alguien que está anunciado</h3>
+      <ol class="pasos">
+        <li><strong>Busca en <em>Autorizados para hoy</em></strong>Escribe el nombre, la casa o la placa en el buscador.</li>
+        <li><strong>Marca la entrada</strong>La persona pasa a <em>Visitantes adentro</em>.</li>
+        <li><strong>Cuando se vaya, marca la salida</strong>Queda en el historial de <em>Salidas y no autorizados</em> (últimas 48 horas).</li>
+      </ol>
+
+      <h3>Llega alguien que no está anunciado</h3>
+      <ol class="pasos">
+        <li><strong>Toca <span class="btn-ui">Llegó alguien</span></strong></li>
+        <li><strong>Busca la casa</strong>Por código o por nombre del propietario. Escribe quién es (por ejemplo "Domicilio de Rappi").</li>
+        <li><strong>Toca <span class="btn-ui">Preguntar a la casa</span></strong>La casa recibe el aviso con pitido. Mientras tanto queda en <em>Esperando respuesta</em>.</li>
+        <li><strong>Espera el pitido</strong>Cuando la casa responde, te suena y ves si lo dejas pasar o no.</li>
+      </ol>
+      <div class="nota ojo"><b>Si la casa no responde</b><p>Llama por teléfono como siempre. El sistema no reemplaza tu criterio.</p></div>
+
+      <h3>Llega un paquete</h3>
+      <ol class="pasos">
+        <li><strong>Toca <span class="btn-ui">Registrar paquete</span></strong></li>
+        <li><strong>Elige la casa y escribe qué es</strong>Por ejemplo "Caja mediana" y la empresa ("Servientrega", "Amazon").</li>
+        <li><strong>Al entregarlo</strong>Búscalo en <em>Por entregar</em> y márcalo como entregado.</li>
+      </ol>
+    </section>
+
+    <!-- CREADOR -->
+    <section class="parte" id="creador">
+      <header>
+        <div class="insignia i-creador" aria-hidden="true">D</div>
+        <div><h2>Creador del sistema</h2><p>Solo para quien vende y da de alta los conjuntos.</p></div>
+      </header>
+      <ol class="pasos">
+        <li><strong>Entra a tu panel de creador</strong>Con tu clave de creador. Es una página distinta al inicio normal.</li>
+        <li><strong>Configura dónde te pagan (una vez)</strong>En <em>Dónde te pagan</em> escribe Nequi, Daviplata, llave, cuenta, WhatsApp y sube tu QR con <span class="btn-ui">Subir imagen</span>. Toca <span class="btn-ui">Guardar datos de pago</span>.</li>
+        <li><strong>Crea un conjunto</strong>Toca <span class="btn-ui">Crear conjunto</span>: nombre, ciudad, usuario y clave del administrador y meses de acceso.</li>
+        <li><strong>Comparte el acceso</strong>Cópialo o envíalo por WhatsApp al administrador junto con el enlace de inicio. Desde ahí el administrador hace todo solo.</li>
+        <li><strong>Aprueba pagos de suscripción</strong>Los pagos que reportan los administradores llegan a <em>Pagos reportados</em> (con pitido). Al aprobar, el vencimiento se extiende solo.</li>
+        <li><strong>Renueva o suspende</strong>En la lista de conjuntos puedes renovar +1, +3, +6 o +12 meses, o suspender y activar con un clic.</li>
+      </ol>
+    </section>
+
+    <!-- FAQ -->
+    <section class="parte" id="preguntas">
+      <header>
+        <div class="insignia i-gen" aria-hidden="true">?</div>
+        <div><h2>Preguntas frecuentes</h2><p>Toca una pregunta para ver la respuesta.</p></div>
+      </header>
+
+      <details><summary>Olvidé mi clave, ¿qué hago?</summary><div><p>Pídele al administrador que te asigne una nueva desde <span class="tab-ui">Usuarios</span>. Si el administrador olvidó la suya, debe pedírsela al creador del sistema.</p></div></details>
+      <details><summary>Pagué pero sigo apareciendo con deuda.</summary><div><p>Tu pago está esperando que el administrador lo apruebe. Revisa <em>Mis pagos recientes</em>. Si aparece rechazado, mira el motivo y vuelve a reportarlo.</p></div></details>
+      <details><summary>Pagué de más, ¿pierdo ese dinero?</summary><div><p>No. El sobrante queda como saldo a favor y se usa en el siguiente cobro.</p></div></details>
+      <details><summary>Toqué dos veces "Generar servicios del mes", ¿se cobró doble?</summary><div><p>No. El sistema revisa qué ya se cobró ese mes y no lo repite.</p></div></details>
+      <details><summary>No suena el pitido.</summary><div><p>Toca <span class="btn-ui">Activar sonido</span>, sube el volumen del dispositivo y deja la pantalla abierta (no minimizada). En celulares, el modo ahorro de batería puede pausar la página.</p></div></details>
+      <details><summary>¿Puedo usarlo en varios celulares a la vez?</summary><div><p>Sí. Entra con el mismo usuario en cada dispositivo. Por ejemplo, dos personas de la misma casa o dos turnos de portería.</p></div></details>
+      <details><summary>Los datos no se ven actualizados.</summary><div><p>Se refrescan solos cada pocos segundos mientras la pantalla está visible. Si cambiaste de pestaña, al volver se ponen al día solos.</p></div></details>
+      <details><summary>Aparece que el conjunto está bloqueado.</summary><div><p>Venció el plan del conjunto. El administrador debe tocar <em>Ver cómo renovar</em> en la página de inicio, pagar y reportarlo. Cuando se aprueba, todos pueden entrar de nuevo.</p></div></details>
+      <details><summary>¿Cómo guardo esta guía como PDF?</summary><div><p>Toca <em>Descargar en PDF</em> en el índice (o Ctrl+P / Compartir &gt; Imprimir) y elige <em>Guardar como PDF</em>. Las respuestas se abren solas al imprimir.</p></div></details>
+    </section>
+
+    <p class="pie">Guía de uso · Conjuntos residenciales</p>
+  </main>
+</div>
+
+<script>
+  (function () {
+    var todos = function (abrir) {
+      document.querySelectorAll("details").forEach(function (d) { d.open = abrir; });
+    };
+    var abiertos = false;
+    var casillas = Array.prototype.slice.call(document.querySelectorAll("#elegir input"));
+    var partes = Array.prototype.slice.call(document.querySelectorAll("section.parte"));
+    var portada = document.querySelector(".portada");
+    var btnPdf = document.getElementById("btnPdf");
+    var soloEsta = null;
+
+    var elegidos = function () {
+      return casillas.filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+    };
+    var contar = function () {
+      var n = elegidos().filter(function (v) { return v !== "portada"; }).length;
+      btnPdf.textContent = n === partes.length ? "Imprimir todo (PDF)" : "Imprimir " + n + " de " + partes.length + " partes (PDF)";
+      btnPdf.disabled = n === 0;
+    };
+    var aplicar = function (ids) {
+      var primera = true;
+      portada.classList.toggle("fuera", ids.indexOf("portada") < 0);
+      partes.forEach(function (s) {
+        var va = ids.indexOf(s.id) >= 0;
+        s.classList.toggle("fuera", !va);
+        s.classList.toggle("primera", va && primera);
+        if (va) primera = false;
+      });
+    };
+    var limpiar = function () {
+      portada.classList.remove("fuera");
+      partes.forEach(function (s) { s.classList.remove("fuera", "primera"); });
+    };
+
+    casillas.forEach(function (c) { c.addEventListener("change", contar); });
+    document.getElementById("selTodo").addEventListener("click", function () { casillas.forEach(function (c) { c.checked = true; }); contar(); });
+    document.getElementById("selNada").addEventListener("click", function () { casillas.forEach(function (c) { c.checked = false; }); contar(); });
+    btnPdf.addEventListener("click", function () { soloEsta = null; window.print(); });
+
+    partes.forEach(function (s) {
+      var cab = s.querySelector("header");
+      if (!cab) return;
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "solo-esta";
+      b.textContent = "Imprimir solo esta parte";
+      b.addEventListener("click", function () { soloEsta = s.id; window.print(); });
+      cab.appendChild(b);
+    });
+    contar();
+    document.getElementById("btnAbrir").addEventListener("click", function (e) {
+      abiertos = !abiertos;
+      todos(abiertos);
+      e.currentTarget.textContent = abiertos ? "Cerrar todas las respuestas" : "Abrir todas las respuestas";
+    });
+    var previos = [];
+    window.addEventListener("beforeprint", function () {
+      previos = Array.prototype.map.call(document.querySelectorAll("details"), function (d) { return d.open; });
+      todos(true);
+      var ids = soloEsta ? [soloEsta] : elegidos();
+      if (soloEsta && elegidos().indexOf("portada") >= 0) ids.push("portada");
+      if (ids.filter(function (v) { return v !== "portada"; }).length === 0) ids = partes.map(function (s) { return s.id; }).concat("portada");
+      aplicar(ids);
+    });
+    window.addEventListener("afterprint", function () {
+      limpiar();
+      soloEsta = null;
+      document.querySelectorAll("details").forEach(function (d, i) { d.open = !!previos[i]; });
+    });
+  })();
+</script>
+</body>
+</html>

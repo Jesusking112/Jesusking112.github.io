@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070d1c">
+  <meta name="robots" content="noindex">
+  <title>Conjuntos · Administración</title>
+  <link rel="stylesheet" href="006_estilos.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-in">
+      <div class="marca">
+        <span class="logo" aria-hidden="true">CJ</span>
+        <div><b id="t-conjunto">Administración</b><small id="t-usuario">Panel del administrador</small></div>
+      </div>
+      <div class="acciones"><button class="btn ghost mini" id="salir" type="button">Salir</button></div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Secciones">
+      <button class="tab" data-tab="resumen" role="tab">Resumen</button>
+      <button class="tab" data-tab="cobros" role="tab">Cobros</button>
+      <button class="tab" data-tab="pagos" role="tab">Pagos <span class="badge" id="badge-pagos" hidden></span></button>
+      <button class="tab" data-tab="casas" role="tab">Residencias</button>
+      <button class="tab" data-tab="servicios" role="tab">Servicios</button>
+      <button class="tab" data-tab="caja" role="tab">Caja</button>
+      <button class="tab" data-tab="porteria" role="tab">Portería</button>
+      <button class="tab" data-tab="reportes" role="tab">Reportes</button>
+      <button class="tab" data-tab="comunicados" role="tab">Comunicados</button>
+      <button class="tab" data-tab="usuarios" role="tab">Usuarios</button>
+      <button class="tab" data-tab="ajustes" role="tab">Ajustes</button>
+      <button class="tab" data-tab="suscripcion" role="tab">Mi plan <span class="badge" id="badge-plan" hidden>!</span></button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div id="aviso-vence"></div>
+
+    <!-- ============================================================ RESUMEN -->
+    <section data-panel="resumen" hidden>
+      <div class="cabeza-panel">
+        <div><p class="eyebrow">Tablero</p><h1 id="r-titulo">Resumen del mes</h1></div>
+        <label class="campo"><span>Mes</span><input type="month" id="r-periodo"></label>
+      </div>
+      <div class="kpis" id="r-kpis"></div>
+      <div class="grid2">
+        <div class="card"><div class="card-h"><h2>Recaudo de los últimos meses</h2></div><div class="graf" id="g-recaudo"></div></div>
+        <div class="card"><div class="card-h"><h2>Estado de las casas este mes</h2></div><div class="graf" id="g-casas"></div></div>
+        <div class="card"><div class="card-h"><h2>Entradas vs gastos (caja)</h2></div><div class="graf" id="g-caja"></div></div>
+        <div class="card"><div class="card-h"><h2>Facturado por servicio</h2></div><div class="graf" id="g-conceptos"></div></div>
+        <div class="card"><div class="card-h"><h2>Gastos por categoría</h2></div><div class="graf" id="g-egresos"></div></div>
+        <div class="card">
+          <div class="card-h"><h2>No han pagado este mes</h2><button class="btn mini" type="button" data-ir="casas">Ver todas</button></div>
+          <div class="buscador"><label class="lupa"><span class="sr-only">Buscar casa</span><input id="r-buscar" placeholder="Buscar casa o propietario…"></label></div>
+          <div class="lista corta" id="r-morosos"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ COBROS -->
+    <section data-panel="cobros" hidden>
+      <div class="cabeza-panel">
+        <div><p class="eyebrow">Facturación</p><h1>Cobros a las casas</h1><p class="muted">Genera las cuotas del mes de un clic, o un cobro especial con la forma de reparto que necesites.</p></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2><span class="ico" aria-hidden="true">1</span>Cobro rápido del mes</h2></div>
+        <p class="muted" style="margin-top:0">Crea de una vez todos los servicios recurrentes (administración, parqueadero, etc.). No duplica lo que ya está creado.</p>
+        <div class="fila">
+          <label class="campo"><span>Mes</span><input type="month" id="gm-periodo"></label>
+          <label class="campo"><span>Fecha límite (opcional)</span><input type="date" id="gm-vence"></label>
+          <button class="btn primario" id="gm-btn" type="button" style="align-self:flex-end">Generar servicios del mes</button>
+          <button class="btn" id="mora-btn" type="button" style="align-self:flex-end">Aplicar intereses de mora</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2><span class="ico" aria-hidden="true">2</span>Cobro especial / extraordinario</h2></div>
+        <form id="f-generar" class="pila">
+          <div class="campos">
+            <label class="campo"><span>Servicio</span><select name="concepto_id" id="g-concepto"><option value="">Otro (escribir nombre)</option></select></label>
+            <label class="campo"><span>Nombre del cobro</span><input name="nombre" id="g-nombre" placeholder="Arreglo de fachada"></label>
+            <label class="campo"><span>Mes</span><input type="month" name="periodo" id="g-periodo"></label>
+            <label class="campo"><span>Fecha límite</span><input type="date" name="vence"></label>
+          </div>
+          <div class="campo"><span>¿Cómo se reparte?</span><div class="opciones" id="g-reparto"></div></div>
+          <label class="campo" id="g-monto-box"><span id="g-monto-lbl">Valor</span><input type="number" name="monto" min="0" step="100" inputmode="numeric"></label>
+          <div id="g-detalle"></div>
+          <div class="fila-btns">
+            <button class="btn" type="button" id="g-previa">Vista previa</button>
+            <button class="btn primario" type="submit">Generar cobro</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Cobros creados</h2><button class="btn mini" id="c-csv" type="button">Exportar CSV</button></div>
+        <div class="buscador">
+          <label class="lupa"><span class="sr-only">Buscar cobros</span><input id="c-buscar" placeholder="Casa, propietario, servicio…"></label>
+          <input type="month" id="c-periodo" aria-label="Mes">
+          <select id="c-estado" aria-label="Estado"><option value="">Todos</option><option value="pendiente">Pendientes</option><option value="abonado">Abonados</option><option value="pagado">Pagados</option><option value="vencido">Vencidos</option></select>
+          <select id="c-concepto" aria-label="Servicio"><option value="">Todos los servicios</option></select>
+          <span class="conteo" id="c-conteo"></span>
+        </div>
+        <div class="tabla-wrap"><table><thead><tr><th>Casa</th><th>Servicio</th><th>Mes</th><th>Vence</th><th class="num">Valor</th><th class="num">Pagado</th><th>Estado</th><th></th></tr></thead><tbody id="c-tabla"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ PAGOS -->
+    <section data-panel="pagos" hidden>
+      <div class="cabeza-panel">
+        <div><p class="eyebrow">Recaudo</p><h1>Pagos</h1><p class="muted">Valida los pagos que reportan las casas o registra uno tú (efectivo, consignación…).</p></div>
+        <button class="btn primario" id="p-nuevo" type="button">Registrar pago</button>
+      </div>
+      <div class="card">
+        <div class="filtros-chip" id="p-estados" style="margin-bottom:12px">
+          <button data-e="por_validar" class="on" type="button">Por validar</button>
+          <button data-e="aprobado" type="button">Aprobados</button>
+          <button data-e="rechazado" type="button">Rechazados</button>
+          <button data-e="" type="button">Todos</button>
+        </div>
+        <div class="buscador">
+          <label class="lupa"><span class="sr-only">Buscar pagos</span><input id="p-buscar" placeholder="Casa, referencia, método…"></label>
+          <input type="date" id="p-desde" aria-label="Desde"><input type="date" id="p-hasta" aria-label="Hasta">
+          <select id="p-metodo" aria-label="Método"><option value="">Todos los métodos</option></select>
+          <button class="btn mini" id="p-csv" type="button">CSV</button>
+          <span class="conteo" id="p-conteo"></span>
+        </div>
+        <div class="lista" id="p-lista"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ RESIDENCIAS -->
+    <section data-panel="casas" hidden>
+      <div class="cabeza-panel">
+        <div><p class="eyebrow">Unidades</p><h1>Residencias</h1><p class="muted">Quién pagó y quién no, estado de cuenta, usuarios de cada residencia.</p></div>
+        <div class="fila">
+          <button class="btn" id="k-importar" type="button">Importar lista</button>
+          <button class="btn" id="k-auto" type="button">Crear usuarios automáticos</button>
+          <button class="btn primario" id="k-nueva" type="button">Nueva residencia</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="filtros-chip" id="k-filtros" style="margin-bottom:12px">
+          <button data-f="" class="on" type="button">Todas</button>
+          <button data-f="pagado" type="button">Pagaron</button>
+          <button data-f="parcial" type="button">Abonaron</button>
+          <button data-f="pendiente" type="button">No han pagado</button>
+          <button data-f="mora" type="button">Con mora</button>
+          <button data-f="sin_usuario" type="button">Sin usuario</button>
+          <button data-f="inactiva" type="button">Inactivas</button>
+        </div>
+        <div class="buscador">
+          <label class="lupa"><span class="sr-only">Buscar casas</span><input id="k-buscar" placeholder="Código, propietario, teléfono, usuario…"></label>
+          <input type="month" id="k-periodo" aria-label="Mes">
+          <select id="k-orden" aria-label="Ordenar"><option value="codigo">Ordenar por código</option><option value="deuda">Mayor deuda</option><option value="propietario">Propietario</option></select>
+          <button class="btn mini" id="k-csv" type="button">CSV</button>
+          <span class="conteo" id="k-conteo"></span>
+        </div>
+        <div class="lista" id="k-lista"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ SERVICIOS -->
+    <section data-panel="servicios" hidden>
+      <div class="cabeza-panel">
+        <div><p class="eyebrow">Catálogo</p><h1>Servicios y cuotas</h1><p class="muted">Define una vez cada servicio y cómo se reparte. Luego se cobra solo cada mes.</p></div>
+        <button class="btn primario" id="s-nuevo" type="button">Nuevo servicio</button>
+      </div>
+      <div class="card">
+        <div class="buscador"><label class="lupa"><span class="sr-only">Buscar servicios</span><input id="s-buscar" placeholder="Buscar servicio…"></label><span class="conteo" id="s-conteo"></span></div>
+        <div class="lista" id="s-lista"></div>
+      </div>
+      <div class="card">
+        <h3>Ideas comunes en conjuntos</h3>
+        <div class="opciones" id="s-plantillas"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ CAJA -->
+    <section data-panel="caja" hidden>
+      <div class="cabeza-panel">
+        <div><p class="eyebrow">Contabilidad básica</p><h1>Caja del conjunto</h1><p class="muted">Gastos (vigilancia, aseo, arreglos) y otros ingresos (alquiler salón, multas).</p></div>
+        <button class="btn primario" id="m-nuevo" type="button">Registrar movimiento</button>
+      </div>
+      <div class="kpis" id="m-kpis"></div>
+      <div class="card">
+        <div class="buscador">
+          <label class="lupa"><span class="sr-only">Buscar movimientos</span><input id="m-buscar" placeholder="Concepto, proveedor, categoría…"></label>
+          <input type="date" id="m-desde" aria-label="Desde"><input type="date" id="m-hasta" aria-label="Hasta">
+          <select id="m-tipo" aria-label="Tipo"><option value="">Ingresos y egresos</option><option value="ingreso">Solo ingresos</option><option value="egreso">Solo egresos</option></select>
+          <select id="m-cat" aria-label="Categoría"><option value="">Todas las categorías</option></select>
+          <button class="btn mini" id="m-csv" type="button">CSV</button>
+          <span class="conteo" id="m-conteo"></span>
+        </div>
+        <div class="lista" id="m-lista"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ PORTERÍA -->
+    <section data-panel="porteria" hidden>
+      <div class="cabeza-panel">
+        <div><p class="eyebrow">Historial</p><h1>Portería</h1><p class="muted">Visitas y paquetes registrados por la portería.</p></div>
+      </div>
+      <div class="card">
+        <div class="filtros-chip" id="v-vista" style="margin-bottom:12px">
+          <button data-v="visitas" class="on" type="button">Visitas</button>
+          <button data-v="paquetes" type="button">Paquetes</button>
+        </div>
+        <div class="buscador">
+          <label class="lupa"><span class="sr-only">Buscar</span><input id="v-buscar" placeholder="Nombre, casa, placa, documento…"></label>
+          <input type="date" id="v-desde" aria-label="Desde"><input type="date" id="v-hasta" aria-label="Hasta">
+          <select id="v-estado" aria-label="Estado"><option value="">Todos los estados</option></select>
+          <button class="btn mini" id="v-csv" type="button">CSV</button>
+          <span class="conteo" id="v-conteo"></span>
+        </div>
+        <div class="lista" id="v-lista"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ REPORTES -->
+    <section data-panel="reportes" hidden>
+      <div class="cabeza-panel">
+        <div><p class="eyebrow">Informes en PDF</p><h1>Reportes</h1><p class="muted">Elige el rango de fechas y descarga el informe que necesites. Se abre listo para "Guardar como PDF" o imprimir.</p></div>
+      </div>
+      <div class="card rp-rango">
+        <div class="filtros-chip" id="rp-rangos" role="group" aria-label="Rangos rápidos">
+          <button data-r="mes" type="button">Este mes</button>
+          <button data-r="anterior" type="button">Mes anterior</button>
+          <button data-r="trimestre" type="button">Últimos 3 meses</button>
+          <button data-r="semestre" type="button">Últimos 6 meses</button>
+          <button data-r="anio" type="button">Este año</button>
+          <button data-r="anio_ant" type="button">Año anterior</button>
+        </div>
+        <div class="rp-campos">
+          <label class="campo"><span>Desde</span><input type="date" id="rp-desde"></label>
+          <label class="campo"><span>Hasta</span><input type="date" id="rp-hasta"></label>
+          <label class="campo rp-casa"><span>Casa (para estado de cuenta y paz y salvo)</span><select id="rp-casa"><option value="">Elige una casa…</option></select></label>
+        </div>
+      </div>
+      <div class="rp-lista" id="rp-lista"></div>
+    </section>
+
+    <!-- ============================================================ COMUNICADOS -->
+    <section data-panel="comunicados" hidden>
+      <div class="cabeza-panel"><div><p class="eyebrow">Avisos</p><h1>Comunicados</h1><p class="muted">Lo ven todas las casas en su panel (con un pitido suave).</p></div></div>
+      <div class="grid2">
+        <div class="card">
+          <h3>Nuevo comunicado</h3>
+          <form id="f-com" class="pila">
+            <input type="hidden" name="id">
+            <label class="campo"><span>Título</span><input name="titulo" required placeholder="Corte de agua el sábado"></label>
+            <label class="campo"><span>Mensaje</span><textarea name="cuerpo" required></textarea></label>
+            <label class="check"><input type="checkbox" name="importante"> Marcar como importante</label>
+            <div class="fila-btns"><button class="btn ghost" type="reset">Limpiar</button><button class="btn primario" type="submit">Publicar</button></div>
+          </form>
+        </div>
+        <div class="card">
+          <div class="buscador"><label class="lupa"><span class="sr-only">Buscar comunicados</span><input id="o-buscar" placeholder="Buscar comunicado…"></label><span class="conteo" id="o-conteo"></span></div>
+          <div class="lista" id="o-lista"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ USUARIOS -->
+    <section data-panel="usuarios" hidden>
+      <div class="cabeza-panel">
+        <div><p class="eyebrow">Accesos</p><h1>Usuarios</h1><p class="muted">Administradores, casas y portería. Cada uno entra con su usuario y clave.</p></div>
+        <button class="btn primario" id="u-nuevo" type="button">Nuevo usuario</button>
+      </div>
+      <div class="card">
+        <div class="filtros-chip" id="u-roles" style="margin-bottom:12px">
+          <button data-r="" class="on" type="button">Todos</button>
+          <button data-r="admin" type="button">Administración</button>
+          <button data-r="guardia" type="button">Portería</button>
+          <button data-r="casa" type="button">Casas</button>
+          <button data-r="bloqueado" type="button">Bloqueados</button>
+        </div>
+        <div class="buscador"><label class="lupa"><span class="sr-only">Buscar usuarios</span><input id="u-buscar" placeholder="Usuario, nombre, casa…"></label><span class="conteo" id="u-conteo"></span></div>
+        <div class="lista" id="u-lista"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ AJUSTES -->
+    <section data-panel="ajustes" hidden>
+      <div class="cabeza-panel"><div><p class="eyebrow">Configuración</p><h1>Ajustes del conjunto</h1></div></div>
+      <form id="f-ajustes">
+        <div class="grid2">
+          <div class="card">
+            <h3>Datos del conjunto</h3>
+            <div class="campos">
+              <label class="campo ancho"><span>Nombre</span><input name="nombre" required></label>
+              <label class="campo"><span>NIT</span><input name="nit"></label>
+              <label class="campo"><span>Ciudad</span><input name="ciudad"></label>
+              <label class="campo ancho"><span>Dirección</span><input name="direccion"></label>
+              <label class="campo"><span>Teléfono administración</span><input name="telefono" inputmode="tel"></label>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Cobro y mora</h3>
+            <div class="campos">
+              <label class="campo"><span>Día límite de pago cada mes</span><input name="dia_vence" type="number" min="1" max="28"></label>
+              <label class="campo"><span>Interés de mora mensual (%)</span><input name="mora_pct" type="number" min="0" max="10" step="0.1"></label>
+            </div>
+            <p class="muted">El interés se aplica cuando pulses "Aplicar intereses de mora" en Cobros, solo sobre lo vencido.</p>
+          </div>
+          <div class="card">
+            <h3>¿Dónde pagan las casas?</h3>
+            <p class="muted" style="margin-top:0">Llena solo lo que uses. Las casas lo ven ordenado y con botón de copiar.</p>
+            <div class="campos">
+              <label class="campo"><span>Nequi</span><input name="pago_nequi" inputmode="numeric"></label>
+              <label class="campo"><span>Daviplata</span><input name="pago_daviplata" inputmode="numeric"></label>
+              <label class="campo"><span>Llave Bre-B / llave</span><input name="pago_llave"></label>
+              <label class="campo"><span>Titular de la cuenta</span><input name="pago_titular"></label>
+              <label class="campo ancho"><span>Cuenta bancaria (banco, tipo y número)</span><input name="pago_banco" placeholder="Bancolombia ahorros 000-000000-00"></label>
+              <label class="campo ancho"><span>Instrucciones extra</span><textarea name="pago_notas" placeholder="Ej: en la referencia escribe tu número de casa"></textarea></label>
+            </div>
+            <div class="sub fila" style="margin-top:12px">
+              <div class="qr-caja mini" id="aj-qr-prev"><span class="muted">Sin imagen</span></div>
+              <div class="pila" style="flex:1;min-width:180px">
+                <b>QR o imagen de pago</b>
+                <span class="muted">Sube el QR de Nequi, Bancolombia, Daviplata o Bre-B (la imagen que te da tu banco para recibir dinero). Se ajusta sola de tamaño.</span>
+                <div class="fila">
+                  <label class="btn mini">Subir imagen<input type="file" id="aj-qr-file" accept="image/*" class="sr-only"></label>
+                  <button class="btn mini peligro" type="button" id="aj-qr-quitar">Quitar</button>
+                </div>
+              </div>
+            </div>
+            <details class="sub" style="margin-top:12px">
+              <summary style="cursor:pointer;font-weight:700">Ver cómo lo ve la casa</summary>
+              <div id="aj-previa" style="margin-top:12px"></div>
+            </details>
+            <p class="muted" style="margin:10px 0 0">Recuerda pulsar <b>Guardar ajustes</b> para publicar los cambios.</p>
+          </div>
+          <div class="card">
+            <h3>Comprobantes de pago</h3>
+            <div class="opciones" id="aj-modo">
+              <button class="opcion" type="button" data-m="whatsapp">Por WhatsApp<small>La casa envía la foto del comprobante a tu WhatsApp</small></button>
+              <button class="opcion" type="button" data-m="referencia">Solo referencia<small>La casa escribe el número de la transacción</small></button>
+            </div>
+            <input type="hidden" name="comprobante_modo">
+            <label class="campo" style="margin-top:12px"><span>WhatsApp que recibe comprobantes</span><input name="whatsapp_comprobantes" inputmode="tel" placeholder="3001234567"></label>
+          </div>
+        </div>
+        <div class="fila-btns"><button class="btn primario grande" type="submit">Guardar ajustes</button></div>
+      </form>
+    </section>
+
+    <!-- ============================================================ MI PLAN (suscripción con el proveedor) -->
+    <section data-panel="suscripcion" hidden>
+      <div class="cabeza-panel">
+        <div><p class="eyebrow">Tu servicio</p><h1>Mi plan y pagos</h1></div>
+        <a class="btn wa" id="s-soporte" target="_blank" rel="noopener" hidden>Hablar con soporte</a>
+      </div>
+      <div class="kpis" id="s-kpis"></div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-h"><h2>Escanea y paga</h2></div>
+          <p class="muted" style="margin-top:0">Realiza la transferencia de tu suscripción a la plataforma.</p>
+          <div id="s-pago"></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Reportar mi pago</h2></div>
+          <form id="f-sus" class="pila">
+            <div>
+              <p class="muted" style="margin:0 0 8px">¿Cuántos meses pagas?</p>
+              <div class="opciones" id="s-meses"></div>
+              <input type="hidden" name="meses" value="1">
+            </div>
+            <label class="campo"><span>Referencia o número de la transacción</span><input name="referencia" required minlength="3" placeholder="M1234567"></label>
+            <label class="campo"><span>Nota (opcional)</span><input name="nota" placeholder="Ej: pagué desde la cuenta de la tesorera"></label>
+            <div class="sub"><span class="muted">Total a pagar</span> <b id="s-total" style="font-size:20px;margin-left:6px">$0</b></div>
+            <div class="fila-btns"><button class="btn primario" type="submit">Reportar pago</button></div>
+          </form>
+          <p class="muted">Cuando el proveedor confirme tu pago, la fecha de vencimiento se extiende sola.</p>
+        </div>
+        <div class="card ancho-total">
+          <div class="card-h"><h2>Historial de pagos de la suscripción</h2></div>
+          <div class="buscador">
+            <label class="lupa"><span class="sr-only">Buscar pago</span><input id="s-buscar" placeholder="Buscar referencia, nota…"></label>
+            <select id="s-estado" aria-label="Filtrar por estado">
+              <option value="">Todos</option><option value="por_validar">Por validar</option><option value="aprobado">Aprobados</option><option value="rechazado">Rechazados</option>
+            </select>
+            <span class="conteo" id="s-conteo"></span>
+          </div>
+          <div class="lista" id="s-historial"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="006_api.js"></script>
+  <script src="006_admin.js"></script>
+  <script src="006_reportes.js"></script>
+</body>
+</html>

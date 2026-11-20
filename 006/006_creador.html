@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070d1c">
+  <meta name="robots" content="noindex">
+  <title>Conjuntos · Creador</title>
+  <link rel="stylesheet" href="006_estilos.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-in">
+      <div class="marca">
+        <span class="logo" aria-hidden="true">CJ</span>
+        <div><b>Panel del creador</b><small>Crea conjuntos y comparte el acceso</small></div>
+      </div>
+      <div class="acciones"><button class="btn ghost mini" id="salir" hidden type="button">Salir</button></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="v-login" class="wrap estrecho" hidden>
+      <div class="card">
+        <h2 style="margin-bottom:6px">Acceso del creador</h2>
+        <p class="muted">Solo tú tienes esta clave (secreto CREADOR_CLAVE de la Edge Function).</p>
+        <form id="f-login" class="pila">
+          <label class="campo"><span>Clave</span><input name="clave" type="password" required autocomplete="current-password"></label>
+          <button class="btn primario grande" type="submit">Entrar</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="v-panel" hidden>
+      <div class="kpis" id="kpis"></div>
+
+      <div class="grid2">
+        <div class="card">
+          <div class="card-h"><h2><span class="ico" aria-hidden="true">+</span>Crear conjunto</h2></div>
+          <form id="f-crear" class="pila">
+            <div class="campos">
+              <label class="campo ancho"><span>Nombre del conjunto</span><input name="nombre" required placeholder="Conjunto Los Robles"></label>
+              <label class="campo"><span>Ciudad</span><input name="ciudad" placeholder="Bogotá"></label>
+              <label class="campo"><span>Teléfono de contacto</span><input name="telefono" inputmode="tel"></label>
+              <label class="campo"><span>Valor mensual que cobras</span><input name="plan_mensual" type="number" min="0" step="1000" placeholder="150000"></label>
+              <label class="campo"><span>Meses de acceso iniciales</span><input name="meses" type="number" min="0" max="36" value="1"></label>
+            </div>
+            <div class="sub pila">
+              <b>Usuario del administrador</b>
+              <div class="campos">
+                <label class="campo"><span>Usuario</span><input name="admin_usuario" required autocapitalize="none" placeholder="robles-admin"></label>
+                <label class="campo"><span>Clave</span><input name="admin_clave" required minlength="4"></label>
+                <label class="campo ancho"><span>Nombre (opcional)</span><input name="admin_nombre" placeholder="Administración Los Robles"></label>
+              </div>
+            </div>
+            <button class="btn primario" type="submit">Crear conjunto</button>
+          </form>
+          <div id="creado" hidden></div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2><span class="ico" aria-hidden="true">#</span>Conjuntos</h2></div>
+          <div class="buscador">
+            <label class="lupa"><span class="sr-only">Buscar conjunto</span><input id="b-texto" placeholder="Buscar por nombre, ciudad, usuario…"></label>
+            <select id="b-estado" aria-label="Filtrar por estado">
+              <option value="">Todos</option>
+              <option value="activo">Activos</option>
+              <option value="vence">Vencen en 7 días</option>
+              <option value="vencido">Vencidos</option>
+              <option value="suspendido">Suspendidos</option>
+            </select>
+            <span class="conteo" id="b-conteo"></span>
+          </div>
+          <div class="lista" id="lista"></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2><span class="ico" aria-hidden="true">$</span>Pagos reportados <span class="badge" id="badge-sus" hidden></span></h2></div>
+          <p class="muted" style="margin-top:0">Al aprobar, el vencimiento del conjunto se extiende solo por los meses pagados.</p>
+          <div class="buscador">
+            <label class="lupa"><span class="sr-only">Buscar pago</span><input id="p-texto" placeholder="Buscar conjunto, referencia…"></label>
+            <select id="p-estado" aria-label="Filtrar pagos">
+              <option value="por_validar">Por validar</option><option value="aprobado">Aprobados</option><option value="rechazado">Rechazados</option><option value="">Todos</option>
+            </select>
+            <span class="conteo" id="p-conteo"></span>
+          </div>
+          <div class="lista" id="p-lista"></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2><span class="ico" aria-hidden="true">Q</span>Dónde te pagan</h2></div>
+          <p class="muted" style="margin-top:0">Esto lo ve cada administrador en su pestaña "Mi plan" (y en el inicio si su acceso está bloqueado).</p>
+          <form id="f-plat" class="pila">
+            <div class="campos">
+              <label class="campo"><span>Nequi</span><input name="nequi" inputmode="numeric"></label>
+              <label class="campo"><span>Daviplata</span><input name="daviplata" inputmode="numeric"></label>
+              <label class="campo"><span>Llave Bre-B</span><input name="llave"></label>
+              <label class="campo"><span>Titular</span><input name="titular"></label>
+              <label class="campo ancho"><span>Cuenta bancaria</span><input name="banco" placeholder="Bancolombia ahorros 000-000000-00"></label>
+              <label class="campo"><span>WhatsApp de soporte y comprobantes</span><input name="whatsapp" inputmode="tel" placeholder="3001234567"></label>
+              <label class="campo"><span>Horario de atención</span><input name="horario" placeholder="Lun a sáb, 8 a.m. – 6 p.m."></label>
+              <label class="campo ancho"><span>Nota para el administrador</span><textarea name="notas" placeholder="Ej: en la referencia escribe el nombre del conjunto"></textarea></label>
+            </div>
+            <div class="sub fila">
+              <div class="qr-caja mini" id="qr-prev"><span class="muted">Sin QR</span></div>
+              <div class="pila" style="flex:1;min-width:180px">
+                <b>Código QR de pago</b>
+                <span class="muted">Sube la imagen del QR de Nequi o de tu banco. Se ajusta sola de tamaño.</span>
+                <div class="fila">
+                  <label class="btn mini">Subir imagen<input type="file" id="qr-file" accept="image/*" class="sr-only"></label>
+                  <button class="btn mini peligro" type="button" id="qr-quitar">Quitar</button>
+                </div>
+              </div>
+            </div>
+            <div class="fila-btns"><button class="btn primario" type="submit">Guardar datos de pago</button></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="006_api.js"></script>
+  <script src="006_creador.js"></script>
+</body>
+</html>

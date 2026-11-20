@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070d1c">
+  <title>Conjuntos · Iniciar sesión</title>
+  <meta name="description" content="Administración, pagos y portería de tu conjunto residencial en un solo lugar.">
+  <link rel="stylesheet" href="006_estilos.css">
+</head>
+<body>
+  <main class="login-wrap">
+    <section class="login-hero" aria-labelledby="t-hero">
+      <span class="figura f1" aria-hidden="true"></span>
+      <span class="figura f2" aria-hidden="true"></span>
+      <span class="figura f3" aria-hidden="true"></span>
+      <div class="marca">
+        <span class="logo" aria-hidden="true">CJ</span>
+        <div><b>Conjuntos</b><small>Administración residencial</small></div>
+      </div>
+      <div>
+        <h1 id="t-hero">Tu conjunto, <em>en orden</em> y sin papeles.</h1>
+        <p>Cuotas, pagos, comprobantes por WhatsApp, visitas autorizadas y paquetes en portería. Cada casa ve lo suyo; la administración lo ve todo.</p>
+      </div>
+      <div class="rasgos">
+        <div class="rasgo"><b>Cuentas claras</b><span>Quién pagó, quién debe y cuánto.</span></div>
+        <div class="rasgo"><b>Portería con aviso</b><span>Pitido cuando llega alguien.</span></div>
+        <div class="rasgo"><b>Comprobantes</b><span>Directo al WhatsApp de la administración.</span></div>
+        <div class="rasgo"><b>Sesión guardada</b><span>Entras una vez y listo.</span></div>
+      </div>
+    </section>
+
+    <section class="login-form">
+      <div class="login-card">
+        <div class="card">
+          <p class="eyebrow">Bienvenido</p>
+          <h2 style="font-size:22px;margin-bottom:6px">Inicia sesión</h2>
+          <p class="muted" style="margin:0 0 18px">Usa el usuario y la clave que te dio la administración.</p>
+          <div id="motivo" class="banner mal" hidden></div>
+          <form id="f-login" class="pila" autocomplete="on">
+            <label class="campo"><span>Usuario</span>
+              <input name="usuario" autocomplete="username" autocapitalize="none" spellcheck="false" required placeholder="ej: torres-casa12">
+            </label>
+            <label class="campo"><span>Clave</span>
+              <span class="ver-clave">
+                <input name="clave" type="password" autocomplete="current-password" required placeholder="Tu clave">
+                <button type="button" id="ver" aria-label="Mostrar clave">Ver</button>
+              </span>
+            </label>
+            <button class="btn primario grande bloque" type="submit">Entrar</button>
+          </form>
+          <p class="muted" style="margin:16px 0 0;text-align:center">Tu sesión queda guardada en este dispositivo hasta que salgas.</p>
+        </div>
+        <p class="muted" style="text-align:center"><a href="006_creador.html">Acceso del creador</a></p>
+      </div>
+    </section>
+  </main>
+  <script src="006_api.js"></script>
+  <script src="006_inicio.js"></script>
+</body>
+</html>

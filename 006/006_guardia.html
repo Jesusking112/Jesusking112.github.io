@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070d1c">
+  <meta name="robots" content="noindex">
+  <title>Conjuntos · Portería</title>
+  <link rel="stylesheet" href="006_estilos.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-in">
+      <div class="marca">
+        <span class="logo" aria-hidden="true">CJ</span>
+        <div><b>Portería</b><small id="t-conjunto">Conjunto</small></div>
+      </div>
+      <div class="acciones">
+        <button class="btn mini" id="sonido" type="button">Activar sonido</button>
+        <button class="btn ghost mini" id="salir" type="button">Salir</button>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Secciones">
+      <button class="tab" data-tab="escanear" role="tab">Escanear QR</button>
+      <button class="tab" data-tab="esperados" role="tab">Autorizados <span class="badge" id="b-esp" hidden></span></button>
+      <button class="tab" data-tab="adentro" role="tab">Adentro</button>
+      <button class="tab" data-tab="anunciar" role="tab">Llegó alguien</button>
+      <button class="tab" data-tab="paquetes" role="tab">Paquetes</button>
+      <button class="tab" data-tab="recientes" role="tab">Recientes</button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="contadores" id="contadores"></div>
+    <div id="respuestas"></div>
+
+    <section data-panel="escanear" hidden>
+      <div class="esc-grid">
+        <div class="card">
+          <div class="card-h"><h2>Escanear pase</h2></div>
+          <p class="muted" style="margin-top:0">Pide el QR del residente o del invitado y apúntale con la cámara. El mismo QR sirve para entrar y para salir.</p>
+          <div class="esc-cam" id="esc-cam" hidden><span class="esc-mira" aria-hidden="true"></span></div>
+          <button class="btn primario grande bloque" id="esc-abrir" type="button">Abrir cámara</button>
+          <form id="esc-manual" class="fila" style="margin-top:12px">
+            <label class="sr-only" for="esc-codigo">Código del pase</label>
+            <input id="esc-codigo" name="codigo" inputmode="numeric" autocomplete="off" placeholder="O escribe el código de 14 números" style="flex:1;min-width:0">
+            <button class="btn" type="submit">Revisar</button>
+          </form>
+        </div>
+        <div class="card esc-res" id="esc-res" aria-live="polite"><p class="vacio">Aquí verás los datos de la persona cuando escanees su QR.</p></div>
+      </div>
+    </section>
+
+    <section data-panel="esperados" hidden>
+      <div class="card">
+        <div class="card-h"><h2>Autorizados para hoy</h2></div>
+        <div class="buscador"><label class="lupa"><span class="sr-only">Buscar</span><input id="e-buscar" placeholder="Nombre, casa, placa, documento…" autocomplete="off"></label><select id="e-tipo" aria-label="Tipo"><option value="">Todos los tipos</option></select><span class="conteo" id="e-conteo"></span></div>
+        <div class="lista" id="e-lista"></div>
+      </div>
+    </section>
+
+    <section data-panel="adentro" hidden>
+      <div class="card">
+        <div class="card-h"><h2>Visitantes adentro</h2></div>
+        <div class="buscador"><label class="lupa"><span class="sr-only">Buscar</span><input id="a-buscar" placeholder="Nombre, casa, placa…" autocomplete="off"></label><span class="conteo" id="a-conteo"></span></div>
+        <div class="lista" id="a-lista"></div>
+      </div>
+    </section>
+
+    <section data-panel="anunciar" hidden>
+      <div class="card">
+        <div class="card-h"><h2>Llegó alguien que no estaba anunciado</h2></div>
+        <p class="muted" style="margin-top:0">La casa recibe un pitido y responde si lo dejas entrar. Te avisamos aquí mismo.</p>
+        <form id="f-anunciar" class="pila">
+          <div class="campo"><span>Casa a la que va</span>
+            <input id="n-buscar" placeholder="Buscar casa por código o propietario…" autocomplete="off" aria-label="Buscar casa">
+            <div class="casa-pick" id="n-casas" style="margin-top:8px"></div>
+          </div>
+          <div class="campo"><span>Tipo</span><div class="opciones" id="n-tipo"></div></div>
+          <div class="campos">
+            <label class="campo"><span>Nombre</span><input name="nombre" required></label>
+            <label class="campo"><span>Documento</span><input name="documento" inputmode="numeric"></label>
+            <label class="campo"><span>Placa</span><input name="placa" autocapitalize="characters"></label>
+            <label class="campo"><span>Nota</span><input name="nota" placeholder="Domicilio de Rappi"></label>
+          </div>
+          <button class="btn primario grande" type="submit">Preguntar a la residencia</button>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Esperando respuesta</h2></div>
+        <div class="lista corta" id="n-espera"></div>
+      </div>
+    </section>
+
+    <section data-panel="paquetes" hidden>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-h"><h2>Recibir paquete</h2></div>
+          <form id="f-paquete" class="pila">
+            <div class="campo"><span>Casa</span>
+              <input id="q-buscar" placeholder="Buscar casa…" autocomplete="off" aria-label="Buscar casa">
+              <div class="casa-pick" id="q-casas" style="margin-top:8px"></div>
+            </div>
+            <label class="campo"><span>Qué es</span><input name="descripcion" required placeholder="Caja mediana"></label>
+            <label class="campo"><span>Empresa (opcional)</span><input name="empresa" placeholder="Servientrega, Amazon…"></label>
+            <button class="btn primario" type="submit">Registrar paquete</button>
+          </form>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Por entregar</h2></div>
+          <div class="buscador"><label class="lupa"><span class="sr-only">Buscar</span><input id="p-buscar" placeholder="Casa, empresa…" autocomplete="off"></label><span class="conteo" id="p-conteo"></span></div>
+          <div class="lista" id="p-lista"></div>
+        </div>
+      </div>
+    </section>
+
+    <section data-panel="recientes" hidden>
+      <div class="card">
+        <div class="card-h"><h2>Salidas y no autorizados (últimas 48 h)</h2></div>
+        <div class="buscador"><label class="lupa"><span class="sr-only">Buscar</span><input id="r-buscar" placeholder="Nombre, casa, placa…" autocomplete="off"></label><span class="conteo" id="r-conteo"></span></div>
+        <div class="lista" id="r-lista"></div>
+      </div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" defer></script>
+  <script src="006_api.js"></script>
+  <script src="006_pases.js?v=20261021"></script>
+  <script src="006_guardia.js?v=20261021"></script>
+</body>
+</html>

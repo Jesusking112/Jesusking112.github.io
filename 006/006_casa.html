@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070d1c">
+  <meta name="robots" content="noindex">
+  <title>Conjuntos · Mi residencia</title>
+  <link rel="stylesheet" href="006_estilos.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-in">
+      <div class="marca">
+        <span class="logo" aria-hidden="true">CJ</span>
+        <div><b id="t-casa">Mi residencia</b><small id="t-conjunto">Conjunto</small></div>
+      </div>
+      <div class="acciones">
+        <button class="btn mini" id="sonido" type="button" hidden>Activar sonido</button>
+        <button class="btn ghost mini" id="salir" type="button">Salir</button>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Secciones">
+      <button class="tab" data-tab="cuenta" role="tab">Mi cuenta</button>
+      <button class="tab" data-tab="miqr" role="tab">Mi QR</button>
+      <button class="tab" data-tab="invitados" role="tab">Invitados</button>
+      <button class="tab" data-tab="visitas" role="tab">Visitas <span class="badge" id="badge-vis" hidden></span></button>
+      <button class="tab" data-tab="avisos" role="tab">Avisos <span class="badge" id="badge-av" hidden></span></button>
+    </nav>
+  </header>
+
+  <main class="wrap estrecho">
+    <div id="por-autorizar"></div>
+
+    <section data-panel="cuenta" hidden>
+      <div class="saldo-hero" id="saldo"><span class="figura f1" aria-hidden="true"></span><span>Cargando…</span></div>
+      <div class="card">
+        <div class="card-h"><h2>Lo que debo</h2><button class="btn mini" id="historial" type="button">Ver historial completo</button></div>
+        <div class="lista corta" id="pendientes"></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Mis pagos recientes</h2></div>
+        <div class="lista corta" id="pagos"></div>
+      </div>
+    </section>
+
+    <section data-panel="miqr" hidden>
+      <div class="card">
+        <div class="card-h"><h2>QR de entrada de la familia</h2><button class="btn mini primario" id="r-nuevo" type="button">+ Agregar persona</button></div>
+        <p class="muted" style="margin-top:0">Cada persona que vive en la casa tiene su propio QR para entrar y salir. <b>El QR cambia solo cada 30 segundos</b>, así que una foto o captura de pantalla no sirve en portería.</p>
+        <div class="lista" id="r-lista"></div>
+      </div>
+    </section>
+
+    <section data-panel="invitados" hidden>
+      <div class="card">
+        <div class="card-h"><h2><span class="ico" aria-hidden="true">+</span>Crear pase QR para un invitado</h2></div>
+        <p class="muted" style="margin-top:0">Llena los datos, confirma y envíale el QR por WhatsApp. Con el mismo QR puede entrar y salir mientras dure el plazo.</p>
+        <form id="f-pase" class="pila">
+          <div class="campo"><span>¿Quién viene?</span><div class="opciones" id="p-tipo"></div></div>
+          <div class="campos">
+            <label class="campo"><span>Nombre del invitado</span><input name="nombre" required placeholder="Jesús Casillas" autocomplete="off"></label>
+            <label class="campo"><span>Documento (opcional)</span><input name="documento" inputmode="numeric" autocomplete="off"></label>
+            <label class="campo"><span>Placa (opcional)</span><input name="placa" autocapitalize="characters" placeholder="ABC123" autocomplete="off"></label>
+            <label class="campo"><span>WhatsApp del invitado (opcional)</span><input name="telefono" type="tel" inputmode="tel" placeholder="300 123 4567" autocomplete="off"></label>
+          </div>
+          <div class="campo"><span>¿Desde cuándo vale?</span>
+            <div class="opciones" id="p-desde"><button type="button" class="opcion on" data-d="ahora">Desde ahora</button><button type="button" class="opcion" data-d="otro">Otra fecha y hora</button></div>
+            <input name="desde" type="datetime-local" id="p-desde-f" hidden aria-label="Fecha y hora de inicio" style="margin-top:8px">
+          </div>
+          <div class="campo"><span>¿Por cuánto tiempo puede entrar y salir?</span>
+            <div class="opciones" id="p-plazo"></div>
+            <div class="fila" id="p-plazo-otro" hidden style="margin-top:8px">
+              <input name="cant" type="number" min="1" max="744" value="2" inputmode="numeric" aria-label="Cantidad" style="max-width:110px">
+              <select name="unidad" aria-label="Unidad"><option value="1">horas</option><option value="24" selected>días</option></select>
+            </div>
+          </div>
+          <label class="campo"><span>Nota para portería (opcional)</span><input name="nota" placeholder="Viene a la reunión"></label>
+          <div class="banner info" id="p-resumen"></div>
+          <div class="fila-btns"><button class="btn primario grande" type="submit">Crear pase</button></div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Mis pases de invitados</h2></div>
+        <div class="buscador">
+          <label class="lupa"><span class="sr-only">Buscar pases</span><input id="p-buscar" placeholder="Nombre, placa, código…"></label>
+          <select id="p-filtro" aria-label="Filtro"><option value="activos">Vigentes</option><option value="">Todos</option></select>
+          <span class="conteo" id="p-conteo"></span>
+        </div>
+        <div class="lista" id="p-lista"></div>
+      </div>
+    </section>
+
+    <section data-panel="visitas" hidden>
+      <div class="card">
+        <div class="card-h"><h2><span class="ico" aria-hidden="true">+</span>Anunciar a alguien que viene</h2></div>
+        <p class="muted" style="margin-top:0">La portería lo verá en su lista y lo dejará entrar sin llamarte.</p>
+        <form id="f-visita" class="pila">
+          <div class="campo"><span>¿Quién viene?</span><div class="opciones" id="v-tipo"></div></div>
+          <div class="campos">
+            <label class="campo"><span>Nombre</span><input name="nombre" required placeholder="Carlos Ruiz"></label>
+            <label class="campo"><span>Documento (opcional)</span><input name="documento" inputmode="numeric"></label>
+            <label class="campo"><span>Placa (opcional)</span><input name="placa" autocapitalize="characters" placeholder="ABC123"></label>
+            <label class="campo"><span>Día de llegada</span><input name="fecha" type="date" required></label>
+            <label class="campo"><span>Viene seguido hasta (opcional)</span><input name="hasta" type="date"></label>
+            <label class="campo"><span>Nota para portería</span><input name="nota" placeholder="Trae herramientas"></label>
+          </div>
+          <div class="fila-btns"><button class="btn primario" type="submit">Anunciar visita</button></div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Mis visitas</h2></div>
+        <div class="buscador">
+          <label class="lupa"><span class="sr-only">Buscar visitas</span><input id="v-buscar" placeholder="Nombre, placa, documento…"></label>
+          <select id="v-estado" aria-label="Estado"><option value="activas">Próximas y adentro</option><option value="">Todas</option><option value="salio">Ya salieron</option><option value="rechazado">No autorizadas</option><option value="cancelado">Canceladas</option></select>
+          <span class="conteo" id="v-conteo"></span>
+        </div>
+        <div class="lista" id="v-lista"></div>
+      </div>
+    </section>
+
+    <section data-panel="avisos" hidden>
+      <div class="card">
+        <div class="card-h"><h2>Paquetes en portería</h2></div>
+        <div class="lista corta" id="paquetes"></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Comunicados de la administración</h2></div>
+        <div class="buscador"><label class="lupa"><span class="sr-only">Buscar comunicados</span><input id="o-buscar" placeholder="Buscar comunicado…"></label></div>
+        <div class="lista" id="comunicados"></div>
+      </div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <script src="006_api.js"></script>
+  <script src="006_pases.js?v=20261021"></script>
+  <script src="006_casa.js?v=20261021"></script>
+</body>
+</html>
