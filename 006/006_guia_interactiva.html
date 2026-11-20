@@ -1,0 +1,1331 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070d1c">
+  <meta name="robots" content="noindex">
+  <title>Conjuntos · Guía interactiva paso a paso</title>
+  <meta name="description" content="Aprende a usar el módulo de conjuntos residenciales picando paso a paso: administración, casas y portería.">
+  <link rel="stylesheet" href="006_estilos.css">
+  <style>
+    /* ---------- capa de la guía (estilo videojuego) ---------- */
+    #g-capa { position: fixed; inset: 0; z-index: 9000; pointer-events: none; }
+    #g-capa[hidden] { display: none !important; }
+    .g-bloq { position: fixed; background: rgba(2, 6, 18, .74); pointer-events: auto; cursor: not-allowed; }
+    .g-foco {
+      position: fixed; pointer-events: none; border: 3px solid #facc15; border-radius: 14px;
+      box-shadow: 0 0 0 5px rgba(250, 204, 21, .22), 0 0 34px rgba(250, 204, 21, .55);
+      animation: gPulso 1.3s ease-in-out infinite;
+    }
+    .g-foco.info { border-color: #38bdf8; box-shadow: 0 0 0 5px rgba(56, 189, 248, .2), 0 0 30px rgba(56, 189, 248, .45); animation: none; }
+    @keyframes gPulso { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.025); } }
+    .g-flecha { position: fixed; width: 46px; height: 46px; margin-left: -23px; pointer-events: none; color: #facc15; filter: drop-shadow(0 4px 10px rgba(0,0,0,.6)); }
+    .g-flecha.abajo { animation: gBajaA .7s ease-in-out infinite alternate; }
+    .g-flecha.arriba { animation: gBajaB .7s ease-in-out infinite alternate; }
+    @keyframes gBajaA { from { transform: translateY(-6px); } to { transform: translateY(4px); } }
+    @keyframes gBajaB { from { transform: translateY(6px) rotate(180deg); } to { transform: translateY(-4px) rotate(180deg); } }
+    .g-burbuja {
+      position: fixed; pointer-events: auto; width: min(370px, calc(100vw - 16px));
+      background: #fffbeb; color: #0b1428; border: 2px solid #facc15; border-radius: 18px;
+      padding: 16px 16px 12px; box-shadow: 0 24px 60px rgba(0, 0, 0, .55); font-size: 15px; line-height: 1.45;
+    }
+    .g-burbuja.centro { left: 50% !important; top: 50% !important; transform: translate(-50%, -50%); width: min(460px, calc(100vw - 24px)); }
+    .g-burbuja.sacude { animation: gSacude .4s; }
+    @keyframes gSacude { 20%, 60% { margin-left: -8px; } 40%, 80% { margin-left: 8px; } }
+    .g-burbuja h4 { margin: 6px 0 4px; font-size: 18px; line-height: 1.25; color: #0b1428; }
+    .g-burbuja p { margin: 0 0 10px; color: #334155; }
+    .g-cab { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: #92400e; text-transform: uppercase; letter-spacing: .04em; }
+    .g-rol { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 99px; background: #0b1428; color: #facc15; font-size: 11.5px; letter-spacing: .03em; }
+    .g-pista { display: flex; align-items: center; gap: 8px; background: #fef3c7; border: 1px dashed #f59e0b; border-radius: 12px; padding: 8px 10px; font-weight: 700; color: #92400e; font-size: 14px; margin-bottom: 10px; }
+    .g-pista code { background: #fff; border-radius: 6px; padding: 1px 6px; color: #0b1428; font-weight: 800; }
+    .g-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .g-btn { border: 0; border-radius: 11px; padding: 10px 14px; font: inherit; font-weight: 800; cursor: pointer; background: #0b1428; color: #fff; min-height: 42px; }
+    .g-btn.am { background: #facc15; color: #0b1428; }
+    .g-btn.cl { background: transparent; color: #334155; border: 1px solid #cbd5e1; }
+    .g-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .g-prog { height: 6px; background: #fde68a; border-radius: 99px; overflow: hidden; margin: 10px 0 8px; }
+    .g-prog i { display: block; height: 100%; background: #f59e0b; border-radius: 99px; transition: width .3s; }
+    .g-pie { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; }
+    .g-pie button { background: none; border: 0; color: #64748b; font: inherit; font-weight: 700; cursor: pointer; padding: 4px 0; text-decoration: underline; }
+    .g-lista-ok { margin: 6px 0 12px; padding: 0; list-style: none; display: grid; gap: 6px; }
+    .g-lista-ok li { display: flex; gap: 8px; align-items: flex-start; color: #1e293b; }
+    .g-lista-ok li::before { content: ""; flex: none; width: 18px; height: 18px; margin-top: 2px; border-radius: 50%; background: #10b981 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'%3E%3Cpath d='M5 12l5 5 9-9'/%3E%3C/svg%3E") center/12px no-repeat; }
+    .g-estrellas { display: flex; justify-content: center; gap: 6px; margin: 4px 0 8px; }
+    .g-estrellas span { width: 34px; height: 34px; background: #facc15; clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); animation: gEstrella .6s ease-out backwards; }
+    .g-estrellas span:nth-child(2) { animation-delay: .12s; } .g-estrellas span:nth-child(3) { animation-delay: .24s; }
+    @keyframes gEstrella { from { transform: scale(0) rotate(-90deg); } }
+
+    /* barra fija de la guía */
+    #g-barra {
+      position: fixed; left: 10px; bottom: 10px; z-index: 9600; display: flex; gap: 6px; align-items: center;
+      background: #0b1428; border: 1px solid #facc15; border-radius: 14px; padding: 6px 6px 6px 12px; box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      font-size: 12.5px; font-weight: 800; color: #facc15; max-width: calc(100vw - 20px);
+    }
+    #g-barra button { border: 0; border-radius: 9px; padding: 7px 10px; font: inherit; cursor: pointer; background: #facc15; color: #0b1428; }
+    #g-barra button.cl { background: #1e293b; color: #e2e8f0; }
+    #g-barra-txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* pantallas grandes: inicio y mapa */
+    .g-pantalla { position: fixed; inset: 0; z-index: 9700; background: radial-gradient(1200px 600px at 20% -10%, rgba(56,189,248,.25), transparent), radial-gradient(900px 500px at 110% 110%, rgba(250,204,21,.18), transparent), #070d1c; overflow-y: auto; padding: 28px 16px 40px; }
+    .g-pantalla[hidden] { display: none !important; }
+    .g-cont { max-width: 980px; margin: 0 auto; }
+    .g-titulo { font-size: clamp(28px, 5vw, 44px); line-height: 1.1; margin: 10px 0 10px; letter-spacing: -.02em; }
+    .g-titulo em { font-style: normal; color: #facc15; }
+    .g-sub { color: var(--muted); font-size: 16px; max-width: 640px; margin: 0 0 22px; }
+    .g-rutas { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .g-ruta {
+      text-align: left; cursor: pointer; font: inherit; color: var(--text); border-radius: 18px; padding: 18px;
+      background: linear-gradient(180deg, var(--card-2), var(--card)); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; min-height: 170px;
+      transition: transform .15s, border-color .15s;
+    }
+    .g-ruta:hover, .g-ruta:focus-visible { transform: translateY(-3px); border-color: #facc15; outline: none; }
+    .g-ruta.top { border-color: #facc15; background: linear-gradient(160deg, rgba(250,204,21,.18), var(--card) 60%); }
+    .g-ruta b { font-size: 19px; }
+    .g-ruta span { color: var(--muted); font-size: 14px; }
+    .g-ruta small { margin-top: auto; color: #facc15; font-weight: 800; }
+    .g-ico { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; font-weight: 900; font-size: 17px; background: #0b1428; border: 1px solid var(--line); color: #facc15; }
+    .g-nota { margin-top: 22px; padding: 14px 16px; border-radius: 14px; border: 1px dashed var(--line); color: var(--muted); font-size: 14px; }
+    .g-mapa-grupo { margin: 18px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: #facc15; font-weight: 800; }
+    .g-mapa-lista { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+    .g-mapa-lista button {
+      display: flex; gap: 10px; align-items: center; text-align: left; font: inherit; color: var(--text); cursor: pointer;
+      background: var(--card); border: 1px solid var(--line); border-radius: 13px; padding: 11px 12px;
+    }
+    .g-mapa-lista button:hover { border-color: #facc15; }
+    .g-mapa-lista button.hecho { border-color: rgba(52, 211, 153, .5); }
+    .g-mapa-lista button.actual { border-color: #facc15; background: rgba(250, 204, 21, .08); }
+    .g-num { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 13px; background: #1e293b; color: #e2e8f0; }
+    .hecho .g-num { background: #10b981; color: #fff; }
+    .g-mapa-lista small { display: block; color: var(--muted); font-size: 12px; }
+
+    /* piezas simuladas que en el módulo real son imágenes/cámara */
+    .g-qr { background: #fff; border-radius: 12px; padding: 10px; display: grid; place-items: center; }
+    .g-qr svg { width: 100%; height: auto; display: block; }
+    .g-pase { background: #fff; color: #0b1428; border-radius: 18px; overflow: hidden; max-width: 300px; margin: 0 auto 12px; box-shadow: 0 18px 40px rgba(0,0,0,.45); text-align: center; }
+    .g-pase-cab { background: linear-gradient(135deg, #0b1428, #12305a); color: #fff; padding: 14px; }
+    .g-pase-cab small { display: block; color: #7dd3fc; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: 11px; }
+    .g-pase-cab b { font-size: 17px; }
+    .g-pase-cuerpo { padding: 14px 18px 16px; }
+    .g-pase-cuerpo h5 { margin: 0 0 2px; font-size: 20px; }
+    .g-pase-cuerpo p { margin: 0; color: #475569; font-size: 13px; }
+    .g-pase .g-qr { width: 190px; margin: 12px auto; padding: 6px; }
+    .g-pase-cod { font: 700 14px ui-monospace, Menlo, monospace; letter-spacing: .08em; color: #0b1428; }
+    .g-cam { position: relative; display: grid; place-items: center; padding: 22px; min-height: 260px; background: repeating-linear-gradient(45deg, #0a1326, #0a1326 12px, #0c1730 12px, #0c1730 24px); }
+    .g-cam .g-qr { width: 170px; transform: rotate(-4deg); }
+    .g-cam-txt { position: absolute; top: 10px; left: 12px; font-size: 12px; color: #f87171; font-weight: 800; letter-spacing: .06em; }
+    .g-doc { background: #fff; color: #0b1428; border-radius: 10px; padding: 22px; font-size: 13px; }
+    .g-doc h4 { margin: 0; font-size: 18px; color: #0b1428; }
+    .g-doc table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .g-doc th, .g-doc td { border-bottom: 1px solid #e2e8f0; padding: 6px 4px; text-align: left; color: #0b1428; background: none; }
+    .g-doc td.num, .g-doc th.num { text-align: right; }
+    .g-doc .g-firma { margin-top: 26px; padding-top: 8px; border-top: 1px solid #94a3b8; width: 220px; color: #475569; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <div id="g-capa" hidden></div>
+  <div id="g-barra" hidden>
+    <span id="g-barra-txt">Guía</span>
+    <button type="button" id="g-barra-mapa">Mapa</button>
+    <button type="button" class="cl" id="g-barra-volver" hidden>Volver a la guía</button>
+  </div>
+
+  <section class="g-pantalla" id="g-inicio" aria-labelledby="g-inicio-tit">
+    <div class="g-cont">
+      <p class="eyebrow">Módulo de conjuntos · Guía interactiva</p>
+      <h1 class="g-titulo" id="g-inicio-tit">Aprende <em>picando</em>, paso a paso</h1>
+      <p class="g-sub">Te vamos a llevar de la mano por todo lo que hace el sistema. Una flecha te dice dónde picar y no avanzas hasta que lo hagas. Al terminar cada parte se abre la siguiente.</p>
+      <div class="g-rutas" id="g-rutas"></div>
+      <p class="g-nota">Todo aquí es de mentiras: los datos son de ejemplo y no se guarda nada en tu conjunto real. Pica sin miedo.</p>
+    </div>
+  </section>
+
+  <section class="g-pantalla" id="g-mapa" hidden aria-labelledby="g-mapa-tit">
+    <div class="g-cont">
+      <div class="fila entre"><h1 class="g-titulo" id="g-mapa-tit" style="font-size:30px">Mapa del recorrido</h1><button class="btn" type="button" id="g-mapa-cerrar">Cerrar</button></div>
+      <p class="g-sub" style="margin-bottom:6px">Pica cualquier parte para practicarla. Las verdes ya las hiciste.</p>
+      <div id="g-mapa-cont"></div>
+      <div class="fila" style="margin-top:22px"><button class="btn" type="button" id="g-reiniciar">Empezar de cero</button><button class="btn" type="button" id="g-libre">Explorar libre (sin guía)</button></div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    /* ============================================================ utilidades */
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const din = (n) => "$" + Math.round(Number(n) || 0).toLocaleString("es-CO");
+    const AHORA = new Date();
+    const ym = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+    const mesMas = (n) => new Date(AHORA.getFullYear(), AHORA.getMonth() + n, 1);
+    const PER = ym(AHORA), PER_ANT = ym(mesMas(-1)), PER_ANT2 = ym(mesMas(-2));
+    const nombrePeriodo = (p) => { const [a, m] = p.split("-").map(Number); const t = new Date(a, m - 1, 2).toLocaleDateString("es-CO", { month: "long", year: "numeric" }); return t.charAt(0).toUpperCase() + t.slice(1); };
+    const fCorta = (d) => new Date(d).toLocaleDateString("es-CO", { day: "numeric", month: "short" });
+    const fh = (d) => new Date(d).toLocaleString("es-CO", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+    const hora = (d) => new Date(d).toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" });
+    const hoyISO = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+    const cod14 = () => Array.from({ length: 14 }, () => Math.floor(Math.random() * 10)).join("");
+    const cod14Bonito = (c) => c.replace(/(\d{4})(\d{4})(\d{4})(\d{2})/, "$1 $2 $3 $4");
+    let uid = 0; const nuevoId = (p) => p + (++uid);
+
+    function pitido(ok) {
+      try {
+        const ctx = pitido.ctx || (pitido.ctx = new (window.AudioContext || window.webkitAudioContext)());
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.frequency.value = ok === false ? 220 : 880; o.type = "sine";
+        g.gain.setValueAtTime(0.08, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
+        o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + 0.26);
+      } catch (_e) { /* sin audio: no pasa nada */ }
+    }
+    function aviso(texto, tipo) {
+      const t = document.createElement("div");
+      t.className = "toast" + (tipo ? " " + tipo : " ok");
+      t.textContent = texto;
+      $("#toasts").appendChild(t);
+      setTimeout(() => { t.classList.add("sale"); setTimeout(() => t.remove(), 300); }, 2600);
+    }
+    function qrSVG(texto) {
+      if (window.qrcode) {
+        const q = window.qrcode(0, "M"); q.addData(texto); q.make();
+        return '<div class="g-qr">' + q.createSvgTag(4, 0) + "</div>";
+      }
+      return '<div class="g-qr" style="aspect-ratio:1;color:#0b1428;font:700 12px monospace;text-align:center">QR<br>' + esc(texto.slice(-14)) + "</div>";
+    }
+
+    /* ============================================================ datos de ejemplo */
+    const CASAS0 = [["101", "Ana Ramírez", "3001112233"], ["102", "Carlos Gómez", "3002223344"], ["103", "Luisa Fernández", "3003334455"], ["104", "Pedro Martínez", "3004445566"], ["105", "Diana López", "3005556677"], ["106", "Jorge Castaño", "3006667788"]];
+    const PASE_GUIA = "48213907651234";
+    let S;
+    function datosIniciales() {
+      const vencAnt = new Date(mesMas(-1).getFullYear(), mesMas(-1).getMonth(), 10);
+      const vencAnt2 = new Date(mesMas(-2).getFullYear(), mesMas(-2).getMonth(), 10);
+      const cobros = [];
+      CASAS0.forEach(([c]) => cobros.push({ id: nuevoId("cb"), casa: c, desc: "Administración", serv: "adm0", periodo: PER_ANT, vence: vencAnt, monto: 180000, pagado: ["102", "106"].includes(c) ? 180000 : 0 }));
+      cobros.push({ id: nuevoId("cb"), casa: "103", desc: "Administración", serv: "adm0", periodo: PER_ANT2, vence: vencAnt2, monto: 180000, pagado: 0 });
+      return {
+        rol: "admin", tab: "resumen", draft: {}, kf: "", vv: "visitas", cam: false, lectura: null, tapado: false,
+        conj: { nombre: "Conjunto Los Robles", ciudad: "Medellín", nequi: "", titular: "", banco: "", modo: "referencia", wa: "", mora: 1.5, diaVence: 10 },
+        casas: CASAS0.map(([codigo, prop, tel]) => ({ codigo, prop, tel, usuario: null })),
+        servicios: [], cobros, moraHecha: false,
+        pagos: [
+          { id: "p104", casa: "104", monto: 180000, metodo: "Nequi", ref: "M88231", estado: "por_validar", at: new Date(Date.now() - 3600e3 * 5) },
+          { id: nuevoId("pg"), casa: "102", monto: 180000, metodo: "Bancolombia", ref: "TRX5521", estado: "aprobado", at: new Date(Date.now() - 86400e3 * 12) },
+          { id: nuevoId("pg"), casa: "106", monto: 180000, metodo: "Efectivo", ref: "", estado: "aprobado", at: new Date(Date.now() - 86400e3 * 9) },
+        ],
+        movs: [{ id: nuevoId("mv"), tipo: "ingreso", concepto: "Alquiler salón social", cat: "Salón social", monto: 150000, at: new Date(Date.now() - 86400e3 * 4) }],
+        comunicados: [],
+        usuarios: [{ usuario: "admin.robles", nombre: "Laura Pérez", rol: "admin", casa: "" }],
+        residentes: [{ nombre: "Ana Ramírez", rel: "Propietaria" }],
+        pases: [], visitas: [], paquetes: [], respuestas: [], log: [],
+        sus: { vence: new Date(Date.now() + 86400e3 * 18), valor: 120000, pagos: [] },
+      };
+    }
+    S = datosIniciales();
+
+    const v = (id, def) => esc(S.draft[id] ?? def ?? "");
+    const on = (g, val, def) => ((S.draft["g:" + g] ?? def) === val ? " on" : "");
+    const grupo = (g, def) => S.draft["g:" + g] ?? def;
+    const casa = (c) => S.casas.find((x) => x.codigo === c) || { codigo: c, prop: "" };
+    const deuda = (c) => S.cobros.filter((x) => x.casa === c).reduce((s, x) => s + Math.max(0, x.monto - x.pagado), 0);
+    const enMora = (c) => S.cobros.some((x) => x.casa === c && x.pagado < x.monto && new Date(x.vence) < AHORA);
+    function estadoCobro(x) {
+      if (x.pagado >= x.monto) return '<span class="chip ok">Pagado</span>';
+      if (x.pagado > 0) return '<span class="chip info">Abonado</span>';
+      if (new Date(x.vence) < AHORA) return '<span class="chip mal">Vencido</span>';
+      return '<span class="chip warn">Pendiente</span>';
+    }
+    function estadoCasa(c) {
+      if (deuda(c) <= 0) return ["pagado", '<span class="chip ok">Al día</span>'];
+      if (enMora(c)) return ["mora", '<span class="chip mal">En mora</span>'];
+      return ["pendiente", '<span class="chip warn">Debe</span>'];
+    }
+    const chipPago = (e) => e === "aprobado" ? '<span class="chip ok">Aprobado</span>' : e === "rechazado" ? '<span class="chip mal">Rechazado</span>' : '<span class="chip warn">Por validar</span>';
+    function aplicarPago(c, monto) {
+      let resto = monto;
+      S.cobros.filter((x) => x.casa === c && x.pagado < x.monto).sort((a, b) => a.periodo.localeCompare(b.periodo)).forEach((x) => {
+        const usa = Math.min(resto, x.monto - x.pagado); x.pagado += usa; resto -= usa;
+      });
+    }
+    function metricas() {
+      const aprob = S.pagos.filter((p) => p.estado === "aprobado");
+      const recaudado = aprob.reduce((s, p) => s + p.monto, 0);
+      const ingresos = S.movs.filter((m) => m.tipo === "ingreso").reduce((s, m) => s + m.monto, 0);
+      const egresos = S.movs.filter((m) => m.tipo === "egreso").reduce((s, m) => s + m.monto, 0);
+      const cartera = S.casas.reduce((s, c) => s + deuda(c.codigo), 0);
+      const alDia = S.casas.filter((c) => deuda(c.codigo) <= 0).length;
+      const facturado = S.cobros.filter((x) => x.periodo === PER || x.periodo === PER_ANT).reduce((s, x) => s + x.monto, 0) || 1;
+      return { recaudado, ingresos, egresos, cartera, alDia, pct: Math.round((recaudado / facturado) * 100), balance: recaudado + ingresos - egresos };
+    }
+    const TIPOS = [["visita", "Visita"], ["familiar", "Familiar"], ["domicilio", "Domicilio"], ["tecnico", "Técnico"], ["otro", "Otro"]];
+    const nombreTipo = (t) => (TIPOS.find((x) => x[0] === t) || [0, t])[1];
+    const PLAZOS = [["4h", "4 horas", 4], ["1d", "1 día", 24], ["3d", "3 días", 72], ["7d", "1 semana", 168]];
+
+    /* ============================================================ ventana (modal) igual a la del módulo */
+    let qrTimer = null;
+    function modal(html, ancho) {
+      cerrarModal();
+      const f = document.createElement("div");
+      f.className = "modal-fondo"; f.id = "modal-fondo";
+      f.innerHTML = '<div class="modal' + (ancho ? " ancho" : "") + '" role="dialog" aria-modal="true"><button class="modal-x" type="button" aria-label="Cerrar" data-act="cerrar">&times;</button>' + html + "</div>";
+      document.body.appendChild(f);
+    }
+    function cerrarModal() {
+      const f = $("#modal-fondo"); if (f) f.remove();
+      if (qrTimer) { clearInterval(qrTimer); qrTimer = null; }
+    }
+
+    /* ============================================================ cascarón: barra superior y pestañas */
+    const TABS = {
+      admin: [["resumen", "Resumen"], ["cobros", "Cobros"], ["pagos", "Pagos"], ["casas", "Casas"], ["servicios", "Servicios"], ["caja", "Caja"], ["porteria", "Portería"], ["reportes", "Reportes"], ["comunicados", "Comunicados"], ["usuarios", "Usuarios"], ["ajustes", "Ajustes"], ["suscripcion", "Mi plan"]],
+      casa: [["cuenta", "Mi cuenta"], ["miqr", "Mi QR"], ["invitados", "Invitados"], ["visitas", "Visitas"], ["avisos", "Avisos"]],
+      guardia: [["escanear", "Escanear QR"], ["esperados", "Autorizados"], ["adentro", "Adentro"], ["anunciar", "Llegó alguien"], ["paquetes", "Paquetes"], ["recientes", "Recientes"]],
+    };
+    function badge(rol, tab) {
+      let n = 0;
+      if (rol === "admin" && tab === "pagos") n = S.pagos.filter((p) => p.estado === "por_validar").length;
+      if (rol === "casa" && tab === "visitas") n = S.visitas.filter((x) => x.casa === "101" && ["esperado", "adentro"].includes(x.estado)).length;
+      if (rol === "casa" && tab === "avisos") n = S.paquetes.filter((p) => p.casa === "101" && !p.entregado).length + S.comunicados.length;
+      if (rol === "guardia" && tab === "esperados") n = S.visitas.filter((x) => x.estado === "esperado").length;
+      return n ? ' <span class="badge">' + n + "</span>" : "";
+    }
+    function cabecera() {
+      const r = S.rol;
+      const t = r === "admin" ? [S.conj.nombre, "Laura Pérez · Administración"] : r === "casa" ? ["Casa 101", S.conj.nombre] : ["Portería", S.conj.nombre];
+      return '<header class="top"><div class="top-in"><div class="marca"><span class="logo" aria-hidden="true">CJ</span><div><b>' + esc(t[0]) + "</b><small>" + esc(t[1]) + "</small></div></div>" +
+        '<div class="acciones">' + (r !== "admin" ? '<button class="btn mini" type="button" data-act="sonido">Activar sonido</button>' : "") + '<button class="btn ghost mini" type="button" data-act="salir">Salir</button></div></div>' +
+        '<nav class="tabs" role="tablist" aria-label="Secciones">' + TABS[r].map(([k, n]) => '<button class="tab' + (S.tab === k ? " on" : "") + '" type="button" role="tab" aria-selected="' + (S.tab === k) + '" data-tab="' + k + '" data-act="tab">' + n + badge(r, k) + "</button>").join("") + "</nav></header>";
+    }
+    function render() {
+      const vista = VISTAS[S.rol][S.tab] || (() => "");
+      const antes = S.rol === "casa" ? porAutorizar() : S.rol === "guardia" ? contadores() + respuestas() : avisoPlan();
+      $("#app").innerHTML = cabecera() + '<main class="wrap' + (S.rol === "casa" ? " estrecho" : "") + '">' + antes + '<section data-panel="' + S.tab + '">' + vista() + "</section></main>";
+    }
+    function irA(rol, tab) { cerrarModal(); S.rol = rol; S.tab = tab; render(); window.scrollTo(0, 0); }
+
+    /* ============================================================ vistas: ADMINISTRACIÓN */
+    const avisoPlan = () => "";
+    const cabezaPanel = (eyebrow, titulo, texto, derecha) => '<div class="cabeza-panel"><div><p class="eyebrow">' + eyebrow + "</p><h1>" + titulo + "</h1>" + (texto ? '<p class="muted">' + texto + "</p>" : "") + "</div>" + (derecha || "") + "</div>";
+    const barras = (filas, color) => {
+      const max = Math.max(1, ...filas.map((f) => f[1]));
+      return '<div class="barras-h">' + filas.map((f) => '<div class="bh-fila"><span class="bh-etq">' + esc(f[0]) + '</span><span class="bh-pista"><i class="bh-barra" style="width:' + Math.round((f[1] / max) * 100) + "%;background:" + (color || "var(--accent)") + '"></i></span><span class="bh-val">' + din(f[1]) + "</span></div>").join("") + "</div>";
+    };
+    const VISTAS = { admin: {}, casa: {}, guardia: {} };
+
+    VISTAS.admin.resumen = () => {
+      const m = metricas();
+      const morosos = S.casas.filter((c) => deuda(c.codigo) > 0);
+      const meses = [-5, -4, -3, -2].map((n, i) => [nombrePeriodo(ym(mesMas(n))).split(" ")[0], [3100000, 2950000, 3380000, 3240000][i]]);
+      meses.push([nombrePeriodo(PER_ANT).split(" ")[0], 360000], [nombrePeriodo(PER).split(" ")[0], m.recaudado - 360000 > 0 ? m.recaudado - 360000 : 0]);
+      return cabezaPanel("Tablero", "Resumen del mes") +
+        '<div class="kpis" id="r-kpis">' +
+        '<div class="kpi ok"><span>Recaudado</span><b>' + din(m.recaudado) + "</b><small>" + Math.min(100, m.pct) + '% de lo facturado</small><div class="barra-prog"><i style="width:' + Math.min(100, m.pct) + '%"></i></div></div>' +
+        '<div class="kpi mal"><span>Cartera total</span><b>' + din(m.cartera) + "</b><small>" + S.casas.filter((c) => enMora(c.codigo)).length + " casas en mora</small></div>" +
+        '<div class="kpi ' + (m.balance >= 0 ? "ok" : "mal") + '"><span>Caja</span><b>' + din(m.balance) + "</b><small>Entró " + din(m.recaudado + m.ingresos) + " · Salió " + din(m.egresos) + "</small></div>" +
+        '<div class="kpi info"><span>Casas al día</span><b>' + m.alDia + " de " + S.casas.length + "</b><small>" + (S.casas.length - m.alDia) + " deben algo</small></div></div>" +
+        '<div class="grid2"><div class="card" id="card-recaudo"><div class="card-h"><h2>Recaudo de los últimos meses</h2></div>' + barras(meses) + "</div>" +
+        '<div class="card" id="card-morosos"><div class="card-h"><h2>No han pagado</h2><button class="btn mini" type="button" data-act="tab" data-tab="casas">Ver todas</button></div>' +
+        '<div class="lista corta">' + (morosos.length ? morosos.map((c) => '<div class="item"><div class="principal"><b>Casa ' + c.codigo + "</b><small>" + esc(c.prop) + "</small></div>" + estadoCasa(c.codigo)[1] + '<span class="monto">' + din(deuda(c.codigo)) + "</span></div>").join("") : '<p class="vacio">Todas las casas están al día.</p>') + "</div></div></div>";
+    };
+
+    VISTAS.admin.ajustes = () => cabezaPanel("Configuración", "Ajustes del conjunto") +
+      '<div class="grid2">' +
+      '<div class="card"><h3>Datos del conjunto</h3><div class="campos"><label class="campo ancho"><span>Nombre</span><input id="aj-nombre" value="' + v("aj-nombre", S.conj.nombre) + '"></label>' +
+      '<label class="campo"><span>Ciudad</span><input id="aj-ciudad" value="' + v("aj-ciudad", S.conj.ciudad) + '"></label></div>' +
+      '<h3 style="margin-top:16px">Cobro y mora</h3><div class="campos"><label class="campo"><span>Día límite de pago</span><input id="aj-dia" type="number" value="' + v("aj-dia", S.conj.diaVence) + '"></label><label class="campo"><span>Interés de mora mensual (%)</span><input id="aj-mora" type="number" step="0.1" value="' + v("aj-mora", S.conj.mora) + '"></label></div></div>' +
+      '<div class="card"><h3>¿Dónde pagan las casas?</h3><p class="muted" style="margin-top:0">Llena solo lo que uses. Las casas lo ven ordenado y con botón de copiar.</p><div class="campos">' +
+      '<label class="campo"><span>Nequi</span><input id="aj-nequi" inputmode="numeric" value="' + v("aj-nequi", S.conj.nequi) + '"></label>' +
+      '<label class="campo"><span>Titular de la cuenta</span><input id="aj-titular" value="' + v("aj-titular", S.conj.titular) + '"></label>' +
+      '<label class="campo ancho"><span>Cuenta bancaria (opcional)</span><input id="aj-banco" placeholder="Bancolombia ahorros 000-000000-00" value="' + v("aj-banco", S.conj.banco) + '"></label></div>' +
+      '<div class="sub fila" id="aj-qr" style="margin-top:12px"><div class="qr-caja mini"><span class="muted">Sin imagen</span></div><div class="pila" style="flex:1;min-width:180px"><b>QR o imagen de pago</b><span class="muted">Sube el QR que te da tu banco para recibir dinero.</span><div class="fila"><button class="btn mini" type="button" data-act="demo" data-t="Aquí eliges la imagen del QR desde tu celular o computador">Subir imagen</button></div></div></div></div>' +
+      '<div class="card"><h3>Comprobantes de pago</h3><div class="opciones">' +
+      '<button class="opcion' + on("ajmodo", "whatsapp", S.conj.modo) + '" type="button" id="aj-modo-whatsapp" data-act="opt" data-grupo="ajmodo" data-v="whatsapp">Por WhatsApp<small>La casa envía la foto del comprobante a tu WhatsApp</small></button>' +
+      '<button class="opcion' + on("ajmodo", "referencia", S.conj.modo) + '" type="button" id="aj-modo-referencia" data-act="opt" data-grupo="ajmodo" data-v="referencia">Solo referencia<small>La casa escribe el número de la transacción</small></button></div>' +
+      '<label class="campo" style="margin-top:12px"><span>WhatsApp que recibe comprobantes</span><input id="aj-wa" inputmode="tel" placeholder="3001234567" value="' + v("aj-wa", S.conj.wa) + '"></label></div></div>' +
+      '<div class="fila-btns"><button class="btn primario grande" type="button" id="aj-guardar" data-act="ajGuardar">Guardar ajustes</button></div>';
+
+    const PLANTILLAS = [["Administración", 180000], ["Parqueadero", 40000], ["Fondo de imprevistos", 15000], ["Cuota de piscina", 25000], ["Alquiler salón social", 120000]];
+    const REPARTOS = { fijo: "Fijo por casa", igual: "Igual entre todas", coef: "Por coeficiente", sel: "Solo algunas casas", manual: "Manual" };
+    VISTAS.admin.servicios = () => cabezaPanel("Catálogo", "Servicios y cuotas", "Define una vez cada servicio y cómo se reparte. Luego se cobra solo cada mes.", '<button class="btn primario" type="button" id="s-nuevo" data-act="svNuevo">Nuevo servicio</button>') +
+      '<div class="card"><div class="lista" id="s-lista">' + (S.servicios.length ? S.servicios.map((s) => '<div class="item"><div class="principal"><b>' + esc(s.nombre) + "</b><small>" + REPARTOS[s.reparto] + (s.recurrente ? " · se cobra cada mes" : " · cobro único") + '</small></div><span class="monto">' + din(s.valor) + '</span><div class="acc"><button class="btn mini" type="button" data-act="demo" data-t="Aquí cambias el nombre, el valor o el reparto">Editar</button></div></div>').join("") : '<p class="vacio">Aún no tienes servicios. Crea el primero.</p>') + "</div></div>" +
+      '<div class="card"><h3>Ideas comunes en conjuntos</h3><div class="opciones" id="s-plantillas">' + PLANTILLAS.map(([n, val]) => '<button class="opcion" type="button" data-act="svNuevo" data-n="' + n + '" data-val="' + val + '">' + n + "<small>" + din(val) + "</small></button>").join("") + "</div></div>";
+
+    VISTAS.admin.casas = () => {
+      const filtradas = S.casas.filter((c) => {
+        if (!S.kf) return true;
+        if (S.kf === "sin_usuario") return !c.usuario;
+        if (S.kf === "pendiente") return deuda(c.codigo) > 0;
+        return estadoCasa(c.codigo)[0] === S.kf;
+      });
+      const chip = (f, n) => '<button type="button" id="kf-' + (f || "todas") + '" class="' + (S.kf === f ? "on" : "") + '" data-act="kfiltro" data-f="' + f + '">' + n + "</button>";
+      return cabezaPanel("Unidades", "Casas", "Quién pagó y quién no, estado de cuenta, usuarios de cada casa.",
+        '<div class="fila"><button class="btn" type="button" id="k-importar" data-act="importar">Importar lista</button><button class="btn" type="button" id="k-auto" data-act="autoUsuarios">Crear usuarios automáticos</button><button class="btn primario" type="button" data-act="demo" data-t="Aquí creas una casa suelta: código, propietario y teléfono">Nueva casa</button></div>') +
+        '<div class="card"><div class="filtros-chip" id="k-filtros" style="margin-bottom:12px">' + chip("", "Todas") + chip("pagado", "Pagaron") + chip("pendiente", "No han pagado") + chip("mora", "Con mora") + chip("sin_usuario", "Sin usuario") + "</div>" +
+        '<div class="buscador"><label class="lupa"><span class="sr-only">Buscar casas</span><input placeholder="Código, propietario, teléfono, usuario…"></label><span class="conteo">' + filtradas.length + " casas</span></div>" +
+        '<div class="lista" id="k-lista">' + (filtradas.length ? filtradas.map((c) => '<div class="item"><div class="principal"><b>Casa ' + c.codigo + " · " + esc(c.prop) + "</b><small>" + (c.usuario ? "Usuario: " + c.usuario : "Sin usuario") + " · " + esc(c.tel) + "</small></div>" + estadoCasa(c.codigo)[1] + '<span class="monto">' + din(deuda(c.codigo)) + '</span><div class="acc"><button class="btn mini" type="button" id="k-ver-' + c.codigo + '" data-act="verCasa" data-c="' + c.codigo + '">Estado de cuenta</button></div></div>').join("") : '<p class="vacio">No hay casas con ese filtro.</p>') + "</div></div>";
+    };
+
+    VISTAS.admin.cobros = () => {
+      const filas = S.cobros.slice().sort((a, b) => b.periodo.localeCompare(a.periodo) || a.casa.localeCompare(b.casa));
+      return cabezaPanel("Facturación", "Cobros a las casas", "Genera las cuotas del mes de un clic, o un cobro especial con la forma de reparto que necesites.") +
+        '<div class="card"><div class="card-h"><h2><span class="ico" aria-hidden="true">1</span>Cobro rápido del mes</h2></div><p class="muted" style="margin-top:0">Crea de una vez todos los servicios que se cobran cada mes. No duplica lo que ya está creado.</p>' +
+        '<div class="fila"><button class="btn primario" type="button" id="gm-btn" data-act="generarMes">Generar servicios de ' + nombrePeriodo(PER) + '</button><button class="btn" type="button" id="mora-btn" data-act="mora">Aplicar intereses de mora</button></div></div>' +
+        '<div class="card" id="g-especial"><div class="card-h"><h2><span class="ico" aria-hidden="true">2</span>Cobro especial / extraordinario</h2></div><div class="pila">' +
+        '<div class="campos"><label class="campo"><span>Nombre del cobro</span><input id="g-nombre" placeholder="Arreglo de fachada" value="' + v("g-nombre") + '"></label>' +
+        '<label class="campo"><span>Valor total</span><input id="g-monto" type="number" inputmode="numeric" placeholder="600000" value="' + v("g-monto") + '"></label></div>' +
+        '<div class="campo"><span>¿Cómo se reparte?</span><div class="opciones">' + Object.entries(REPARTOS).map(([k, n]) => '<button class="opcion' + on("grep", k, "fijo") + '" type="button" id="g-rep-' + k + '" data-act="opt" data-grupo="grep" data-v="' + k + '">' + n + "</button>").join("") + "</div></div>" +
+        '<div class="fila-btns"><button class="btn" type="button" id="g-previa" data-act="previa">Vista previa</button><button class="btn primario" type="button" id="g-generar" data-act="generarEspecial">Generar cobro</button></div></div></div>' +
+        '<div class="card"><div class="card-h"><h2>Cobros creados</h2><button class="btn mini" type="button" data-act="demo" data-t="Descarga la tabla para abrirla en Excel">Exportar CSV</button></div>' +
+        '<div class="buscador" id="c-buscador"><label class="lupa"><span class="sr-only">Buscar cobros</span><input placeholder="Casa, propietario, servicio…"></label><select aria-label="Estado"><option>Todos</option><option>Pendientes</option><option>Pagados</option><option>Vencidos</option></select><span class="conteo">' + filas.length + " cobros</span></div>" +
+        '<div class="tabla-wrap" id="c-tabla"><table><thead><tr><th>Casa</th><th>Servicio</th><th>Mes</th><th>Vence</th><th class="num">Valor</th><th class="num">Pagado</th><th>Estado</th></tr></thead><tbody>' +
+        filas.map((x) => "<tr><td>" + x.casa + "</td><td>" + esc(x.desc) + "</td><td>" + nombrePeriodo(x.periodo) + "</td><td>" + fCorta(x.vence) + '</td><td class="num">' + din(x.monto) + '</td><td class="num">' + din(x.pagado) + "</td><td>" + estadoCobro(x) + "</td></tr>").join("") + "</tbody></table></div></div>";
+    };
+
+    VISTAS.admin.pagos = () => {
+      const l = S.pagos.slice().sort((a, b) => (a.estado === "por_validar" ? -1 : 1) - (b.estado === "por_validar" ? -1 : 1) || b.at - a.at);
+      return cabezaPanel("Recaudo", "Pagos", "Valida los pagos que reportan las casas o registra uno tú (efectivo, consignación…).", '<button class="btn primario" type="button" id="p-nuevo" data-act="pagoManual">Registrar pago</button>') +
+        '<div class="card"><div class="filtros-chip" id="p-estados" style="margin-bottom:12px"><button class="on" type="button">Por validar</button><button type="button">Aprobados</button><button type="button">Rechazados</button><button type="button">Todos</button></div>' +
+        '<div class="lista" id="p-lista">' + l.map((p) => '<div class="item' + (p.estado === "por_validar" ? " alerta" : "") + '"><div class="principal"><b>Casa ' + p.casa + " · " + din(p.monto) + "</b><small>" + esc([fh(p.at), p.metodo, p.ref ? "Ref " + p.ref : ""].filter(Boolean).join(" · ")) + "</small></div>" + chipPago(p.estado) +
+          (p.estado === "por_validar" ? '<div class="acc"><button class="btn mini peligro" type="button" data-act="rechazar" data-id="' + p.id + '">Rechazar</button><button class="btn mini ok" type="button" id="pg-aprobar-' + p.id + '" data-act="aprobar" data-id="' + p.id + '">Aprobar</button></div>' : "") + "</div>").join("") + "</div></div>";
+    };
+
+    VISTAS.admin.caja = () => {
+      const m = metricas();
+      return cabezaPanel("Contabilidad básica", "Caja del conjunto", "Gastos (vigilancia, aseo, arreglos) y otros ingresos (alquiler salón, multas).", '<button class="btn primario" type="button" id="m-nuevo" data-act="movNuevo">Registrar movimiento</button>') +
+        '<div class="kpis" id="m-kpis"><div class="kpi ok"><span>Entró</span><b>' + din(m.recaudado + m.ingresos) + "</b><small>Pagos de casas + otros ingresos</small></div>" +
+        '<div class="kpi mal"><span>Salió</span><b>' + din(m.egresos) + "</b><small>Gastos registrados</small></div>" +
+        '<div class="kpi ' + (m.balance >= 0 ? "ok" : "mal") + '"><span>Balance</span><b>' + din(m.balance) + "</b><small>Lo que queda en caja</small></div></div>" +
+        '<div class="card"><div class="lista" id="m-lista">' + S.movs.slice().reverse().map((x) => '<div class="item"><div class="principal"><b>' + esc(x.concepto) + "</b><small>" + esc(x.cat) + " · " + fCorta(x.at) + "</small></div>" + (x.tipo === "ingreso" ? '<span class="chip ok">Ingreso</span>' : '<span class="chip mal">Egreso</span>') + '<span class="monto">' + (x.tipo === "egreso" ? "−" : "+") + din(x.monto) + "</span></div>").join("") + "</div></div>";
+    };
+
+    VISTAS.admin.porteria = () => {
+      const chip = (k, n) => '<button type="button" id="vv-' + k + '" class="' + (S.vv === k ? "on" : "") + '" data-act="vvista" data-v="' + k + '">' + n + "</button>";
+      const lista = S.vv === "visitas"
+        ? (S.log.length ? S.log.slice().reverse().map((x) => '<div class="item"><div class="principal"><b>' + esc(x.nombre) + " → Casa " + x.casa + "</b><small>" + esc(x.detalle) + " · " + fh(x.at) + "</small></div>" + '<span class="chip ' + (x.tipo === "entrada" ? "ok" : x.tipo === "salida" ? "info" : "mal") + '">' + (x.tipo === "entrada" ? "Entró" : x.tipo === "salida" ? "Salió" : "No autorizado") + "</span></div>").join("") : '<p class="vacio">Todavía no hay movimientos de portería.</p>')
+        : (S.paquetes.length ? S.paquetes.map((p) => '<div class="item"><div class="principal"><b>Casa ' + p.casa + " · " + esc(p.desc) + "</b><small>" + esc(p.empresa || "Sin empresa") + " · llegó " + fh(p.at) + "</small></div>" + (p.entregado ? '<span class="chip ok">Entregado</span>' : '<span class="chip warn">En portería</span>') + "</div>").join("") : '<p class="vacio">No hay paquetes registrados.</p>');
+      return cabezaPanel("Historial", "Portería", "Visitas y paquetes registrados por la portería.") +
+        '<div class="card"><div class="filtros-chip" style="margin-bottom:12px">' + chip("visitas", "Visitas") + chip("paquetes", "Paquetes") + '</div><div class="lista" id="v-lista">' + lista + "</div></div>";
+    };
+
+    const REPORTES = [["cartera", "Cartera por casa", "Quién debe y cuánto, de mayor a menor."], ["recaudo", "Recaudo del periodo", "Todos los pagos aprobados en el rango."], ["estado", "Estado de cuenta de una casa", "Cobros y pagos de una casa, mes a mes."], ["paz", "Paz y salvo", "Certificado para una casa que está al día."], ["caja", "Movimientos de caja", "Ingresos y gastos con su categoría."], ["balance", "Ingresos vs gastos", "Cuánto entró, cuánto salió y cuánto queda."], ["servicios", "Facturado por servicio", "Administración, parqueadero, cobros especiales…"], ["mora", "Casas en mora", "Solo las que tienen cobros vencidos."], ["pagos", "Pagos por método", "Nequi, efectivo, banco…"], ["visitas", "Visitas de portería", "Entradas y salidas con fecha y hora."], ["paquetes", "Paquetes", "Recibidos y entregados."]];
+    VISTAS.admin.reportes = () => {
+      const r = grupo("rr", "mes");
+      const chip = (k, n) => '<button type="button" id="rr-' + k + '" class="' + (r === k ? "on" : "") + '" data-act="rrango" data-v="' + k + '">' + n + "</button>";
+      return cabezaPanel("Informes en PDF", "Reportes", 'Elige el rango de fechas y descarga el informe que necesites. Se abre listo para "Guardar como PDF" o imprimir.') +
+        '<div class="card rp-rango"><div class="filtros-chip" id="rp-rangos">' + chip("mes", "Este mes") + chip("anterior", "Mes anterior") + chip("trimestre", "Últimos 3 meses") + chip("anio", "Este año") + "</div></div>" +
+        '<div class="rp-lista" id="rp-lista">' + REPORTES.map(([k, t, d], i) => '<div class="rp-card' + (i === 0 ? " destacado" : "") + '"><span class="rp-ico" aria-hidden="true">' + (i + 1) + '</span><div class="rp-txt"><h3>' + t + "</h3><p>" + d + '</p></div><button class="btn mini primario" type="button" id="rp-btn-' + k + '" data-act="reporte" data-k="' + k + '">Descargar PDF</button></div>').join("") + "</div>";
+    };
+
+    VISTAS.admin.comunicados = () => cabezaPanel("Avisos", "Comunicados", "Lo ven todas las casas en su panel (con un pitido suave).") +
+      '<div class="grid2"><div class="card"><h3>Nuevo comunicado</h3><div class="pila">' +
+      '<label class="campo"><span>Título</span><input id="com-titulo" placeholder="Corte de agua el sábado" value="' + v("com-titulo") + '"></label>' +
+      '<label class="campo"><span>Mensaje</span><textarea id="com-cuerpo">' + v("com-cuerpo") + "</textarea></label>" +
+      '<label class="check" id="com-imp-lbl"><input type="checkbox" id="com-imp"' + (S.draft["com-imp"] ? " checked" : "") + "> Marcar como importante</label>" +
+      '<div class="fila-btns"><button class="btn primario" type="button" id="com-publicar" data-act="publicar">Publicar</button></div></div></div>' +
+      '<div class="card"><div class="lista" id="o-lista">' + (S.comunicados.length ? S.comunicados.map((c) => '<div class="item' + (c.imp ? " alerta" : "") + '"><div class="principal"><b>' + esc(c.titulo) + "</b><small>" + fh(c.at) + (c.imp ? " · Importante" : "") + '</small><p style="margin:6px 0 0">' + esc(c.cuerpo) + "</p></div></div>").join("") : '<p class="vacio">Aún no has publicado comunicados.</p>') + "</div></div></div>";
+
+    const ROLES = { admin: "Administración", guardia: "Portería", casa: "Casa" };
+    VISTAS.admin.usuarios = () => cabezaPanel("Accesos", "Usuarios", "Administradores, casas y portería. Cada uno entra con su usuario y clave.", '<button class="btn primario" type="button" id="u-nuevo" data-act="usNuevo">Nuevo usuario</button>') +
+      '<div class="card"><div class="filtros-chip" style="margin-bottom:12px"><button class="on" type="button">Todos</button><button type="button">Administración</button><button type="button">Portería</button><button type="button">Casas</button><button type="button">Bloqueados</button></div>' +
+      '<div class="lista" id="u-lista">' + S.usuarios.map((u) => '<div class="item"><div class="principal"><b>' + esc(u.usuario) + "</b><small>" + esc(u.nombre) + (u.casa ? " · Casa " + u.casa : "") + '</small></div><span class="chip ' + (u.rol === "admin" ? "info" : u.rol === "guardia" ? "warn" : "ok") + '">' + ROLES[u.rol] + '</span><div class="acc"><button class="btn mini" type="button" data-act="demo" data-t="Aquí le pones una clave nueva">Cambiar clave</button><button class="btn mini peligro" type="button" data-act="demo" data-t="Un usuario bloqueado no puede entrar">Bloquear</button></div></div>').join("") + "</div></div>";
+
+    VISTAS.admin.suscripcion = () => {
+      const dias = Math.ceil((S.sus.vence - AHORA) / 86400e3);
+      const meses = grupo("smeses", "1");
+      return cabezaPanel("Tu servicio", "Mi plan y pagos") +
+        '<div class="kpis" id="s-kpis"><div class="kpi ' + (dias > 7 ? "ok" : "warn") + '"><span>Estado</span><b>Activo</b><small>Faltan ' + dias + " días</small></div>" +
+        '<div class="kpi info"><span>Vence</span><b>' + fCorta(S.sus.vence) + "</b><small>+5 días de gracia</small></div>" +
+        '<div class="kpi"><span>Valor mensual</span><b>' + din(S.sus.valor) + "</b><small>Por todo el conjunto</small></div></div>" +
+        '<div class="grid2"><div class="card" id="s-pago"><div class="card-h"><h2>Escanea y paga</h2></div><p class="muted" style="margin-top:0">Realiza la transferencia de tu suscripción a la plataforma.</p><div class="pila">' +
+        '<div class="dato-pago"><div><small>Nequi</small><b>3110000000</b></div><button class="btn mini" type="button" data-act="copiar" data-t="3110000000">Copiar</button></div>' +
+        '<div class="dato-pago"><div><small>Titular</small><b>Plataforma Conjuntos</b></div><button class="btn mini" type="button" data-act="copiar" data-t="Plataforma Conjuntos">Copiar</button></div></div></div>' +
+        '<div class="card"><div class="card-h"><h2>Reportar mi pago</h2></div><div class="pila"><p class="muted" style="margin:0">¿Cuántos meses pagas?</p><div class="opciones">' +
+        ["1", "3", "6"].map((n) => '<button class="opcion' + (meses === n ? " on" : "") + '" type="button" data-act="opt" data-grupo="smeses" data-v="' + n + '" data-render="1">' + n + (n === "1" ? " mes" : " meses") + "<small>" + din(S.sus.valor * Number(n)) + "</small></button>").join("") + "</div>" +
+        '<label class="campo"><span>Referencia o número de la transacción</span><input id="sus-ref" placeholder="M1234567" value="' + v("sus-ref") + '"></label>' +
+        '<div class="sub"><span class="muted">Total a pagar</span> <b style="font-size:20px;margin-left:6px">' + din(S.sus.valor * Number(meses)) + "</b></div>" +
+        '<div class="fila-btns"><button class="btn primario" type="button" id="sus-enviar" data-act="susEnviar">Reportar pago</button></div></div></div>' +
+        '<div class="card ancho-total"><div class="card-h"><h2>Historial de pagos de la suscripción</h2></div><div class="lista" id="s-historial">' + (S.sus.pagos.length ? S.sus.pagos.map((p) => '<div class="item"><div class="principal"><b>' + din(p.monto) + " · " + p.meses + (p.meses === "1" ? " mes" : " meses") + "</b><small>Ref " + esc(p.ref) + " · " + fh(p.at) + "</small></div>" + chipPago("por_validar") + "</div>").join("") : '<p class="vacio">Aún no has reportado pagos.</p>') + "</div></div></div>";
+    };
+
+    /* ============================================================ vistas: CASA (Casa 101 · Ana Ramírez) */
+    function porAutorizar() {
+      const p = S.visitas.filter((x) => x.casa === "101" && x.estado === "pregunta");
+      return p.map((x) => '<div class="banner warn" id="por-autorizar"><div><b>Portería pregunta: ¿dejas entrar a ' + esc(x.nombre) + "?</b><br><span class=\"muted\">" + nombreTipo(x.tipo) + (x.nota ? " · " + esc(x.nota) : "") + " · llegó a las " + hora(x.at) + '</span></div><div class="fila"><button class="btn peligro" type="button" id="aut-no" data-act="autorizar" data-id="' + x.id + '" data-v="no">No lo conozco</button><button class="btn ok" type="button" id="aut-si" data-act="autorizar" data-id="' + x.id + '" data-v="si">Sí, que entre</button></div></div>').join("");
+    }
+    VISTAS.casa.cuenta = () => {
+      const d = deuda("101");
+      const vencido = S.cobros.filter((x) => x.casa === "101" && x.pagado < x.monto && new Date(x.vence) < AHORA).reduce((s, x) => s + x.monto - x.pagado, 0);
+      const enRevision = S.pagos.filter((p) => p.casa === "101" && p.estado === "por_validar").reduce((s, p) => s + p.monto, 0);
+      const pend = S.cobros.filter((x) => x.casa === "101" && x.pagado < x.monto);
+      const pagos = S.pagos.filter((p) => p.casa === "101");
+      return '<div class="saldo-hero' + (d <= 0 ? " al-dia" : "") + '" id="saldo"><span class="figura f1" aria-hidden="true"></span><span>' + (d <= 0 ? "Estás al día" : "Total pendiente") + "</span><strong>" + din(d) + "</strong>" +
+        '<p class="muted" style="margin:0 0 14px">' + (vencido > 0 ? '<b style="color:var(--mal)">' + din(vencido) + " vencido.</b> " : "") + (enRevision > 0 ? din(enRevision) + " en revisión por la administración." : "") + "</p>" +
+        '<div class="fila">' + (d <= 0 ? '<button class="btn" type="button" data-act="demo" data-t="Se descarga el paz y salvo en PDF con tu nombre">Descargar paz y salvo</button>' : '<button class="btn primario grande" type="button" id="pagar" data-act="pagar">Pagar / reportar pago</button>') + "</div></div>" +
+        '<div class="card"><div class="card-h"><h2>Lo que debo</h2><button class="btn mini" type="button" data-act="demo" data-t="Muestra todos tus cobros y pagos desde el inicio">Ver historial completo</button></div><div class="lista corta" id="pendientes">' +
+        (pend.length ? pend.map((x) => '<div class="item"><div class="principal"><b>' + esc(x.desc) + "</b><small>" + nombrePeriodo(x.periodo) + " · vence " + fCorta(x.vence) + "</small></div>" + estadoCobro(x) + '<span class="monto">' + din(x.monto - x.pagado) + "</span></div>").join("") : '<p class="vacio">No tienes cobros pendientes.</p>') + "</div></div>" +
+        '<div class="card"><div class="card-h"><h2>Mis pagos recientes</h2></div><div class="lista corta" id="pagos">' +
+        (pagos.length ? pagos.map((p) => '<div class="item"><div class="principal"><b>' + din(p.monto) + "</b><small>" + esc([fh(p.at), p.metodo, p.ref ? "Ref " + p.ref : ""].filter(Boolean).join(" · ")) + "</small></div>" + chipPago(p.estado) + "</div>").join("") : '<p class="vacio">Aún no has reportado pagos.</p>') + "</div></div>";
+    };
+    VISTAS.casa.miqr = () => '<div class="card"><div class="card-h"><h2>QR de entrada de la familia</h2><button class="btn mini primario" type="button" id="r-nuevo" data-act="resNuevo">+ Agregar persona</button></div>' +
+      '<p class="muted" style="margin-top:0">Cada persona que vive en la casa tiene su propio QR para entrar y salir. <b>El QR cambia solo cada 30 segundos</b>, así que una foto o captura de pantalla no sirve en portería.</p>' +
+      '<div class="lista" id="r-lista">' + S.residentes.map((r, i) => '<div class="item"><div class="principal"><b>' + esc(r.nombre) + "</b><small>" + esc(r.rel) + ' · Casa 101</small></div><div class="acc"><button class="btn mini primario" type="button" id="qr-ver-' + i + '" data-act="verQR" data-i="' + i + '">Mostrar QR</button></div></div>').join("") + "</div></div>";
+
+    function resumenPase() {
+      const nom = (S.draft["ps-nombre"] || "").trim() || "Tu invitado";
+      const pl = PLAZOS.find((p) => p[0] === grupo("pplazo", "4h"));
+      const hasta = new Date(Date.now() + pl[2] * 3600e3);
+      return "<b>" + esc(nom) + "</b> podrá entrar y salir <b>desde ahora</b> hasta el <b>" + fh(hasta) + "</b> con el mismo QR.";
+    }
+    VISTAS.casa.invitados = () => {
+      const pases = S.pases.filter((p) => p.estado === "activo");
+      return '<div class="card"><div class="card-h"><h2><span class="ico" aria-hidden="true">+</span>Crear pase QR para un invitado</h2></div>' +
+        '<p class="muted" style="margin-top:0">Llena los datos, confirma y envíale el QR por WhatsApp. Con el mismo QR puede entrar y salir mientras dure el plazo.</p><div class="pila">' +
+        '<div class="campo"><span>¿Quién viene?</span><div class="opciones">' + TIPOS.map(([k, n]) => '<button class="opcion' + on("ptipo", k, "visita") + '" type="button" id="pt-' + k + '" data-act="opt" data-grupo="ptipo" data-v="' + k + '">' + n + "</button>").join("") + "</div></div>" +
+        '<div class="campos"><label class="campo"><span>Nombre del invitado</span><input id="ps-nombre" placeholder="Jesús Casillas" autocomplete="off" value="' + v("ps-nombre") + '"></label>' +
+        '<label class="campo"><span>Documento (opcional)</span><input id="ps-doc" inputmode="numeric" autocomplete="off" value="' + v("ps-doc") + '"></label>' +
+        '<label class="campo"><span>Placa (opcional)</span><input id="ps-placa" placeholder="ABC123" autocomplete="off" value="' + v("ps-placa") + '"></label>' +
+        '<label class="campo"><span>WhatsApp del invitado (opcional)</span><input id="ps-tel" type="tel" inputmode="tel" placeholder="300 123 4567" autocomplete="off" value="' + v("ps-tel") + '"></label></div>' +
+        '<div class="campo"><span>¿Desde cuándo vale?</span><div class="opciones"><button type="button" class="opcion on">Desde ahora</button><button type="button" class="opcion" data-act="demo" data-t="Eliges el día y la hora en que empieza a valer el pase">Otra fecha y hora</button></div></div>' +
+        '<div class="campo"><span>¿Por cuánto tiempo puede entrar y salir?</span><div class="opciones">' + PLAZOS.map(([k, n]) => '<button class="opcion' + on("pplazo", k, "4h") + '" type="button" id="pl-' + k + '" data-act="opt" data-grupo="pplazo" data-v="' + k + '">' + n + "</button>").join("") + "</div></div>" +
+        '<div class="banner info" id="p-resumen">' + resumenPase() + "</div>" +
+        '<div class="fila-btns"><button class="btn primario grande" type="button" id="ps-crear" data-act="paseCrear">Crear pase</button></div></div></div>' +
+        '<div class="card"><div class="card-h"><h2>Mis pases de invitados</h2></div><div class="lista" id="p-lista">' +
+        (pases.length ? pases.map((p) => '<div class="item"><div class="principal"><b>' + esc(p.nombre) + "</b><small>" + nombreTipo(p.tipo) + " · vale hasta " + fh(p.hasta) + " · " + p.entradas + " entrada(s)</small></div>" + (p.adentro ? '<span class="chip ok">Adentro</span>' : '<span class="chip info">Vigente</span>') + '<div class="acc"><button class="btn mini" type="button" data-act="verPase" data-id="' + p.id + '">Ver QR</button><button class="btn mini peligro" type="button" data-act="cancelarPase" data-id="' + p.id + '">Cancelar</button></div></div>').join("") : '<p class="vacio">No tienes pases vigentes.</p>') + "</div></div>";
+    };
+    const chipVisita = (e) => ({ esperado: '<span class="chip info">Autorizado</span>', adentro: '<span class="chip ok">Adentro</span>', salio: '<span class="chip">Ya salió</span>', rechazado: '<span class="chip mal">No autorizado</span>', cancelado: '<span class="chip">Cancelada</span>', pregunta: '<span class="chip warn">Esperando tu respuesta</span>' }[e] || "");
+    VISTAS.casa.visitas = () => {
+      const mias = S.visitas.filter((x) => x.casa === "101");
+      return '<div class="card"><div class="card-h"><h2><span class="ico" aria-hidden="true">+</span>Anunciar a alguien que viene</h2></div><p class="muted" style="margin-top:0">La portería lo verá en su lista y lo dejará entrar sin llamarte.</p><div class="pila">' +
+        '<div class="campo"><span>¿Quién viene?</span><div class="opciones">' + TIPOS.map(([k, n]) => '<button class="opcion' + on("vtipo", k, "tecnico") + '" type="button" data-act="opt" data-grupo="vtipo" data-v="' + k + '">' + n + "</button>").join("") + "</div></div>" +
+        '<div class="campos"><label class="campo"><span>Nombre</span><input id="vi-nombre" placeholder="Carlos Ruiz" value="' + v("vi-nombre") + '"></label>' +
+        '<label class="campo"><span>Documento (opcional)</span><input id="vi-doc" inputmode="numeric" value="' + v("vi-doc") + '"></label>' +
+        '<label class="campo"><span>Día de llegada</span><input id="vi-fecha" type="date" value="' + v("vi-fecha", hoyISO()) + '"></label>' +
+        '<label class="campo"><span>Nota para portería</span><input id="vi-nota" placeholder="Trae herramientas" value="' + v("vi-nota") + '"></label></div>' +
+        '<div class="fila-btns"><button class="btn primario" type="button" id="vi-anunciar" data-act="anunciarVisita">Anunciar visita</button></div></div></div>' +
+        '<div class="card"><div class="card-h"><h2>Mis visitas</h2></div><div class="lista" id="v-lista">' +
+        (mias.length ? mias.slice().reverse().map((x) => '<div class="item"><div class="principal"><b>' + esc(x.nombre) + "</b><small>" + nombreTipo(x.tipo) + " · " + fCorta(x.at) + (x.nota ? " · " + esc(x.nota) : "") + "</small></div>" + chipVisita(x.estado) + "</div>").join("") : '<p class="vacio">No has anunciado visitas.</p>') + "</div></div>";
+    };
+    VISTAS.casa.avisos = () => {
+      const paq = S.paquetes.filter((p) => p.casa === "101" && !p.entregado);
+      return '<div class="card"><div class="card-h"><h2>Paquetes en portería</h2></div><div class="lista corta" id="paquetes">' +
+        (paq.length ? paq.map((p) => '<div class="item alerta"><div class="principal"><b>' + esc(p.desc) + "</b><small>" + esc([p.empresa, "Llegó " + fh(p.at)].filter(Boolean).join(" · ")) + '</small></div><span class="chip warn">Recógelo en portería</span></div>').join("") : '<p class="vacio">No tienes paquetes esperando.</p>') + "</div></div>" +
+        '<div class="card"><div class="card-h"><h2>Comunicados de la administración</h2></div><div class="lista" id="comunicados">' +
+        (S.comunicados.length ? S.comunicados.map((c) => '<div class="item' + (c.imp ? " alerta" : "") + '"><div class="principal"><b>' + esc(c.titulo) + "</b><small>" + fh(c.at) + '</small><p style="margin:6px 0 0">' + esc(c.cuerpo) + "</p></div></div>").join("") : '<p class="vacio">No hay comunicados.</p>') + "</div></div>";
+    };
+
+    /* ============================================================ vistas: PORTERÍA */
+    function contadores() {
+      const esp = S.visitas.filter((x) => x.estado === "esperado").length;
+      const ad = S.visitas.filter((x) => x.estado === "adentro").length + S.pases.filter((p) => p.adentro).length;
+      const pr = S.visitas.filter((x) => x.estado === "pregunta").length;
+      const pq = S.paquetes.filter((p) => !p.entregado).length;
+      return '<div class="contadores" id="contadores"><div class="contador"><b>' + esp + '</b><span>Autorizados</span></div><div class="contador"><b>' + ad + '</b><span>Adentro</span></div><div class="contador"><b>' + pr + '</b><span>Esperando casa</span></div><div class="contador"><b>' + pq + "</b><span>Paquetes</span></div></div>";
+    }
+    function respuestas() {
+      return '<div id="respuestas">' + S.respuestas.map((r, i) => '<div class="banner ' + (r.si ? "" : "mal") + '" style="' + (r.si ? "border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.1)" : "") + '"><div><b>Casa ' + r.casa + (r.si ? " dijo SÍ: " : " dijo NO: ") + esc(r.nombre) + (r.si ? " puede entrar" : " no puede entrar") + '</b><br><span class="muted">' + (r.si ? "Ya quedó registrado como adentro." : "No lo dejes pasar.") + '</span></div><button class="btn mini" type="button" data-act="okResp" data-i="' + i + '">Entendido</button></div>').join("") + "</div>";
+    }
+    function paseActivo() { return S.pases.find((p) => p.estado === "activo" && new Date(p.hasta) > new Date()); }
+    function pintarLectura() {
+      const L = S.lectura;
+      if (!L) return '<p class="vacio">Aquí verás los datos de la persona cuando escanees su QR.</p>';
+      if (L.hecho) return '<div class="esc-estado ' + (L.hecho.accion === "entrada" ? "ok" : "info") + '" id="esc-estado"><b>' + (L.hecho.accion === "entrada" ? "ENTRADA REGISTRADA" : "SALIDA REGISTRADA") + "</b><span>" + esc(L.hecho.nombre) + " · " + hora(new Date()) + '</span></div><div class="esc-pie"><button class="btn primario grande bloque" type="button" id="esc-otro" data-act="escOtro">Escanear otro</button></div>';
+      const r = L.r, x = r.datos || {};
+      const res = r.clase === "residente";
+      const estado = !r.ok ? ["mal", "NO VÁLIDO", r.motivo] : r.accion === "entrada" ? ["ok", "PUEDE ENTRAR", res ? "Residente de la casa" : "Pase de invitado vigente"] : ["info", "VA A SALIR", res ? "Residente que está adentro" : "Invitado que está adentro"];
+      const filas = [["Casa", x.casa], [res ? "Propietario" : "Lo invita", x.prop], ["Documento", x.doc], ["Placa", x.placa], ["Tipo", res ? "Residente" : nombreTipo(x.tipo)], ["Válido desde", x.desde ? fh(x.desde) : ""], ["Válido hasta", x.hasta ? fh(x.hasta) : ""], ["Entradas", res ? "" : String(x.entradas ?? "")]].filter((f) => f[1]);
+      let pie;
+      if (!r.ok) pie = '<button class="btn grande bloque" type="button" id="esc-otro" data-act="escOtro">Escanear otro</button>';
+      else if (L.paso === 2) pie = '<p class="muted" style="margin:0 0 8px">Paso 2 de 2. Confirma el registro:</p><div class="fila-btns" style="justify-content:stretch"><button class="btn ghost" type="button" data-act="escOtro">Cancelar</button><button class="btn ' + (r.accion === "entrada" ? "ok" : "primario") + ' grande" type="button" id="esc-usar" data-act="escUsar">Confirmar ' + (r.accion === "entrada" ? "ENTRADA" : "SALIDA") + "</button></div>";
+      else pie = '<p class="muted" style="margin:0 0 8px">Paso 1 de 2. Mira a la persona y compara nombre, documento y placa.</p><div class="fila-btns" style="justify-content:stretch"><button class="btn peligro" type="button" id="esc-nocoincide" data-act="escNo">No coincide</button><button class="btn primario grande" type="button" id="esc-coincide" data-act="escSi">Sí, los datos son correctos</button></div>';
+      return '<div class="esc-estado ' + estado[0] + '" id="esc-estado"><b>' + estado[1] + "</b><span>" + esc(estado[2]) + "</span></div>" +
+        (x.nombre ? '<div class="esc-quien"><span class="chip ' + (res ? "info" : "warn") + '">' + (res ? "Residente" : "Invitado") + "</span><h3>" + esc(x.nombre) + "</h3></div>" : "") +
+        (filas.length ? '<dl class="datos-pase" id="esc-datos">' + filas.map((f) => "<dt>" + f[0] + "</dt><dd>" + esc(f[1]) + "</dd>").join("") + "</dl>" : "") + '<div class="esc-pie">' + pie + "</div>";
+    }
+    VISTAS.guardia.escanear = () => {
+      const p = paseActivo();
+      return '<div class="esc-grid"><div class="card"><div class="card-h"><h2>Escanear pase</h2></div><p class="muted" style="margin-top:0">Pide el QR del residente o del invitado y apúntale con la cámara. El mismo QR sirve para entrar y para salir.</p>' +
+        (S.cam ? '<div class="esc-cam" id="esc-cam"><div class="g-cam"><span class="g-cam-txt">CÁMARA (SIMULADA)</span>' + (p ? qrSVG(p.codigo) : '<p class="vacio">No hay pases para leer.</p>') + '<span class="esc-mira" aria-hidden="true"></span></div></div><button class="btn primario grande bloque" type="button" id="sim-leer" data-act="simLeer" style="margin-top:10px">Leer este QR</button>' : "") +
+        '<button class="btn ' + (S.cam ? "" : "primario ") + 'grande bloque" type="button" id="esc-abrir" data-act="camara" style="margin-top:10px">' + (S.cam ? "Cerrar cámara" : "Abrir cámara") + "</button>" +
+        '<div class="fila" id="esc-manual" style="margin-top:12px"><label class="sr-only" for="esc-codigo">Código del pase</label><input id="esc-codigo" inputmode="numeric" autocomplete="off" placeholder="O escribe el código de 14 números" style="flex:1;min-width:0" value="' + v("esc-codigo") + '"><button class="btn" type="button" id="esc-revisar" data-act="revisar">Revisar</button></div></div>' +
+        '<div class="card esc-res" id="esc-res" aria-live="polite">' + pintarLectura() + "</div></div>";
+    };
+    VISTAS.guardia.esperados = () => {
+      const l = S.visitas.filter((x) => x.estado === "esperado");
+      return '<div class="card"><div class="card-h"><h2>Autorizados para hoy</h2></div><div class="buscador"><label class="lupa"><span class="sr-only">Buscar</span><input placeholder="Nombre, casa, placa, documento…"></label><span class="conteo">' + l.length + "</span></div>" +
+        '<div class="lista" id="e-lista">' + (l.length ? l.map((x) => '<div class="item"><div class="principal"><b>' + esc(x.nombre) + " → " + x.casa + "</b><small>" + nombreTipo(x.tipo) + " · " + esc(casa(x.casa).prop) + (x.nota ? " · " + esc(x.nota) : "") + '</small></div><div class="acc"><button class="btn mini peligro" type="button" data-act="noAut" data-id="' + x.id + '">No autorizado</button><button class="btn mini ok" type="button" id="ent-' + x.id + '" data-act="entro" data-id="' + x.id + '">Entró</button></div></div>').join("") : '<p class="vacio">No hay nadie autorizado por ahora.</p>') + "</div></div>";
+    };
+    VISTAS.guardia.adentro = () => {
+      const l = S.visitas.filter((x) => x.estado === "adentro").map((x) => ({ id: x.id, nombre: x.nombre, casa: x.casa, det: nombreTipo(x.tipo) + " · entró " + hora(x.ingreso) }))
+        .concat(S.pases.filter((p) => p.adentro).map((p) => ({ id: p.id, nombre: p.nombre, casa: p.casa, det: "Pase QR · sale escaneando su QR" , pase: true })));
+      return '<div class="card"><div class="card-h"><h2>Visitantes adentro</h2></div><div class="lista" id="a-lista">' +
+        (l.length ? l.map((x) => '<div class="item"><div class="principal"><b>' + esc(x.nombre) + " → " + x.casa + "</b><small>" + esc(x.det) + "</small></div>" + (x.pase ? '<span class="chip info">Con QR</span>' : '<div class="acc"><button class="btn mini primario" type="button" id="sal-' + x.id + '" data-act="salio" data-id="' + x.id + '">Salió</button></div>') + "</div>").join("") : '<p class="vacio">No hay visitantes adentro.</p>') + "</div></div>";
+    };
+    function pickCasas(prefijo, grupoId, filtro) {
+      const f = (filtro || "").toLowerCase();
+      const l = S.casas.filter((c) => !f || c.codigo.includes(f) || c.prop.toLowerCase().includes(f));
+      return l.map((c) => '<button type="button" id="' + prefijo + c.codigo + '" class="' + (grupo(grupoId) === c.codigo ? "on" : "") + '" data-act="opt" data-grupo="' + grupoId + '" data-v="' + c.codigo + '"><b>' + c.codigo + "</b><small>" + esc(c.prop) + "</small></button>").join("") || '<p class="vacio">No hay casas con ese texto.</p>';
+    }
+    VISTAS.guardia.anunciar = () => {
+      const esp = S.visitas.filter((x) => x.estado === "pregunta");
+      return '<div class="card"><div class="card-h"><h2>Llegó alguien que no estaba anunciado</h2></div><p class="muted" style="margin-top:0">La casa recibe un pitido y responde si lo dejas entrar. Te avisamos aquí mismo.</p><div class="pila">' +
+        '<div class="campo"><span>Casa a la que va</span><input id="n-buscar" placeholder="Buscar casa por código o propietario…" autocomplete="off" aria-label="Buscar casa" value="' + v("n-buscar") + '"><div class="casa-pick" id="n-casas" style="margin-top:8px">' + pickCasas("n-casa-", "ncasa", S.draft["n-buscar"]) + "</div></div>" +
+        '<div class="campo"><span>Tipo</span><div class="opciones">' + TIPOS.map(([k, n]) => '<button class="opcion' + on("ntipo", k, "visita") + '" type="button" id="nt-' + k + '" data-act="opt" data-grupo="ntipo" data-v="' + k + '">' + n + "</button>").join("") + "</div></div>" +
+        '<div class="campos"><label class="campo"><span>Nombre</span><input id="an-nombre" value="' + v("an-nombre") + '"></label><label class="campo"><span>Documento</span><input id="an-doc" inputmode="numeric" value="' + v("an-doc") + '"></label><label class="campo"><span>Nota</span><input id="an-nota" placeholder="Domicilio de Rappi" value="' + v("an-nota") + '"></label></div>' +
+        '<button class="btn primario grande" type="button" id="an-preguntar" data-act="preguntar">Preguntar a la casa</button></div></div>' +
+        '<div class="card"><div class="card-h"><h2>Esperando respuesta</h2></div><div class="lista corta" id="n-espera">' + (esp.length ? esp.map((x) => '<div class="item alerta"><div class="principal"><b>' + esc(x.nombre) + " → " + x.casa + "</b><small>" + nombreTipo(x.tipo) + " · preguntado a las " + hora(x.at) + '</small></div><span class="chip warn">Esperando a la casa</span></div>').join("") : '<p class="vacio">Nadie esperando.</p>') + "</div></div>";
+    };
+    VISTAS.guardia.paquetes = () => {
+      const l = S.paquetes.filter((p) => !p.entregado);
+      return '<div class="grid2"><div class="card"><div class="card-h"><h2>Recibir paquete</h2></div><div class="pila">' +
+        '<div class="campo"><span>Casa</span><input id="q-buscar" placeholder="Buscar casa…" autocomplete="off" aria-label="Buscar casa" value="' + v("q-buscar") + '"><div class="casa-pick" id="q-casas" style="margin-top:8px">' + pickCasas("q-casa-", "qcasa", S.draft["q-buscar"]) + "</div></div>" +
+        '<label class="campo"><span>Qué es</span><input id="pq-desc" placeholder="Caja mediana" value="' + v("pq-desc") + '"></label>' +
+        '<label class="campo"><span>Empresa (opcional)</span><input id="pq-empresa" placeholder="Servientrega, Amazon…" value="' + v("pq-empresa") + '"></label>' +
+        '<button class="btn primario" type="button" id="pq-registrar" data-act="paquete">Registrar paquete</button></div></div>' +
+        '<div class="card"><div class="card-h"><h2>Por entregar</h2></div><div class="lista" id="p-lista">' +
+        (l.length ? l.map((p) => '<div class="item"><div class="principal"><b>' + p.casa + " · " + esc(p.desc) + "</b><small>" + esc([casa(p.casa).prop, p.empresa, "llegó " + hora(p.at)].filter(Boolean).join(" · ")) + '</small></div><div class="acc"><button class="btn mini ok" type="button" data-act="entregar" data-id="' + p.id + '">Entregado</button></div></div>').join("") : '<p class="vacio">No hay paquetes por entregar.</p>') + "</div></div></div>";
+    };
+    VISTAS.guardia.recientes = () => {
+      const l = S.log.filter((x) => x.tipo !== "entrada").slice().reverse();
+      return '<div class="card"><div class="card-h"><h2>Salidas y no autorizados (últimas 48 h)</h2></div><div class="lista" id="r-lista">' +
+        (l.length ? l.map((x) => '<div class="item"><div class="principal"><b>' + esc(x.nombre) + " → " + x.casa + "</b><small>" + esc(x.detalle) + " · " + fh(x.at) + "</small></div>" + (x.tipo === "salida" ? '<span class="chip info">Salió</span>' : '<span class="chip mal">No autorizado</span>') + "</div>").join("") : '<p class="vacio">Nada en las últimas 48 horas.</p>') + "</div></div>";
+    };
+
+    /* ============================================================ acciones (lo que pasa al picar) */
+    const val = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+    const limpiar = (...ids) => ids.forEach((k) => delete S.draft[k]);
+    function registrar(nombre, casaCod, tipo, detalle) { S.log.push({ nombre, casa: casaCod, tipo, detalle, at: new Date() }); }
+    S.qrVivos = {}; S.resAdentro = new Set();
+    function leerCodigo(codigo) {
+      const c = codigo.replace(/\D/g, "");
+      if (S.qrVivos[c] !== undefined) {
+        const r = S.residentes[S.qrVivos[c]];
+        return { ok: true, clase: "residente", accion: S.resAdentro.has(r.nombre) ? "salida" : "entrada", ref: r, datos: { nombre: r.nombre, casa: "101", prop: "Ana Ramírez" } };
+      }
+      const p = S.pases.find((x) => x.codigo === c);
+      if (!p) return { ok: false, motivo: "Este código no existe. Puede ser una foto vieja o un pase falso." };
+      if (p.estado !== "activo") return { ok: false, motivo: "La casa canceló este pase.", datos: { nombre: p.nombre, casa: p.casa } };
+      if (new Date(p.hasta) < new Date()) return { ok: false, motivo: "El pase ya se venció.", datos: { nombre: p.nombre, casa: p.casa } };
+      return { ok: true, clase: "invitado", accion: p.adentro ? "salida" : "entrada", ref: p, datos: { nombre: p.nombre, casa: p.casa, prop: casa(p.casa).prop, doc: p.doc, placa: p.placa, tipo: p.tipo, desde: p.desde, hasta: p.hasta, entradas: p.entradas } };
+    }
+    function crearPase(datos) {
+      const pl = PLAZOS.find((p) => p[0] === datos.plazo) || PLAZOS[1];
+      const p = { id: nuevoId("ps"), codigo: S.pases.some((x) => x.codigo === PASE_GUIA) ? cod14() : PASE_GUIA, casa: "101", nombre: datos.nombre, doc: datos.doc || "", placa: datos.placa || "", tel: datos.tel || "", tipo: datos.tipo || "visita", desde: new Date(), hasta: new Date(Date.now() + pl[2] * 3600e3), entradas: 0, adentro: false, estado: "activo" };
+      S.pases.push(p);
+      return p;
+    }
+    function tarjetaPase(p) {
+      return '<div class="g-pase" id="psr-tarjeta"><div class="g-pase-cab"><small>Pase de invitado</small><b>' + esc(S.conj.nombre) + '</b></div><div class="g-pase-cuerpo"><h5>' + esc(p.nombre) + "</h5><p>Invitado de la Casa " + p.casa + "</p>" + qrSVG(p.codigo) +
+        '<div class="g-pase-cod">' + cod14Bonito(p.codigo) + '</div><p style="margin-top:8px">Vale de <b>' + fh(p.desde) + "</b><br>hasta <b>" + fh(p.hasta) + "</b></p></div></div>";
+    }
+    function dibujarQRVivo(i) {
+      const c = cod14(); S.qrVivos[c] = i; S.qrActual = c;
+      const caja = $("#qr-svg"); if (caja) caja.innerHTML = qrSVG(c);
+    }
+
+    const ACT = {
+      tab: (a) => { cerrarModal(); S.tab = a.dataset.tab; render(); window.scrollTo(0, 0); },
+      salir: () => aviso("En la guía no se cierra la sesión. En el sistema real vuelves al inicio.", "ok"),
+      sonido: () => { pitido(true); aviso("Sonido activado: escucharás un pitido con cada aviso."); },
+      demo: (a) => aviso(a.dataset.t || "Esto también funciona en el sistema real."),
+      cerrar: () => cerrarModal(),
+      copiar: (a) => { try { navigator.clipboard.writeText(a.dataset.t); } catch (_e) { /* sin portapapeles */ } aviso("Copiado: " + a.dataset.t); },
+      opt: (a) => {
+        const g = a.dataset.grupo;
+        $$('[data-grupo="' + g + '"]').forEach((b) => b.classList.toggle("on", b === a));
+        S.draft["g:" + g] = a.dataset.v;
+        if (g === "pplazo" || g === "ptipo") { const r = $("#p-resumen"); if (r) r.innerHTML = resumenPase(); }
+        if (a.dataset.render) render();
+      },
+
+      /* --- administración --- */
+      ajGuardar: () => {
+        S.conj.nombre = val("aj-nombre") || S.conj.nombre; S.conj.ciudad = val("aj-ciudad");
+        S.conj.nequi = val("aj-nequi"); S.conj.titular = val("aj-titular"); S.conj.banco = val("aj-banco"); S.conj.wa = val("aj-wa");
+        S.conj.mora = Number(val("aj-mora")) || 0; S.conj.diaVence = Number(val("aj-dia")) || 10; S.conj.modo = grupo("ajmodo", S.conj.modo);
+        render(); aviso("Ajustes guardados. Las casas ya ven los datos de pago.");
+      },
+      svNuevo: (a) => {
+        modal('<h3>Nuevo servicio</h3><div class="pila"><label class="campo"><span>Nombre del servicio</span><input id="sv-nombre" placeholder="Administración" value="' + esc(a.dataset.n || "") + '"></label>' +
+          '<div class="campo"><span>¿Cómo se reparte?</span><div class="opciones">' + Object.entries({ fijo: "Todas pagan lo mismo", igual: "Un total dividido entre todas", coef: "Según el tamaño de cada casa", sel: "Tú eliges cuáles casas", manual: "Escribes el valor de cada casa" }).map(([k, d]) => '<button class="opcion' + (k === "fijo" ? " on" : "") + '" type="button" id="sv-rep-' + k + '" data-act="opt" data-grupo="svrep" data-v="' + k + '">' + REPARTOS[k] + "<small>" + d + "</small></button>").join("") + "</div></div>" +
+          '<label class="campo"><span>Valor por casa</span><input id="sv-valor" type="number" inputmode="numeric" placeholder="180000" value="' + esc(a.dataset.val || "") + '"></label>' +
+          '<label class="check" id="sv-recurrente"><input type="checkbox" id="sv-rec" checked> Se cobra todos los meses</label>' +
+          '<div class="fila-btns"><button class="btn ghost" type="button" data-act="cerrar">Cancelar</button><button class="btn primario" type="button" id="sv-guardar" data-act="svGuardar">Guardar servicio</button></div></div>');
+        S.draft["g:svrep"] = "fijo";
+      },
+      svGuardar: () => {
+        const nombre = val("sv-nombre"), valor = Number(val("sv-valor"));
+        if (!nombre || !valor) return aviso("Escribe el nombre y el valor del servicio", "error");
+        S.servicios.push({ id: nuevoId("sv"), nombre, valor, reparto: grupo("svrep", "fijo"), recurrente: $("#sv-rec").checked });
+        cerrarModal(); render(); aviso("Servicio creado: " + nombre);
+      },
+      importar: () => modal('<h3>Importar lista de casas</h3><p class="muted">Una línea por casa: <b>código ; propietario ; teléfono</b>. Puedes copiar las columnas desde Excel.</p>' +
+        '<textarea id="imp-texto" rows="6">201;Marta Ruiz;3012223344\n202;Jorge Díaz;3013334455\n203;Sandra Mejía;3014445566\n204;Andrés Vélez;3015556677</textarea>' +
+        '<div class="fila-btns" style="margin-top:12px"><button class="btn ghost" type="button" data-act="cerrar">Cancelar</button><button class="btn primario" type="button" id="imp-ok" data-act="impOk">Importar casas</button></div>'),
+      impOk: () => {
+        let n = 0;
+        $("#imp-texto").value.split("\n").forEach((l) => {
+          const [c, p, t] = l.split(/[;\t]/).map((x) => (x || "").trim());
+          if (c && p && !S.casas.some((x) => x.codigo === c)) { S.casas.push({ codigo: c, prop: p, tel: t || "", usuario: null }); n++; }
+        });
+        cerrarModal(); render(); aviso(n + " casa(s) importadas");
+      },
+      autoUsuarios: () => {
+        const sin = S.casas.filter((c) => !c.usuario).length;
+        modal('<h3>Crear usuarios automáticos</h3><p class="muted">Se creará un usuario y una clave para las <b>' + sin + " casas</b> que no tienen. Las que ya tienen usuario no se tocan.</p>" +
+          '<div class="fila-btns"><button class="btn ghost" type="button" data-act="cerrar">Volver</button><button class="btn primario" type="button" id="auto-ok" data-act="autoOk">Sí, crear usuarios</button></div>');
+      },
+      autoOk: () => {
+        const nuevos = [];
+        S.casas.filter((c) => !c.usuario).forEach((c) => {
+          c.usuario = "casa" + c.codigo; const clave = String(100000 + Math.floor(Math.random() * 899999));
+          S.usuarios.push({ usuario: c.usuario, nombre: c.prop, rol: "casa", casa: c.codigo }); nuevos.push([c, clave]);
+        });
+        render();
+        modal('<h3>Usuarios creados</h3><p class="muted">Entrégale a cada casa su usuario y su clave. Al entrar por primera vez pueden cambiarla.</p><div class="tabla-wrap" id="auto-res"><table><thead><tr><th>Casa</th><th>Usuario</th><th>Clave</th></tr></thead><tbody>' +
+          nuevos.map(([c, k]) => "<tr><td>" + c.codigo + "</td><td>" + c.usuario + "</td><td><b>" + k + "</b></td></tr>").join("") + "</tbody></table></div>" +
+          '<div class="fila-btns" style="margin-top:12px"><button class="btn" type="button" data-act="demo" data-t="Se copia la lista para pegarla en WhatsApp o Excel">Copiar lista</button><button class="btn primario" type="button" id="auto-cerrar" data-act="cerrar">Listo</button></div>', true);
+      },
+      kfiltro: (a) => { S.kf = a.dataset.f; render(); },
+      verCasa: (a) => {
+        const c = casa(a.dataset.c), l = S.cobros.filter((x) => x.casa === c.codigo);
+        modal("<h3>Estado de cuenta · Casa " + c.codigo + '</h3><p class="muted" style="margin-top:-4px">' + esc(c.prop) + " · " + esc(c.tel) + '</p><div class="tabla-wrap" id="ec-detalle"><table><thead><tr><th>Servicio</th><th>Mes</th><th class="num">Valor</th><th class="num">Pagado</th><th>Estado</th></tr></thead><tbody>' +
+          l.map((x) => "<tr><td>" + esc(x.desc) + "</td><td>" + nombrePeriodo(x.periodo) + '</td><td class="num">' + din(x.monto) + '</td><td class="num">' + din(x.pagado) + "</td><td>" + estadoCobro(x) + "</td></tr>").join("") +
+          '</tbody></table></div><div class="sub fila entre" style="margin-top:12px"><span class="muted">Debe en total</span><b style="font-size:20px">' + din(deuda(c.codigo)) + "</b></div>" +
+          '<div class="fila-btns" style="margin-top:12px"><button class="btn" type="button" data-act="demo" data-t="' + (deuda(c.codigo) > 0 ? "Solo se puede dar paz y salvo cuando la casa está al día" : "Se descarga el paz y salvo en PDF") + '">Paz y salvo</button><button class="btn primario" type="button" id="ec-cerrar" data-act="cerrar">Cerrar</button></div>', true);
+      },
+      generarMes: () => {
+        const rec = S.servicios.filter((s) => s.recurrente);
+        if (!rec.length) return aviso("Primero crea un servicio en la pestaña Servicios", "error");
+        let n = 0;
+        const vence = new Date(AHORA.getFullYear(), AHORA.getMonth(), S.conj.diaVence || 10);
+        rec.forEach((s) => S.casas.forEach((c) => {
+          if (S.cobros.some((x) => x.casa === c.codigo && x.serv === s.id && x.periodo === PER)) return;
+          const monto = s.reparto === "igual" ? Math.round(s.valor / S.casas.length) : s.valor;
+          S.cobros.push({ id: nuevoId("cb"), casa: c.codigo, desc: s.nombre, serv: s.id, periodo: PER, vence, monto, pagado: 0 }); n++;
+        }));
+        render(); aviso(n ? n + " cobros creados para " + nombrePeriodo(PER) : "Ya estaban creados. No se duplicó nada.");
+      },
+      previa: () => {
+        const nombre = val("g-nombre") || "Cobro especial", total = Number(val("g-monto")) || 0, rep = grupo("grep", "fijo");
+        const cada = rep === "fijo" ? total : Math.round(total / S.casas.length);
+        modal("<h3>Vista previa · " + esc(nombre) + '</h3><p class="muted" style="margin-top:-4px">' + REPARTOS[rep] + '. Todavía no se ha cobrado nada.</p><div class="tabla-wrap" id="pv-tabla"><table><thead><tr><th>Casa</th><th>Propietario</th><th class="num">Le toca</th></tr></thead><tbody>' +
+          S.casas.map((c) => "<tr><td>" + c.codigo + "</td><td>" + esc(c.prop) + '</td><td class="num">' + din(cada) + "</td></tr>").join("") + '</tbody></table></div><div class="sub fila entre" style="margin-top:12px"><span class="muted">Total</span><b>' + din(cada * S.casas.length) + "</b></div>" +
+          '<div class="fila-btns" style="margin-top:12px"><button class="btn primario" type="button" id="pv-cerrar" data-act="cerrar">Entendido</button></div>', true);
+      },
+      generarEspecial: () => {
+        const nombre = val("g-nombre"), total = Number(val("g-monto")), rep = grupo("grep", "fijo");
+        if (!nombre || !total) return aviso("Escribe el nombre y el valor del cobro", "error");
+        const cada = rep === "fijo" ? total : Math.round(total / S.casas.length);
+        const vence = new Date(AHORA.getFullYear(), AHORA.getMonth() + 1, S.conj.diaVence || 10);
+        S.casas.forEach((c) => S.cobros.push({ id: nuevoId("cb"), casa: c.codigo, desc: nombre, serv: "esp", periodo: PER, vence, monto: cada, pagado: 0 }));
+        limpiar("g-nombre", "g-monto"); render(); aviso("Cobro especial creado para " + S.casas.length + " casas");
+      },
+      mora: () => modal('<h3>Aplicar intereses de mora</h3><p class="muted">Se suma el <b>' + S.conj.mora + "%</b> solo a lo que ya se venció y no se ha pagado. Se aplica una vez por mes.</p>" +
+        '<div class="fila-btns"><button class="btn ghost" type="button" data-act="cerrar">Volver</button><button class="btn primario" type="button" id="mora-ok" data-act="moraOk">Sí, aplicar</button></div>'),
+      moraOk: () => {
+        cerrarModal();
+        if (S.moraHecha) { render(); return aviso("Ya aplicaste la mora este mes. No se cobró dos veces."); }
+        let n = 0;
+        S.cobros.filter((x) => x.pagado < x.monto && new Date(x.vence) < AHORA && x.serv !== "mora").forEach((x) => {
+          S.cobros.push({ id: nuevoId("cb"), casa: x.casa, desc: "Interés de mora (" + nombrePeriodo(x.periodo) + ")", serv: "mora", periodo: PER, vence: new Date(AHORA.getFullYear(), AHORA.getMonth() + 1, 10), monto: Math.round((x.monto - x.pagado) * S.conj.mora / 100), pagado: 0 }); n++;
+        });
+        S.moraHecha = true; render(); aviso("Mora aplicada a " + n + " cobro(s) vencidos");
+      },
+      aprobar: (a) => {
+        const p = S.pagos.find((x) => x.id === a.dataset.id);
+        modal('<h3>Aprobar pago</h3><dl class="datos-pase"><dt>Casa</dt><dd>' + p.casa + " · " + esc(casa(p.casa).prop) + "</dd><dt>Valor</dt><dd>" + din(p.monto) + "</dd><dt>Método</dt><dd>" + esc(p.metodo) + "</dd><dt>Referencia</dt><dd>" + esc(p.ref || "—") + "</dd></dl>" +
+          '<p class="muted">Revisa en tu cuenta que la plata sí llegó antes de aprobar.</p><div class="fila-btns"><button class="btn ghost" type="button" data-act="cerrar">Volver</button><button class="btn ok" type="button" id="ap-ok" data-act="apOk" data-id="' + p.id + '">Sí, llegó: aprobar</button></div>');
+      },
+      apOk: (a) => {
+        const p = S.pagos.find((x) => x.id === a.dataset.id);
+        p.estado = "aprobado"; aplicarPago(p.casa, p.monto);
+        cerrarModal(); render(); aviso("Pago aprobado. Se descontó de la deuda de la casa " + p.casa);
+      },
+      rechazar: (a) => { const p = S.pagos.find((x) => x.id === a.dataset.id); p.estado = "rechazado"; render(); aviso("Pago rechazado. La casa verá el motivo.", "error"); },
+      pagoManual: () => {
+        modal('<h3>Registrar pago</h3><div class="pila"><div class="campo"><span>Casa</span><div class="casa-pick">' + S.casas.map((c) => '<button type="button" id="rp-casa-' + c.codigo + '" data-act="opt" data-grupo="rpcasa" data-v="' + c.codigo + '"><b>' + c.codigo + "</b><small>" + esc(c.prop) + "</small></button>").join("") + "</div></div>" +
+          '<label class="campo"><span>Valor</span><input id="rp-monto" type="number" inputmode="numeric" placeholder="180000"></label>' +
+          '<div class="campo"><span>Método</span><div class="opciones">' + ["Efectivo", "Nequi", "Consignación"].map((m) => '<button class="opcion" type="button" id="rp-met-' + m.toLowerCase() + '" data-act="opt" data-grupo="rpmet" data-v="' + m + '">' + m + "</button>").join("") + "</div></div>" +
+          '<div class="fila-btns"><button class="btn ghost" type="button" data-act="cerrar">Cancelar</button><button class="btn primario" type="button" id="rp-guardar" data-act="rpGuardar">Registrar pago</button></div></div>');
+        limpiar("g:rpcasa", "g:rpmet");
+      },
+      rpGuardar: () => {
+        const c = grupo("rpcasa"), monto = Number(val("rp-monto"));
+        if (!c || !monto) return aviso("Elige la casa y escribe el valor", "error");
+        S.pagos.push({ id: nuevoId("pg"), casa: c, monto, metodo: grupo("rpmet", "Efectivo"), ref: "", estado: "aprobado", at: new Date() });
+        aplicarPago(c, monto); cerrarModal(); render(); aviso("Pago registrado y aplicado a la casa " + c);
+      },
+      movNuevo: () => {
+        modal('<h3>Registrar movimiento</h3><div class="pila"><div class="opciones"><button class="opcion" type="button" id="mv-ingreso" data-act="opt" data-grupo="mvtipo" data-v="ingreso">Entró plata<small>Alquiler, multa, otro ingreso</small></button><button class="opcion" type="button" id="mv-egreso" data-act="opt" data-grupo="mvtipo" data-v="egreso">Salió plata<small>Vigilancia, aseo, arreglos</small></button></div>' +
+          '<label class="campo"><span>Concepto</span><input id="mv-concepto" placeholder="Pago vigilancia"></label><label class="campo"><span>Valor</span><input id="mv-monto" type="number" inputmode="numeric"></label>' +
+          '<label class="campo"><span>Categoría</span><select id="mv-cat"><option>Vigilancia</option><option>Aseo</option><option>Mantenimiento</option><option>Servicios públicos</option><option>Otro</option></select></label>' +
+          '<div class="fila-btns"><button class="btn ghost" type="button" data-act="cerrar">Cancelar</button><button class="btn primario" type="button" id="mv-guardar" data-act="mvGuardar">Guardar</button></div></div>');
+        limpiar("g:mvtipo");
+      },
+      mvGuardar: () => {
+        const concepto = val("mv-concepto"), monto = Number(val("mv-monto"));
+        if (!concepto || !monto) return aviso("Escribe el concepto y el valor", "error");
+        S.movs.push({ id: nuevoId("mv"), tipo: grupo("mvtipo", "egreso"), concepto, cat: $("#mv-cat").value, monto, at: new Date() });
+        cerrarModal(); render(); aviso("Movimiento guardado en la caja");
+      },
+      vvista: (a) => { S.vv = a.dataset.v; render(); },
+      rrango: (a) => { S.draft["g:rr"] = a.dataset.v; render(); },
+      reporte: (a) => {
+        const k = a.dataset.k, t = REPORTES.find((r) => r[0] === k);
+        let tabla;
+        if (k === "paz") {
+          const c = S.casas.find((x) => deuda(x.codigo) <= 0) || S.casas[0];
+          tabla = '<p style="margin-top:14px">La administración del <b>' + esc(S.conj.nombre) + "</b> certifica que la <b>Casa " + c.codigo + "</b>, de propiedad de <b>" + esc(c.prop) + "</b>, se encuentra a paz y salvo por todo concepto a la fecha " + new Date().toLocaleDateString("es-CO") + '.</p><div class="g-firma">Administración</div>';
+        } else if (k === "caja" || k === "balance") {
+          tabla = "<table><thead><tr><th>Concepto</th><th>Tipo</th><th class=\"num\">Valor</th></tr></thead><tbody>" + S.movs.map((m) => "<tr><td>" + esc(m.concepto) + "</td><td>" + m.tipo + '</td><td class="num">' + din(m.monto) + "</td></tr>").join("") + "</tbody></table>";
+        } else if (k === "visitas" || k === "paquetes") {
+          const l = k === "visitas" ? S.log : S.paquetes;
+          tabla = l.length ? "<table><thead><tr><th>Nombre</th><th>Casa</th><th>Fecha</th></tr></thead><tbody>" + l.map((x) => "<tr><td>" + esc(x.nombre || x.desc) + "</td><td>" + x.casa + "</td><td>" + fh(x.at) + "</td></tr>").join("") + "</tbody></table>" : '<p style="margin-top:14px">Sin registros en el rango.</p>';
+        } else if (k === "recaudo" || k === "pagos") {
+          tabla = "<table><thead><tr><th>Casa</th><th>Método</th><th class=\"num\">Valor</th></tr></thead><tbody>" + S.pagos.filter((p) => p.estado === "aprobado").map((p) => "<tr><td>" + p.casa + "</td><td>" + esc(p.metodo) + '</td><td class="num">' + din(p.monto) + "</td></tr>").join("") + "</tbody></table>";
+        } else {
+          tabla = "<table><thead><tr><th>Casa</th><th>Propietario</th><th class=\"num\">Debe</th></tr></thead><tbody>" + S.casas.filter((c) => k !== "mora" || enMora(c.codigo)).sort((a, b) => deuda(b.codigo) - deuda(a.codigo)).map((c) => "<tr><td>" + c.codigo + "</td><td>" + esc(c.prop) + '</td><td class="num">' + din(deuda(c.codigo)) + "</td></tr>").join("") + "</tbody></table>";
+        }
+        modal('<h3>Vista previa del PDF</h3><div class="g-doc" id="rpv-doc"><small style="color:#64748b">' + esc(S.conj.nombre) + " · " + esc(S.conj.ciudad) + "</small><h4>" + t[1] + '</h4><small style="color:#64748b">Rango: ' + ({ mes: "este mes", anterior: "mes anterior", trimestre: "últimos 3 meses", anio: "este año" }[grupo("rr", "mes")]) + "</small>" + tabla + "</div>" +
+          '<div class="fila-btns" style="margin-top:12px"><button class="btn" type="button" data-act="demo" data-t="En el sistema real se abre la ventana de imprimir: eliges Guardar como PDF">Imprimir / Guardar PDF</button><button class="btn primario" type="button" id="rpv-cerrar" data-act="cerrar">Cerrar</button></div>', true);
+      },
+      publicar: () => {
+        const titulo = val("com-titulo"), cuerpo = val("com-cuerpo");
+        if (!titulo || !cuerpo) return aviso("Escribe el título y el mensaje", "error");
+        S.comunicados.unshift({ titulo, cuerpo, imp: $("#com-imp").checked, at: new Date() });
+        limpiar("com-titulo", "com-cuerpo", "com-imp"); render(); pitido(true); aviso("Comunicado publicado. Todas las casas lo ven.");
+      },
+      usNuevo: () => {
+        modal('<h3>Nuevo usuario</h3><div class="pila"><div class="campo"><span>¿Qué tipo de usuario es?</span><div class="opciones">' +
+          [["admin", "Administración", "Ve y maneja todo"], ["guardia", "Portería", "Visitas, QR y paquetes"], ["casa", "Casa", "Su cuenta, QR e invitados"]].map(([k, n, d]) => '<button class="opcion" type="button" id="us-rol-' + k + '" data-act="opt" data-grupo="usrol" data-v="' + k + '">' + n + "<small>" + d + "</small></button>").join("") + "</div></div>" +
+          '<div class="campos"><label class="campo"><span>Usuario</span><input id="us-usuario" autocomplete="off"></label><label class="campo"><span>Nombre</span><input id="us-nombre" autocomplete="off"></label><label class="campo"><span>Clave</span><input id="us-clave" autocomplete="off"></label></div>' +
+          '<div class="fila-btns"><button class="btn ghost" type="button" data-act="cerrar">Cancelar</button><button class="btn primario" type="button" id="us-guardar" data-act="usGuardar">Crear usuario</button></div></div>');
+        limpiar("g:usrol");
+      },
+      usGuardar: () => {
+        const usuario = val("us-usuario"), nombre = val("us-nombre");
+        if (!usuario || !val("us-clave")) return aviso("Escribe el usuario y la clave", "error");
+        S.usuarios.push({ usuario, nombre, rol: grupo("usrol", "guardia"), casa: "" });
+        cerrarModal(); render(); aviso("Usuario creado. Ya puede entrar con su clave.");
+      },
+      susEnviar: () => {
+        const ref = val("sus-ref"); if (!ref) return aviso("Escribe la referencia del pago", "error");
+        const m = grupo("smeses", "1");
+        S.sus.pagos.unshift({ ref, meses: m, monto: S.sus.valor * Number(m), at: new Date() });
+        limpiar("sus-ref"); render(); aviso("Pago reportado. Te avisamos cuando se confirme.");
+      },
+
+      /* --- casa --- */
+      pagar: () => {
+        const datos = [["Nequi", S.conj.nequi], ["Cuenta", S.conj.banco], ["Titular", S.conj.titular]].filter((d) => d[1]);
+        modal('<h3>Pagar / reportar pago</h3><p class="muted" style="margin-top:-4px">1. Paga a cualquiera de estas cuentas:</p><div class="pila" id="pg-datos">' +
+          datos.map((d, i) => '<div class="dato-pago"><div><small>' + d[0] + "</small><b>" + esc(d[1]) + '</b></div><button class="btn mini" type="button" id="pg-copiar-' + i + '" data-act="copiar" data-t="' + esc(d[1]) + '">Copiar</button></div>').join("") + "</div>" +
+          '<p class="muted">2. Cuéntale a la administración que ya pagaste:</p><div class="campos"><label class="campo"><span>¿Cuánto pagaste?</span><input id="pg-monto" type="number" inputmode="numeric" value="' + deuda("101") + '"></label>' +
+          '<label class="campo"><span>Número de la transacción</span><input id="pg-ref" placeholder="M1234567" autocomplete="off"></label></div>' +
+          '<div class="fila-btns" style="margin-top:12px">' + (S.conj.modo === "whatsapp" || S.conj.wa ? '<button class="btn wa" type="button" id="pg-wa" data-act="demo" data-t="Se abre WhatsApp con el mensaje listo; solo adjuntas la foto del comprobante">Enviar comprobante por WhatsApp</button>' : "") +
+          '<button class="btn primario" type="button" id="pg-enviar" data-act="pgEnviar">Ya pagué: avisar</button></div>');
+      },
+      pgEnviar: () => {
+        const monto = Number(val("pg-monto")), ref = val("pg-ref");
+        if (!monto || !ref) return aviso("Escribe cuánto pagaste y el número de la transacción", "error");
+        const ya = S.pagos.find((p) => p.id === "pana");
+        if (ya) { ya.monto = monto; ya.ref = ref; ya.estado = "por_validar"; ya.at = new Date(); }
+        else S.pagos.push({ id: "pana", casa: "101", monto, metodo: "Nequi", ref, estado: "por_validar", at: new Date() });
+        cerrarModal(); render(); aviso("Listo. La administración revisará tu pago.");
+      },
+      resNuevo: () => modal('<h3>Agregar persona de la casa</h3><div class="pila"><label class="campo"><span>Nombre completo</span><input id="res-nombre" autocomplete="off"></label>' +
+        '<div class="campo"><span>¿Quién es?</span><div class="opciones">' + ["Hijo/a", "Pareja", "Familiar", "Empleada"].map((r, i) => '<button class="opcion' + (i === 0 ? " on" : "") + '" type="button" data-act="opt" data-grupo="resrel" data-v="' + r + '">' + r + "</button>").join("") + "</div></div>" +
+        '<div class="fila-btns"><button class="btn ghost" type="button" data-act="cerrar">Cancelar</button><button class="btn primario" type="button" id="res-guardar" data-act="resGuardar">Agregar</button></div></div>'),
+      resGuardar: () => {
+        const nombre = val("res-nombre"); if (!nombre) return aviso("Escribe el nombre", "error");
+        S.residentes.push({ nombre, rel: grupo("resrel", "Hijo/a") }); limpiar("g:resrel");
+        cerrarModal(); render(); aviso(nombre + " ya tiene su QR de entrada");
+      },
+      verQR: (a) => {
+        const i = Number(a.dataset.i), r = S.residentes[i];
+        modal('<div class="qr-vivo"><p class="eyebrow">' + esc(S.conj.nombre) + "</p><h3>" + esc(r.nombre) + '</h3><p class="muted" style="margin:-6px 0 12px">Casa 101</p>' +
+          '<div class="qr-vivo-caja" id="qr-caja" style="position:relative;max-width:240px;margin:0 auto"><div id="qr-svg"></div><div class="qr-vivo-tapa" id="qr-tapa" data-act="destapar" hidden><b>QR oculto</b><span>Toca aquí para mostrarlo</span></div></div>' +
+          '<div class="qr-vivo-reloj" id="qr-reloj">30 s</div><div class="barra-prog qr-vivo-barra"><i id="qr-barra" style="width:100%"></i></div>' +
+          '<p class="muted" style="font-size:13px">Cambia solo. Una foto o captura no sirve en portería.</p><button class="btn mini" type="button" id="qr-tapar" data-act="tapar">Simular: salí de la app</button></div>');
+        S.qrRes = i; let seg = 30; dibujarQRVivo(i);
+        qrTimer = setInterval(() => {
+          seg--; if (seg <= 0) { seg = 30; dibujarQRVivo(i); }
+          const rl = $("#qr-reloj"), b = $("#qr-barra");
+          if (rl) rl.textContent = seg + " s"; if (b) b.style.width = (seg / 30) * 100 + "%";
+        }, 1000);
+      },
+      tapar: () => { const t = $("#qr-tapa"); if (t) t.hidden = false; },
+      destapar: () => { const t = $("#qr-tapa"); if (t) t.hidden = true; if (S.qrRes !== undefined) dibujarQRVivo(S.qrRes); },
+      paseCrear: () => {
+        const nombre = val("ps-nombre"); if (!nombre) return aviso("Escribe el nombre del invitado", "error");
+        const pl = PLAZOS.find((p) => p[0] === grupo("pplazo", "4h"));
+        const filas = [["Nombre", nombre], ["Tipo", nombreTipo(grupo("ptipo", "visita"))], ["Documento", val("ps-doc")], ["Placa", val("ps-placa")], ["WhatsApp", val("ps-tel")], ["Desde", "Ahora"], ["Hasta", fh(Date.now() + pl[2] * 3600e3)]].filter((f) => f[1]);
+        modal('<h3>¿Confirmas que llega esta persona?</h3><dl class="datos-pase" id="psc-datos">' + filas.map((f) => "<dt>" + f[0] + "</dt><dd>" + esc(f[1]) + "</dd>").join("") + "</dl>" +
+          '<div class="fila-btns"><button class="btn ghost" type="button" data-act="cerrar">Corregir</button><button class="btn primario" type="button" id="psc-si" data-act="pscSi">Sí, llega esta persona</button></div>');
+      },
+      pscSi: () => {
+        const p = crearPase({ nombre: val("ps-nombre") || S.draft["ps-nombre"], doc: S.draft["ps-doc"], placa: S.draft["ps-placa"], tel: S.draft["ps-tel"], tipo: grupo("ptipo", "visita"), plazo: grupo("pplazo", "4h") });
+        limpiar("ps-nombre", "ps-doc", "ps-placa", "ps-tel"); render();
+        modal("<h3>Pase creado</h3>" + tarjetaPase(p) + '<div class="fila-btns" style="justify-content:center">' +
+          (p.tel ? '<button class="btn wa" type="button" id="psr-wa" data-act="psrWa">Enviar por WhatsApp</button>' : "") + '<button class="btn ' + (p.tel ? "ghost" : "primario") + '" type="button" id="psr-guardar" data-act="cerrar">No enviar, solo guardar</button></div>');
+      },
+      psrWa: () => { cerrarModal(); aviso("Aquí se abre WhatsApp con la imagen del pase lista para enviar"); },
+      verPase: (a) => { const p = S.pases.find((x) => x.id === a.dataset.id); modal("<h3>Pase de " + esc(p.nombre) + "</h3>" + tarjetaPase(p) + '<div class="fila-btns" style="justify-content:center"><button class="btn wa" type="button" data-act="psrWa">Reenviar por WhatsApp</button></div>'); },
+      cancelarPase: (a) => { const p = S.pases.find((x) => x.id === a.dataset.id); p.estado = "cancelado"; render(); aviso("Pase cancelado. Ese QR ya no deja entrar.", "error"); },
+      anunciarVisita: () => {
+        const nombre = val("vi-nombre"); if (!nombre) return aviso("Escribe el nombre de quien viene", "error");
+        S.visitas.push({ id: nuevoId("vi"), casa: "101", nombre, tipo: grupo("vtipo", "tecnico"), nota: val("vi-nota"), estado: "esperado", at: new Date() });
+        limpiar("vi-nombre", "vi-doc", "vi-nota"); render(); aviso("Visita anunciada. Portería ya la ve.");
+      },
+      autorizar: (a) => {
+        const x = S.visitas.find((y) => y.id === a.dataset.id), si = a.dataset.v === "si";
+        x.estado = si ? "adentro" : "rechazado"; x.ingreso = new Date();
+        S.respuestas.push({ casa: x.casa, nombre: x.nombre, si });
+        registrar(x.nombre, x.casa, si ? "entrada" : "rechazo", nombreTipo(x.tipo) + (si ? " · autorizado por la casa" : " · la casa dijo que no"));
+        render(); aviso(si ? "Le avisamos a portería que puede entrar" : "Portería no lo dejará entrar", si ? "ok" : "error");
+      },
+
+      /* --- portería --- */
+      camara: () => { S.cam = !S.cam; render(); },
+      simLeer: () => { const p = paseActivo(); if (!p) return aviso("No hay pases para leer", "error"); S.lectura = { codigo: p.codigo, r: leerCodigo(p.codigo), paso: 1 }; S.cam = false; pitido(S.lectura.r.ok); render(); },
+      revisar: () => { const c = val("esc-codigo"); if (!c) return aviso("Escribe el código", "error"); S.lectura = { codigo: c, r: leerCodigo(c), paso: 1 }; limpiar("esc-codigo"); pitido(S.lectura.r.ok); render(); },
+      escSi: () => { S.lectura.paso = 2; render(); },
+      escNo: () => { S.lectura = null; pitido(false); render(); aviso("No registres el paso. Llama a la casa si tienes dudas.", "error"); },
+      escOtro: () => { S.lectura = null; render(); },
+      escUsar: () => {
+        const { r } = S.lectura;
+        if (r.clase === "residente") { r.accion === "entrada" ? S.resAdentro.add(r.ref.nombre) : S.resAdentro.delete(r.ref.nombre); }
+        else { r.ref.adentro = r.accion === "entrada"; if (r.ref.adentro) r.ref.entradas++; }
+        registrar(r.datos.nombre, r.datos.casa, r.accion, (r.clase === "residente" ? "Residente" : "Pase de invitado") + " · QR");
+        S.lectura = { hecho: { accion: r.accion, nombre: r.datos.nombre } }; pitido(true); render();
+      },
+      entro: (a) => { const x = S.visitas.find((y) => y.id === a.dataset.id); x.estado = "adentro"; x.ingreso = new Date(); registrar(x.nombre, x.casa, "entrada", nombreTipo(x.tipo) + " · anunciado por la casa"); render(); aviso(x.nombre + " quedó adentro"); },
+      noAut: (a) => { const x = S.visitas.find((y) => y.id === a.dataset.id); x.estado = "rechazado"; registrar(x.nombre, x.casa, "rechazo", "No autorizado en portería"); render(); },
+      salio: (a) => { const x = S.visitas.find((y) => y.id === a.dataset.id); x.estado = "salio"; registrar(x.nombre, x.casa, "salida", nombreTipo(x.tipo)); render(); aviso(x.nombre + " salió"); },
+      preguntar: () => {
+        const c = grupo("ncasa"), nombre = val("an-nombre");
+        if (!c || !nombre) return aviso("Elige la casa y escribe el nombre", "error");
+        S.visitas.push({ id: nuevoId("vi"), casa: c, nombre, tipo: grupo("ntipo", "visita"), nota: val("an-nota"), estado: "pregunta", at: new Date() });
+        limpiar("an-nombre", "an-doc", "an-nota", "n-buscar", "g:ncasa"); render(); pitido(true); aviso("Le preguntamos a la casa " + c);
+      },
+      okResp: (a) => { S.respuestas.splice(Number(a.dataset.i), 1); render(); },
+      paquete: () => {
+        const c = grupo("qcasa"), desc = val("pq-desc");
+        if (!c || !desc) return aviso("Elige la casa y escribe qué es", "error");
+        S.paquetes.push({ id: nuevoId("pq"), casa: c, desc, empresa: val("pq-empresa"), at: new Date(), entregado: false });
+        limpiar("pq-desc", "pq-empresa", "q-buscar", "g:qcasa"); render(); pitido(true); aviso("Paquete registrado. La casa recibe un aviso.");
+      },
+      entregar: (a) => { const p = S.paquetes.find((x) => x.id === a.dataset.id); p.entregado = true; render(); aviso("Paquete entregado"); },
+    };
+
+    /* clics y escritura de la app simulada */
+    document.addEventListener("click", (e) => {
+      if (e.target.closest("#g-capa, #g-barra, .g-pantalla")) return;
+      const esObjetivo = Guia.esObjetivo(e.target);
+      const a = e.target.closest("[data-act]");
+      if (a) { e.preventDefault(); const f = ACT[a.dataset.act]; if (f) f(a, e); }
+      if (esObjetivo) Guia.avanzarPronto();
+    });
+    document.addEventListener("input", (e) => {
+      const el = e.target; if (!el.id) return;
+      S.draft[el.id] = el.type === "checkbox" ? el.checked : el.value;
+      if (el.id === "ps-nombre") { const r = $("#p-resumen"); if (r) r.innerHTML = resumenPase(); }
+      if (el.id === "n-buscar") $("#n-casas").innerHTML = pickCasas("n-casa-", "ncasa", el.value);
+      if (el.id === "q-buscar") $("#q-casas").innerHTML = pickCasas("q-casa-", "qcasa", el.value);
+    });
+    document.addEventListener("change", (e) => { if (e.target.id && e.target.type === "checkbox") S.draft[e.target.id] = e.target.checked; });
+    document.addEventListener("visibilitychange", () => { if (document.hidden) ACT.tapar(); });
+
+    /* ============================================================ preparación (para poder empezar cualquier parte) */
+    function asegurarDatosPago() { if (!S.conj.nequi) { S.conj.nequi = "3001234567"; S.conj.titular = "Conjunto Los Robles PH"; S.conj.modo = "whatsapp"; S.conj.wa = "3001234567"; } }
+    function asegurarServicio() { if (!S.servicios.some((s) => s.recurrente)) S.servicios.push({ id: nuevoId("sv"), nombre: "Administración", valor: 180000, reparto: "fijo", recurrente: true }); }
+    function asegurarCobroMes() {
+      asegurarServicio();
+      const vence = new Date(AHORA.getFullYear(), AHORA.getMonth(), S.conj.diaVence || 10);
+      S.servicios.filter((s) => s.recurrente).forEach((s) => S.casas.forEach((c) => {
+        if (!S.cobros.some((x) => x.casa === c.codigo && x.serv === s.id && x.periodo === PER)) S.cobros.push({ id: nuevoId("cb"), casa: c.codigo, desc: s.nombre, serv: s.id, periodo: PER, vence, monto: s.valor, pagado: 0 });
+      }));
+    }
+    function asegurarPagoAna() { if (!S.pagos.some((p) => p.id === "pana" && p.estado === "por_validar")) S.pagos = S.pagos.filter((p) => p.id !== "pana").concat([{ id: "pana", casa: "101", monto: deuda("101") || 180000, metodo: "Nequi", ref: "M4455120", estado: "por_validar", at: new Date() }]); }
+    function asegurarPase() { if (!paseActivo()) crearPase({ nombre: "Jesús Casillas", doc: "1033445566", tel: "3105556677", tipo: "visita", plazo: "1d" }); }
+    function asegurarVisita() { if (!S.visitas.some((x) => x.estado === "esperado")) S.visitas.push({ id: nuevoId("vi"), casa: "101", nombre: "Carlos Ruiz", tipo: "tecnico", nota: "Viene a arreglar la nevera", estado: "esperado", at: new Date() }); }
+    function asegurarComunicado() { if (!S.comunicados.length) S.comunicados.push({ titulo: "Corte de agua el sábado", cuerpo: "El sábado de 8 am a 12 m no habrá agua por mantenimiento del tanque.", imp: true, at: new Date() }); }
+    function asegurarMovimiento() { if (!S.log.length) registrar("Carlos Ruiz", "101", "entrada", "Técnico · anunciado por la casa"); }
+
+    /* ============================================================ el recorrido: partes y pasos */
+    const T = (tab, nombre, texto) => ({ tipo: "click", sel: '.tab[data-tab="' + tab + '"]', titulo: 'Pica la pestaña "' + nombre + '"', texto: texto });
+    const K = (sel, titulo, texto) => ({ tipo: "click", sel, titulo, texto });
+    const W = (sel, valor, titulo, texto) => ({ tipo: "escribir", sel, valor, titulo, texto });
+    const I = (sel, titulo, texto, antes) => ({ tipo: "info", sel, titulo, texto, antes });
+    const ROL_TXT = { admin: "Administración", casa: "Casa 101 · residente", guardia: "Portería" };
+
+    const CAPS = {
+      "a-intro": { rol: "admin", tab: "resumen", titulo: "Conoce el panel", desc: "Eres Laura, la administradora del Conjunto Los Robles. Primero te mostramos qué ves apenas entras.", aprendiste: ["Leer los números del mes", "Ver quién no ha pagado", "Dónde están las secciones"],
+        pasos: [I("#r-kpis", "Tus números del mes", "Lo que entró, lo que deben las casas, cómo va la caja y cuántas casas están al día. Se actualiza solo."),
+          I("#card-recaudo", "La gráfica", "Cómo se ha recogido la plata en los últimos meses. Más larga la barra, más plata."),
+          I("#card-morosos", "Quién no ha pagado", "Esta lista te dice qué casas deben y cuánto. Rojo es mora: ya se le pasó la fecha."),
+          I(".tabs", "Las pestañas", "Cada botón de arriba es una parte del conjunto. Vamos a pasar por TODAS, una por una.")] },
+      "a-ajustes": { rol: "admin", tab: "resumen", titulo: "Dónde te pagan", desc: "Antes de cobrar, deja listos los datos para que las casas sepan a dónde mandar la plata.", aprendiste: ["Poner tu Nequi y el titular", "Elegir cómo llegan los comprobantes", "Guardar los ajustes"],
+        pasos: [T("ajustes", "Ajustes", "Aquí se configura todo el conjunto."),
+          W("#aj-nequi", "3001234567", "Escribe tu Nequi", "Este es el número donde las casas te van a pagar."),
+          W("#aj-titular", "Conjunto Los Robles PH", "¿A nombre de quién está?", "Así la casa sabe que está pagando a la cuenta correcta."),
+          K("#aj-modo-whatsapp", "¿Cómo te mandan el comprobante?", 'Pica "Por WhatsApp": la casa te envía la foto del pago a tu celular.'),
+          W("#aj-wa", "3001234567", "Tu WhatsApp", "A este número llegan las fotos de los comprobantes."),
+          I("#aj-qr", "QR de pago (opcional)", "Si tu banco te dio un QR para recibir plata, lo subes aquí y las casas lo escanean."),
+          K("#aj-guardar", "Guarda", 'Pica "Guardar ajustes". Sin esto no se publica nada.')] },
+      "a-servicios": { rol: "admin", tab: "resumen", titulo: "Servicios y cuotas", desc: "Un servicio es lo que se cobra: administración, parqueadero… Lo creas una vez y se cobra solo cada mes.", aprendiste: ["Crear un servicio", "Las 5 formas de repartir", "Usar las ideas listas"],
+        pasos: [T("servicios", "Servicios", "Aquí está el catálogo de lo que cobras."),
+          I("#s-plantillas", "Ideas listas", "Servicios comunes en conjuntos. Si picas uno, el formulario se llena solo."),
+          K("#s-nuevo", "Crea tu primer servicio", 'Pica "Nuevo servicio".'),
+          W("#sv-nombre", "Administración", "¿Cómo se llama?", "Escribe el nombre del servicio."),
+          K("#sv-rep-fijo", "¿Cómo se reparte?", '"Fijo por casa": todas pagan lo mismo. También puedes dividir un total, por coeficiente, solo algunas casas o a mano.'),
+          W("#sv-valor", "180000", "¿Cuánto paga cada casa?", "Escribe solo números, sin puntos."),
+          I("#sv-recurrente", "Se cobra cada mes", 'Con esto marcado, entra en el botón "Generar servicios del mes".'),
+          K("#sv-guardar", "Guarda el servicio", 'Pica "Guardar servicio".'),
+          I("#s-lista", "¡Listo!", "Aquí quedan tus servicios. Los puedes editar cuando quieras.")] },
+      "a-casas": { rol: "admin", tab: "resumen", titulo: "Las casas", desc: "Carga todas las casas de una vez, crea sus usuarios y mira quién debe.", aprendiste: ["Importar casas pegando una lista", "Crear usuarios automáticos", "Filtrar y ver el estado de cuenta"],
+        pasos: [T("casas", "Casas", "Aquí están todas las casas del conjunto."),
+          K("#k-importar", "Carga varias casas de una", "No tienes que crearlas una por una."),
+          I("#imp-texto", "Pega tu lista", "Una línea por casa: código ; propietario ; teléfono. La puedes copiar de Excel. Ya te dejamos un ejemplo."),
+          K("#imp-ok", "Importa", 'Pica "Importar casas".'),
+          K("#k-auto", "Usuarios automáticos", "Crea usuario y clave para cada casa en un solo clic."),
+          K("#auto-ok", "Confirma", 'Pica "Sí, crear usuarios".'),
+          I("#auto-res", "Entrégale esto a cada casa", "Cada casa entra con su usuario y su clave. Puedes copiar la lista y mandarla por WhatsApp."),
+          K("#auto-cerrar", "Cierra", 'Pica "Listo".'),
+          K("#kf-pendiente", "Filtra", 'Pica "No han pagado" para ver solo las casas que deben.'),
+          K("#k-ver-103", "Mira una casa por dentro", 'Pica "Estado de cuenta" de la casa 103.'),
+          I("#ec-detalle", "Estado de cuenta", "Todo lo que debe y lo que ha pagado, mes por mes. Cuando esté al día, desde aquí sale el paz y salvo."),
+          K("#ec-cerrar", "Cierra", 'Pica "Cerrar".')] },
+      "a-cobros": { rol: "admin", tab: "resumen", titulo: "Cobrar", desc: "Cobra el mes con un clic, crea un cobro especial y aplica la mora.", aprendiste: ["Generar los cobros del mes sin duplicar", "Hacer un cobro especial con vista previa", "Aplicar intereses de mora"], prep: asegurarServicio,
+        pasos: [T("cobros", "Cobros", "Aquí se le cobra a las casas."),
+          K("#gm-btn", "Cobra el mes en un clic", "Crea la cuota de cada servicio para todas las casas. Si lo vuelves a picar, no se repite."),
+          I("#c-tabla", "Cobros creados", "Mira: cada casa ya tiene su cobro de este mes."),
+          W("#g-nombre", "Arreglo de fachada", "Ahora un cobro especial", "Para algo que no es de todos los meses. Escribe el nombre."),
+          W("#g-monto", "600000", "Valor total", "Lo que cuesta todo el arreglo."),
+          K("#g-rep-igual", "Repártelo igual", "El total se divide entre todas las casas."),
+          K("#g-previa", "Mira antes de cobrar", 'Pica "Vista previa". No se cobra nada todavía.'),
+          I("#pv-tabla", "Vista previa", "Así le quedaría a cada casa."),
+          K("#pv-cerrar", "Se ve bien", 'Pica "Entendido".'),
+          K("#g-generar", "Ahora sí, cobra", 'Pica "Generar cobro".'),
+          K("#mora-btn", "Intereses de mora", "Suma el interés de Ajustes solo a lo que ya se venció."),
+          K("#mora-ok", "Confirma", 'Pica "Sí, aplicar". Si lo picas otra vez este mes, no cobra doble.'),
+          I("#c-buscador", "Busca y filtra", "Busca por casa o servicio, filtra por estado y descarga la tabla para Excel.")] },
+      "a-usuarios": { rol: "admin", tab: "resumen", titulo: "Usuarios", desc: "Crea el usuario del vigilante para que use la portería.", aprendiste: ["Crear un usuario de portería", "Ver todos los accesos"],
+        pasos: [T("usuarios", "Usuarios", "Aquí ves quién puede entrar al sistema."),
+          K("#u-nuevo", "Nuevo usuario", 'Pica "Nuevo usuario".'),
+          K("#us-rol-guardia", "¿Qué tipo de usuario?", 'Elige "Portería": el vigilante.'),
+          W("#us-usuario", "porteria.robles", "Usuario", "Con esto entra el vigilante."),
+          W("#us-nombre", "Vigilancia turno día", "Nombre", "Para que sepas quién es."),
+          W("#us-clave", "Robles2026", "Clave", "Una clave fácil de recordar para él."),
+          K("#us-guardar", "Créalo", 'Pica "Crear usuario".'),
+          I("#u-lista", "Todos los accesos", "Administradores, casas y portería. A cualquiera le puedes cambiar la clave o bloquearlo.")] },
+      "a-comunicados": { rol: "admin", tab: "resumen", titulo: "Comunicados", desc: "Publica un aviso para todas las casas.", aprendiste: ["Escribir y publicar un comunicado", "Marcarlo como importante"],
+        pasos: [T("comunicados", "Comunicados", "Avisos para todo el conjunto."),
+          W("#com-titulo", "Corte de agua el sábado", "Título", "Corto y claro."),
+          W("#com-cuerpo", "El sábado de 8 am a 12 m no habrá agua por mantenimiento del tanque.", "Mensaje", "Lo que necesitan saber."),
+          K("#com-imp-lbl", "¿Es importante?", "Márcalo y saldrá resaltado en amarillo."),
+          K("#com-publicar", "Publica", 'Pica "Publicar".'),
+          I("#o-lista", "Publicado", "Todas las casas lo ven en su pestaña Avisos, con un pitido suave.")] },
+      "c-cuenta": { rol: "casa", tab: "cuenta", titulo: "Ver y pagar lo que debo", desc: "Ahora eres Ana, de la Casa 101. Esto es lo que ve un residente en su celular.", aprendiste: ["Ver cuánto debes", "Copiar los datos de pago", "Avisar que ya pagaste"], prep: () => { asegurarDatosPago(); asegurarCobroMes(); },
+        pasos: [I("#saldo", "Lo que debes", "Aquí ves de una cuánto debes. Si estás al día, sale en verde."),
+          I("#pendientes", "Detalle", "Cada cobro con su mes y su fecha límite."),
+          K("#pagar", "Paga", 'Pica "Pagar / reportar pago".'),
+          I("#pg-datos", "¿Dónde pago?", "Estos son los datos que puso la administración."),
+          K("#pg-copiar-0", "Copia el número", 'Pica "Copiar" y lo pegas en tu app de Nequi.'),
+          W("#pg-ref", "M4455120", "Número de la transacción", "Lo encuentras en el comprobante de Nequi."),
+          I("#pg-wa", "Comprobante por WhatsApp", "Este botón abre WhatsApp con el mensaje listo para mandar la foto del pago."),
+          K("#pg-enviar", "Avisa que pagaste", 'Pica "Ya pagué: avisar".'),
+          I("#pagos", "En revisión", 'Tu pago queda "Por validar" hasta que la administración lo confirme.')] },
+      "a-pagos": { rol: "admin", tab: "resumen", titulo: "Validar pagos", desc: "Volviste a ser la administradora. Ana acaba de avisar que pagó.", aprendiste: ["Aprobar un pago reportado", "Registrar un pago en efectivo"], prep: () => { asegurarDatosPago(); asegurarCobroMes(); asegurarPagoAna(); },
+        pasos: [T("pagos", "Pagos", "El número rojo te dice cuántos pagos esperan revisión."),
+          I("#p-lista", "Pagos por validar", "Aquí llegan los pagos que reportan las casas. Revisa en tu Nequi que sí llegó."),
+          K("#pg-aprobar-pana", "Aprueba el pago de Ana", 'Pica "Aprobar" en el pago de la casa 101.'),
+          K("#ap-ok", "Confirma", 'Pica "Sí, llegó: aprobar".'),
+          I("#p-lista", "Se aplica solo", "El pago se descuenta de la deuda más vieja de la casa. Si sobra, queda a favor."),
+          K("#p-nuevo", "¿Te pagaron en efectivo?", 'Pica "Registrar pago".'),
+          K("#rp-casa-105", "Elige la casa", "Pica la casa 105."),
+          W("#rp-monto", "180000", "¿Cuánto te dio?", "Escribe el valor."),
+          K("#rp-met-efectivo", "¿Cómo pagó?", 'Pica "Efectivo".'),
+          K("#rp-guardar", "Registra", 'Pica "Registrar pago". Queda aprobado de una.')] },
+      "c-qr": { rol: "casa", tab: "cuenta", titulo: "Mi QR de entrada", desc: "Cada persona de la casa tiene un QR para entrar y salir sin que el vigilante llame.", aprendiste: ["Agregar a alguien de la familia", "Mostrar el QR que cambia solo", "Por qué una captura no sirve"],
+        pasos: [T("miqr", "Mi QR", "Los QR de la familia."),
+          K("#r-nuevo", "Agrega a alguien", 'Pica "+ Agregar persona".'),
+          W("#res-nombre", "Sofía Ramírez", "Nombre", "La hija de Ana."),
+          K("#res-guardar", "Guárdala", 'Pica "Agregar".'),
+          K("#r-lista .item:last-child [data-act=verQR]", "Muestra su QR", 'Pica "Mostrar QR" de Sofía.'),
+          I("#qr-caja", "El QR de entrada", "Se lo muestras al vigilante para entrar y para salir."),
+          I("#qr-reloj", "El reloj", "Cada 30 segundos sale un QR nuevo. Por eso una foto o captura de pantalla NO sirve."),
+          K("#qr-tapar", "Prueba la protección", "Si sales de la app o cambias de pantalla, el QR se tapa solo. Pica aquí para verlo."),
+          K("#qr-tapa", "Muéstralo otra vez", "Toca el cuadro para volver a ver el QR."),
+          K(".modal-x", "Cierra", "Pica la X.")] },
+      "c-invitados": { rol: "casa", tab: "cuenta", titulo: "Pase QR para un invitado", desc: "Viene Jesús de visita. Le vas a hacer un pase QR y se lo mandas por WhatsApp.", aprendiste: ["Llenar los datos del invitado", "Elegir el plazo para entrar y salir", "Confirmar y enviar el pase"],
+        pasos: [T("invitados", "Invitados", "Aquí se hacen los pases para visitas."),
+          K("#pt-visita", "¿Quién viene?", 'Pica "Visita".'),
+          W("#ps-nombre", "Jesús Casillas", "Nombre del invitado", "Así lo ve el vigilante."),
+          W("#ps-tel", "3105556677", "Su WhatsApp", "Si lo tiene, le mandas el QR. Si no, se puede dejar vacío."),
+          K("#pl-1d", "¿Por cuánto tiempo?", 'Pica "1 día". En ese plazo puede salir y volver a entrar las veces que quiera, por ejemplo a comprar algo.'),
+          I("#p-resumen", "Revisa el resumen", "Te dice clarito hasta cuándo vale."),
+          K("#ps-crear", "Crea el pase", 'Pica "Crear pase".'),
+          I("#psc-datos", "Confirma que llega", "Revisa nombre y plazo. Esto evita errores."),
+          K("#psc-si", "Confirma", 'Pica "Sí, llega esta persona".'),
+          I("#psr-tarjeta", "¡Este es el pase!", "Una tarjeta con el QR, el nombre y hasta cuándo vale."),
+          K("#psr-wa", "Envíalo", 'Pica "Enviar por WhatsApp". Si no tiene WhatsApp, usas "No enviar, solo guardar".'),
+          I("#p-lista", "Tus pases", "Aquí ves los vigentes. Puedes reenviarlo o cancelarlo; si lo cancelas, el QR deja de servir.")] },
+      "c-visitas": { rol: "casa", tab: "cuenta", titulo: "Anunciar una visita", desc: "Viene el técnico de la nevera. Lo anuncias y portería lo deja pasar sin llamarte.", aprendiste: ["Anunciar a alguien que viene", "Ver tus visitas"],
+        pasos: [T("visitas", "Visitas", "Para avisar que viene alguien."),
+          W("#vi-nombre", "Carlos Ruiz", "¿Quién viene?", "Su nombre."),
+          W("#vi-nota", "Viene a arreglar la nevera", "Nota para portería", "Cualquier detalle útil."),
+          K("#vi-anunciar", "Anúncialo", 'Pica "Anunciar visita".'),
+          I("#v-lista", "Anunciado", 'Portería ya lo ve en "Autorizados".')] },
+      "g-escanear": { rol: "guardia", tab: "escanear", titulo: "Escanear QR en portería", desc: "Ahora eres el vigilante. Jesús llegó con su pase QR.", aprendiste: ["Leer un QR con la cámara", "Revisar los datos en 2 pasos", "Registrar entrada y salida con el mismo QR", "Escribir el código a mano", "Reconocer un pase falso"], prep: asegurarPase,
+        pasos: [I("#contadores", "Tus números", "Autorizados, quién está adentro, quién espera respuesta y paquetes."),
+          K("#esc-abrir", "Abre la cámara", 'Pica "Abrir cámara".'),
+          I("#esc-cam", "Apunta al QR", "En la vida real apuntas al celular del invitado. Aquí te mostramos el pase de Jesús."),
+          K("#sim-leer", "Lee el QR", 'Pica "Leer este QR".'),
+          I("#esc-estado", "PUEDE ENTRAR", "Verde: el pase es válido y está dentro del plazo."),
+          I("#esc-datos", "Compara los datos", "Mira a la persona: ¿es el mismo nombre? ¿Coincide el documento o la placa?"),
+          K("#esc-coincide", "Paso 1 de 2", 'Si todo coincide, pica "Sí, los datos son correctos".'),
+          K("#esc-usar", "Paso 2 de 2", 'Pica "Confirmar ENTRADA".'),
+          I("#esc-estado", "¡Entrada registrada!", "Quedó la hora guardada."),
+          K("#esc-otro", "Sigue", 'Pica "Escanear otro".'),
+          I("#esc-manual", "¿No funciona la cámara?", "Escribe los 14 números que salen debajo del QR."),
+          W("#esc-codigo", () => (paseActivo() || {}).codigo || PASE_GUIA, "Jesús va de salida", "Escribe el código de su pase."),
+          K("#esc-revisar", "Revisa", 'Pica "Revisar".'),
+          I("#esc-estado", "VA A SALIR", "El mismo QR sirve para salir. Como Jesús está adentro, el sistema sabe que ahora sale."),
+          K("#esc-coincide", "Paso 1 de 2", "Los datos coinciden."),
+          K("#esc-usar", "Paso 2 de 2", 'Pica "Confirmar SALIDA".'),
+          K("#esc-otro", "Sigue", 'Pica "Escanear otro".'),
+          W("#esc-codigo", "11112222333344", "Prueba un código falso", "Como si alguien llegara con un pase inventado."),
+          K("#esc-revisar", "Revisa", 'Pica "Revisar".'),
+          I("#esc-estado", "NO VÁLIDO", "Rojo: no lo dejes pasar. Puede ser falso, vencido o cancelado por la casa."),
+          K("#esc-otro", "Listo", 'Pica "Escanear otro".')] },
+      "g-autorizados": { rol: "guardia", tab: "escanear", titulo: "Visitas anunciadas", desc: "Carlos, el técnico que anunció la casa 101, llegó a portería.", aprendiste: ["Registrar la entrada de un autorizado", "Registrar su salida"], prep: asegurarVisita,
+        pasos: [T("esperados", "Autorizados", "Los que anunciaron las casas."),
+          I("#e-lista", "Ya lo esperaban", "La casa lo anunció. No tienes que llamar."),
+          K("#e-lista [data-act=entro]", "Llegó", 'Pica "Entró".'),
+          T("adentro", "Adentro", "Quién está adentro ahora mismo."),
+          I("#a-lista", "Aquí está", "Carlos aparece adentro con la hora de entrada."),
+          K("#a-lista [data-act=salio]", "Ya se fue", 'Pica "Salió".')] },
+      "g-anunciar": { rol: "guardia", tab: "escanear", titulo: "Llegó alguien sin anunciar", desc: "Llegó un domiciliario para la casa 101 y nadie lo anunció. Le preguntas a la casa desde aquí.", aprendiste: ["Preguntarle a una casa", "Cómo responde la casa", "Ver la respuesta en portería"],
+        pasos: [T("anunciar", "Llegó alguien", "Para los que no estaban anunciados."),
+          W("#n-buscar", "101", "Busca la casa", "Escribe el número o el nombre del dueño."),
+          K("#n-casa-101", "Elige la casa", "Pica la casa 101."),
+          K("#nt-domicilio", "¿Qué es?", 'Pica "Domicilio".'),
+          W("#an-nombre", "Pedro (Rappi)", "Nombre", "Cómo se llama."),
+          K("#an-preguntar", "Pregunta", 'Pica "Preguntar a la casa".'),
+          I("#n-espera", "Esperando respuesta", "A la casa le suena un pitido en el celular."),
+          I(null, "Ahora eres la Casa 101", "Mira lo que le aparece a Ana en su celular.", () => irA("casa", "cuenta")),
+          I("#por-autorizar", "¡Portería pregunta!", "Arriba sale el aviso con el nombre de quien llegó."),
+          K("#aut-si", "Déjalo entrar", 'Pica "Sí, que entre".'),
+          I(null, "De vuelta en portería", "Volviste a ser el vigilante.", () => irA("guardia", "anunciar")),
+          I("#respuestas", "La casa respondió", "Sale en verde: lo puedes dejar entrar. Ya quedó registrado.")] },
+      "g-paquetes": { rol: "guardia", tab: "escanear", titulo: "Paquetes", desc: "Llegó una caja para la casa 101.", aprendiste: ["Registrar un paquete", "Cómo se entera la casa", "Marcarlo como entregado"], prep: asegurarComunicado,
+        pasos: [T("paquetes", "Paquetes", "Lo que llega a portería."),
+          K("#q-casa-101", "¿Para qué casa?", "Pica la casa 101."),
+          W("#pq-desc", "Caja mediana", "¿Qué es?", "Descríbelo corto."),
+          W("#pq-empresa", "Servientrega", "¿Quién lo trajo?", "Es opcional."),
+          K("#pq-registrar", "Regístralo", 'Pica "Registrar paquete".'),
+          I(null, "Mira lo que ve la casa", "Ahora eres Ana un momento.", () => irA("casa", "avisos")),
+          I("#paquetes", "Le llegó el aviso", "La casa ve su paquete y sabe que lo tiene que recoger."),
+          I("#comunicados", "Y los comunicados", "Aquí mismo ve lo que publica la administración."),
+          I(null, "De vuelta en portería", "Ana bajó por su paquete.", () => irA("guardia", "paquetes")),
+          K("#p-lista [data-act=entregar]", "Entrégalo", 'Pica "Entregado".')] },
+      "g-recientes": { rol: "guardia", tab: "escanear", titulo: "Lo que pasó hoy", desc: "Una última mirada a la portería.", aprendiste: ["Ver salidas y no autorizados"], prep: asegurarMovimiento,
+        pasos: [T("recientes", "Recientes", "Lo de las últimas 48 horas."),
+          I("#r-lista", "Historial", "Salidas y no autorizados, por si alguien pregunta.")] },
+      "a-caja": { rol: "admin", tab: "resumen", titulo: "Caja del conjunto", desc: "Otra vez eres la administradora. Vas a anotar un gasto.", aprendiste: ["Registrar un gasto", "Ver el balance de la caja"],
+        pasos: [T("caja", "Caja", "La plata que entra y sale."),
+          I("#m-kpis", "El balance", "Lo que entró, lo que salió y lo que queda."),
+          K("#m-nuevo", "Anota un gasto", 'Pica "Registrar movimiento".'),
+          K("#mv-egreso", "¿Entró o salió plata?", 'Pica "Salió plata".'),
+          W("#mv-concepto", "Pago vigilancia", "¿Qué se pagó?", "Escribe el concepto."),
+          W("#mv-monto", "2500000", "¿Cuánto?", "Solo números."),
+          K("#mv-guardar", "Guarda", 'Pica "Guardar".'),
+          I("#m-lista", "Anotado", "Queda en la lista y el balance se actualiza.")] },
+      "a-porteria": { rol: "admin", tab: "resumen", titulo: "Historial de portería", desc: "Todo lo que hizo el vigilante lo ves tú también.", aprendiste: ["Ver entradas y salidas", "Ver los paquetes"], prep: asegurarMovimiento,
+        pasos: [T("porteria", "Portería", "El historial de la portería."),
+          I("#v-lista", "Entradas y salidas", "Cada movimiento con fecha y hora."),
+          K("#vv-paquetes", "Paquetes", 'Pica "Paquetes".'),
+          I("#v-lista", "Paquetes", "Los que llegaron y si ya se entregaron.")] },
+      "a-reportes": { rol: "admin", tab: "resumen", titulo: "Reportes en PDF", desc: "Saca informes para la asamblea o el contador.", aprendiste: ["Elegir el rango de fechas", "Descargar un informe en PDF"],
+        pasos: [T("reportes", "Reportes", "11 informes listos."),
+          K("#rr-mes", "Elige el rango", 'Pica "Este mes".'),
+          I("#rp-lista", "Los informes", "Cartera, recaudo, estado de cuenta, paz y salvo, caja, visitas y más."),
+          K("#rp-btn-cartera", "Descarga uno", 'Pica "Descargar PDF" en Cartera por casa.'),
+          I("#rpv-doc", "Así sale el PDF", 'Se abre listo para "Guardar como PDF" o imprimir.'),
+          K("#rpv-cerrar", "Cierra", 'Pica "Cerrar".')] },
+      "a-plan": { rol: "admin", tab: "resumen", titulo: "Mi plan", desc: "El pago del servicio del sistema.", aprendiste: ["Ver hasta cuándo tienes el servicio", "Reportar el pago de tu plan"],
+        pasos: [T("suscripcion", "Mi plan", "Tu suscripción."),
+          I("#s-kpis", "Tu plan", "Hasta cuándo tienes el servicio. Te avisamos antes de que se venza."),
+          I("#s-pago", "Paga tu plan", "Copias los datos y pagas desde tu banco."),
+          W("#sus-ref", "M9988776", "Número de la transacción", "Del comprobante."),
+          K("#sus-enviar", "Reporta", 'Pica "Reportar pago".'),
+          I("#s-historial", "Listo", "Cuando se confirme, la fecha se extiende sola.")] },
+    };
+    const ORDEN = ["a-intro", "a-ajustes", "a-servicios", "a-casas", "a-cobros", "a-usuarios", "a-comunicados", "c-cuenta", "a-pagos", "c-qr", "c-invitados", "c-visitas", "g-escanear", "g-autorizados", "g-anunciar", "g-paquetes", "g-recientes", "a-caja", "a-porteria", "a-reportes", "a-plan"];
+    const RUTAS = {
+      todo: { ids: ORDEN, nombre: "Todo el recorrido", texto: "Administración, casa y portería, en el orden en que pasan las cosas de verdad.", ico: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.9 7.5.7-5.7 5 1.7 7.4L12 18l-6.5 4 1.7-7.4-5.7-5 7.5-.7z"/></svg>', top: true },
+      admin: { ids: ORDEN.filter((k) => k[0] === "a"), nombre: "Soy administrador", texto: "Cobros, pagos, casas, caja, reportes, usuarios y más.", ico: "AD" },
+      casa: { ids: ORDEN.filter((k) => k[0] === "c"), nombre: "Soy residente", texto: "Pagar, mi QR, pases para invitados y visitas.", ico: "CS" },
+      guardia: { ids: ORDEN.filter((k) => k[0] === "g"), nombre: "Soy portería", texto: "Escanear QR, autorizados, preguntar a la casa y paquetes.", ico: "PT" },
+    };
+
+    /* ============================================================ motor de la guía */
+    const Guia = (() => {
+      const capa = $("#g-capa");
+      let ruta = [], ci = 0, pasos = [], pi = 0, objetivo = null, reloj = null, token = 0, activo = false;
+      const hechos = new Set();
+      const actual = () => (activo ? pasos[pi] : null);
+      const buscar = (p) => document.querySelector(typeof p.sel === "function" ? p.sel() : p.sel);
+      const valorDe = (p) => (typeof p.valor === "function" ? p.valor() : p.valor);
+
+      function esObjetivo(el) { const p = actual(); return !!(p && p.tipo === "click" && objetivo && (objetivo === el || objetivo.contains(el))); }
+      function avanzarPronto() { const t = token; setTimeout(() => { if (t === token) siguiente(); }, 320); }
+      function parar() { if (reloj) { clearInterval(reloj); reloj = null; } }
+
+      function barra() {
+        $("#g-barra").hidden = false; $("#g-barra-volver").hidden = activo;
+        $("#g-barra-txt").textContent = activo ? "Parte " + (ci + 1) + " de " + ruta.length + " · " + CAPS[ruta[ci]].titulo : "Modo libre";
+      }
+      function iniciar(ids, desde) { ruta = ids; ci = desde || 0; abrir(); }
+      function abrir() {
+        const cap = CAPS[ruta[ci]];
+        activo = true; $("#g-inicio").hidden = true; $("#g-mapa").hidden = true; capa.hidden = false;
+        if (cap.prep) cap.prep();
+        irA(cap.rol, cap.tab);
+        pasos = [{ tipo: "info", sel: null, intro: true, titulo: cap.titulo, texto: cap.desc }].concat(cap.pasos);
+        pi = 0; barra(); mostrar();
+      }
+      function siguiente() { if (!activo) return; pi++; if (pi >= pasos.length) return fin(); mostrar(); }
+      function mostrar() {
+        token++; parar(); objetivo = null;
+        const p = pasos[pi];
+        if (p.antes) p.antes();
+        if (!p.sel) return dibujar(null, p);
+        esperar(p, 0, token);
+      }
+      function esperar(p, n, t) {
+        if (t !== token) return;
+        const el = buscar(p);
+        if (!el) { if (n > 50) return dibujar(null, p); return setTimeout(() => esperar(p, n + 1, t), 80); }
+        objetivo = el;
+        el.scrollIntoView({ block: "center", inline: "nearest", behavior: "auto" });
+        dibujar(el, p);
+      }
+
+      function burbuja(p) {
+        const cap = CAPS[ruta[ci]];
+        const total = pasos.length - 1;
+        let pista = "", btns = "";
+        if (p.intro) btns = '<button class="g-btn am" type="button" data-g="ok">¡Vamos!</button>';
+        else if (p.tipo === "click") pista = '<div class="g-pista">Pica donde brilla en amarillo</div>';
+        else if (p.tipo === "escribir") {
+          pista = '<div class="g-pista">Escribe: <code>' + esc(valorDe(p)) + "</code></div>";
+          btns = '<button class="g-btn cl" type="button" data-g="auto">Escríbelo por mí</button><button class="g-btn am" type="button" data-g="ok" id="g-sig" disabled>Siguiente</button>';
+        } else btns = '<button class="g-btn am" type="button" data-g="ok">Entendido</button>';
+        return '<div class="g-burbuja' + (objetivo ? "" : " centro") + '" id="g-burbuja" role="dialog" aria-live="polite" aria-label="Guía">' +
+          '<div class="g-cab"><span class="g-rol">' + ROL_TXT[S.rol] + "</span><span>" + (p.intro ? "Parte " + (ci + 1) + " de " + ruta.length : "Paso " + pi + " de " + total) + "</span></div>" +
+          "<h4>" + esc(p.titulo) + "</h4><p>" + esc(p.texto) + "</p>" + pista + (btns ? '<div class="g-btns">' + btns + "</div>" : "") +
+          '<div class="g-prog"><i style="width:' + Math.round((pi / total) * 100) + '%"></i></div>' +
+          '<div class="g-pie"><span>' + esc(cap.titulo) + '</span><span><button type="button" data-g="saltar">Saltar esta parte</button></span></div></div>';
+      }
+      function dibujar(el, p) {
+        const flecha = '<svg class="g-flecha abajo" id="g-flecha" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 22 3 11h6V2h6v9h6z"/></svg>';
+        capa.innerHTML = (el ? '<div class="g-bloq" data-b="t"></div><div class="g-bloq" data-b="b"></div><div class="g-bloq" data-b="l"></div><div class="g-bloq" data-b="r"></div><div class="g-foco' + (p.tipo === "click" ? "" : " info") + '" id="g-foco"></div>' + (p.tipo === "click" ? flecha : "") : '<div class="g-bloq" style="inset:0"></div>') + burbuja(p);
+        if (el) { posicionar(); reloj = setInterval(posicionar, 90); }
+        if (p.tipo === "escribir") {
+          const inp = objetivo;
+          if (inp) { setTimeout(() => inp.focus({ preventScroll: true }), 350); inp.onkeydown = (e) => { if (e.key === "Enter" && inp.value.trim()) { e.preventDefault(); siguiente(); } }; }
+        } else { const b = capa.querySelector("[data-g=ok]"); if (b) setTimeout(() => b.focus({ preventScroll: true }), 50); }
+      }
+      function posicionar() {
+        const p = actual(); if (!p) return;
+        if (!objetivo || !document.contains(objetivo)) { const nuevo = buscar(p); if (!nuevo) return; objetivo = nuevo; }
+        const r = objetivo.getBoundingClientRect(), W = innerWidth, H = innerHeight, pad = 6;
+        const t = Math.max(0, r.top - pad), b = Math.min(H, r.bottom + pad), l = Math.max(0, r.left - pad), d = Math.min(W, r.right + pad);
+        const set = (sel, css) => { const e = capa.querySelector(sel); if (e) Object.assign(e.style, css); };
+        set('[data-b="t"]', { left: "0", top: "0", width: W + "px", height: t + "px" });
+        set('[data-b="b"]', { left: "0", top: b + "px", width: W + "px", height: Math.max(0, H - b) + "px" });
+        set('[data-b="l"]', { left: "0", top: t + "px", width: l + "px", height: Math.max(0, b - t) + "px" });
+        set('[data-b="r"]', { left: d + "px", top: t + "px", width: Math.max(0, W - d) + "px", height: Math.max(0, b - t) + "px" });
+        set("#g-foco", { left: l + "px", top: t + "px", width: Math.max(0, d - l) + "px", height: Math.max(0, b - t) + "px" });
+        const bur = $("#g-burbuja"); if (!bur) return;
+        const bw = bur.offsetWidth, bh = bur.offsetHeight, hueco = p.tipo === "click" ? 56 : 14;
+        let top, abajo = true;
+        if (b + hueco + bh < H - 8) top = b + hueco;
+        else if (t - hueco - bh > 8) { top = t - hueco - bh; abajo = false; }
+        else { top = Math.max(8, H - bh - 8); abajo = top > r.top; }
+        const cx = Math.min(W - 24, Math.max(24, r.left + r.width / 2));
+        bur.style.top = top + "px"; bur.style.left = Math.min(W - bw - 8, Math.max(8, cx - bw / 2)) + "px";
+        const fl = $("#g-flecha");
+        if (fl) { fl.setAttribute("class", "g-flecha " + (abajo ? "arriba" : "abajo")); fl.style.left = cx + "px"; fl.style.top = (abajo ? b + 4 : t - 50) + "px"; }
+        if (p.tipo === "escribir") { const s = $("#g-sig"); if (s) s.disabled = !(objetivo.value || "").trim(); }
+      }
+      function escribirSolo() {
+        const p = actual(), el = objetivo; if (!el) return;
+        const texto = String(valorDe(p)); el.value = ""; el.focus({ preventScroll: true });
+        let i = 0;
+        const t = setInterval(() => {
+          el.value += texto[i++]; el.dispatchEvent(new Event("input", { bubbles: true }));
+          if (i >= texto.length) clearInterval(t);
+        }, 35);
+      }
+      function sacudir() {
+        const b = $("#g-burbuja"); if (!b) return;
+        b.classList.remove("sacude"); void b.offsetWidth; b.classList.add("sacude");
+        const f = $("#g-foco"); if (f) f.animate([{ opacity: 0.2 }, { opacity: 1 }], { duration: 300, iterations: 2 });
+      }
+      function fin() {
+        token++; parar(); objetivo = null; hechos.add(ruta[ci]); cerrarModal();
+        const cap = CAPS[ruta[ci]], sig = CAPS[ruta[ci + 1]];
+        capa.innerHTML = '<div class="g-bloq" style="inset:0"></div><div class="g-burbuja centro" id="g-burbuja" role="dialog" aria-label="Parte completada"><div class="g-estrellas" aria-hidden="true"><span></span><span></span><span></span></div>' +
+          '<h4 style="text-align:center">' + (sig ? "¡Parte completada!" : "¡Terminaste todo el recorrido!") + '</h4><p style="text-align:center">' + esc(cap.titulo) + '. Ahora ya sabes:</p><ul class="g-lista-ok">' + cap.aprendiste.map((a) => "<li>" + esc(a) + "</li>").join("") + "</ul>" +
+          (sig ? '<div class="g-pista">Sigue: ' + esc(sig.titulo) + " (" + ROL_TXT[sig.rol] + ")</div>" : '<p style="text-align:center">Ya puedes usar el sistema real sin miedo.</p>') +
+          '<div class="g-btns"><button class="g-btn cl" type="button" data-g="mapa">Ver el mapa</button>' + (sig ? '<button class="g-btn am" type="button" data-g="seguir">Seguir</button>' : '<button class="g-btn am" type="button" data-g="libre">Explorar libre</button>') + "</div></div>";
+        pitido(true); barra();
+      }
+      function libre() { activo = false; token++; parar(); capa.hidden = true; capa.innerHTML = ""; $("#g-mapa").hidden = true; $("#g-inicio").hidden = true; barra(); render(); }
+      function mapa() {
+        const grupos = [["admin", "Administración"], ["casa", "Casa (residente)"], ["guardia", "Portería"]];
+        $("#g-mapa-cont").innerHTML = grupos.map(([r, n]) => '<p class="g-mapa-grupo">' + n + '</p><div class="g-mapa-lista">' + ORDEN.filter((k) => CAPS[k].rol === r).map((k) =>
+          '<button type="button" data-cap="' + k + '" class="' + (hechos.has(k) ? "hecho" : "") + (activo && ruta[ci] === k ? " actual" : "") + '"><span class="g-num">' + (ORDEN.indexOf(k) + 1) + "</span><span><b>" + esc(CAPS[k].titulo) + "</b><small>" + CAPS[k].pasos.length + " pasos" + (hechos.has(k) ? " · hecha" : "") + "</small></span></button>").join("") + "</div>").join("");
+        $("#g-mapa").hidden = false;
+      }
+      function irParte(k) { if (ruta.includes(k)) { ci = ruta.indexOf(k); } else { ruta = ORDEN; ci = ORDEN.indexOf(k); } abrir(); }
+
+      capa.addEventListener("click", (e) => {
+        const g = e.target.closest("[data-g]");
+        if (!g) { if (e.target.closest(".g-bloq")) sacudir(); return; }
+        const a = g.dataset.g;
+        if (a === "ok") siguiente();
+        else if (a === "auto") escribirSolo();
+        else if (a === "seguir") { ci++; abrir(); }
+        else if (a === "saltar") { if (ci + 1 < ruta.length) { token++; ci++; abrir(); } else fin(); }
+        else if (a === "mapa") mapa();
+        else if (a === "libre") libre();
+      });
+      $("#g-barra-mapa").addEventListener("click", mapa);
+      $("#g-barra-volver").addEventListener("click", mapa);
+      $("#g-mapa-cerrar").addEventListener("click", () => { $("#g-mapa").hidden = true; });
+      $("#g-mapa-cont").addEventListener("click", (e) => { const b = e.target.closest("[data-cap]"); if (b) irParte(b.dataset.cap); });
+      $("#g-libre").addEventListener("click", libre);
+      $("#g-reiniciar").addEventListener("click", () => {
+        S = datosIniciales(); S.qrVivos = {}; S.resAdentro = new Set(); hechos.clear();
+        activo = false; token++; parar(); capa.hidden = true; $("#g-mapa").hidden = true; $("#g-barra").hidden = true; $("#g-inicio").hidden = false; render();
+      });
+      return { esObjetivo, avanzarPronto, iniciar };
+    })();
+
+    /* ============================================================ pantalla de inicio */
+    $("#g-rutas").innerHTML = Object.entries(RUTAS).map(([k, r]) => '<button class="g-ruta' + (r.top ? " top" : "") + '" type="button" data-ruta="' + k + '"><span class="g-ico" aria-hidden="true">' + r.ico + "</span><b>" + r.nombre + "</b><span>" + r.texto + "</span><small>" + r.ids.length + " partes · " + r.ids.reduce((s, id) => s + CAPS[id].pasos.length, 0) + " pasos" + (r.top ? " · recomendado" : "") + "</small></button>").join("");
+    $("#g-rutas").addEventListener("click", (e) => { const b = e.target.closest("[data-ruta]"); if (b) { pitido(true); Guia.iniciar(RUTAS[b.dataset.ruta].ids); } });
+    render();
+  })();
+  </script>
+</body>
+</html>
